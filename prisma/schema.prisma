@@ -1,0 +1,105 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["saboaria"]
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@schema("saboaria")
+}
+
+// IN_STOCK | IN_PRODUCTION | OUT_OF_STOCK
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String
+  benefits    String?
+  ingredients String?
+  price       Float
+  salePrice   Float?
+  size        String?
+  imageUrl    String?
+  images      String[] @default([])
+  stockStatus String   @default("IN_STOCK")
+  stockQuantity Int    @default(0)
+  lowStockAlert Int    @default(3)
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  isFeatured  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@schema("saboaria")
+}
+
+model Settings {
+  id             String   @id @default("default")
+  whatsappNumber String?
+  heroImageUrl   String?
+  heroImages     String[] @default([])
+  adminPassword  String?
+  updatedAt      DateTime @updatedAt
+
+  @@schema("saboaria")
+}
+
+model Kit {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  price         Float
+  salePrice     Float?
+  imageUrl      String?
+  images        String[] @default([])
+  productIds    String[] @default([])
+  isActive      Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
+  stockQuantity Int      @default(0)
+  stockStatus   String   @default("IN_STOCK")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@schema("saboaria")
+}
+
+model PricingMaterial {
+  id          String   @id @default(uuid())
+  name        String
+  amountPaid  Float
+  quantity    Float
+  unit        String   @default("g")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@schema("saboaria")
+}
+
+model PricingRecipe {
+  id            String   @id @default(uuid())
+  name          String
+  productId     String?
+  batchYield    Int      @default(1)
+  profitMargin  Float    @default(100)
+  itemsJson     Json     @default("[]")
+  laborCost     Float    @default(0)
+  packagingCost Float    @default(0)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@schema("saboaria")
+}
