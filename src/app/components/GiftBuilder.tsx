@@ -464,7 +464,6 @@ export default function GiftBuilder({
               </div>
             )}
           </div>
-        </section>
 
         {bags && bags.length > 0 && (
           <section className="gift-section">
@@ -516,6 +515,7 @@ export default function GiftBuilder({
             </div>
           </section>
         )}
+        </section>
 
       {/* Resumo do presente */}
       <aside className="gift-summary">
