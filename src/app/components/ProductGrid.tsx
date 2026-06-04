@@ -311,6 +311,7 @@ export default function ProductGrid({
                         name: activeVariant ? `${selectedProduct.name} (${activeVariant.name})` : selectedProduct.name,
                         price: effectivePrice(selectedProduct, selectedVariantId),
                         imageUrl: (activeVariant?.imageUrl) || selectedProduct.imageUrl || "",
+                        stockStatus: activeVariant ? activeVariant.stockStatus : selectedProduct.stockStatus,
                       });
                       setSelectedProduct(null);
                     }}
@@ -469,6 +470,7 @@ export default function ProductGrid({
                               name: product.name,
                               price: effectivePrice(product),
                               imageUrl: product.imageUrl || product.images?.[0] || "",
+                              stockStatus: product.stockStatus,
                             });
                           }
                         }}

@@ -34,10 +34,22 @@ export default function CarrinhoPage() {
     linhas.push("");
     linhas.push("Gostaria de fazer este pedido:");
     linhas.push("");
-    linhas.push("━━━━━━━━━━━━━━━━━");
+    const hasReserva = items.some(i => i.stockStatus === "IN_PRODUCTION");
+    const hasProntaEntrega = items.some(i => i.stockStatus !== "IN_PRODUCTION");
+
+    if (hasReserva && hasProntaEntrega) {
+      linhas.push("📋 *MEU PEDIDO (Pronta Entrega + Reserva):*");
+    } else if (hasReserva) {
+      linhas.push("📋 *MINHA RESERVA DE PRODUTOS:*");
+    } else {
+      linhas.push("📋 *MEU PEDIDO:*");
+    }
+
     items.forEach((item, idx) => {
       const subtotal = item.price * item.quantity;
-      linhas.push(`🧼 *${item.name}*`);
+      const isReserva = item.stockStatus === "IN_PRODUCTION";
+      const nameLabel = isReserva ? `${item.name} (RESERVA)` : item.name;
+      linhas.push(`🧼 *${nameLabel}*`);
       linhas.push(`   ${item.quantity} un. × ${formatPrice(item.price)} = ${formatPrice(subtotal)}`);
       if (idx < items.length - 1) linhas.push("");
     });

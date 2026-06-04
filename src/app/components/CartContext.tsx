@@ -8,6 +8,7 @@ export type ProductItem = {
   price: number;
   imageUrl: string;
   quantity: number;
+  stockStatus?: string;
 };
 
 type CartContextType = {
