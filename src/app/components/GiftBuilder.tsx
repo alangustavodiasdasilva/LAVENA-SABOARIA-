@@ -65,12 +65,12 @@ export default function GiftBuilder({
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [senderName, setSenderName] = useState("");
-  const [senderPhone, setSenderPhone] = useState("");
   const [recipientName, setRecipientName] = useState("");
   const [cardMessage, setCardMessage] = useState("");
   const [extraNote, setExtraNote] = useState("");
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const closeDetailRef = useRef<HTMLButtonElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const purchasables = products.filter(isPurchasable);
   const activeKits = kits.filter((k) => k.isActive);
@@ -154,6 +154,8 @@ export default function GiftBuilder({
     if (totalUnits === 0) return;
     if (!senderName.trim()) {
       alert("Por favor, informe seu nome.");
+      nameInputRef.current?.focus();
+      nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -166,7 +168,7 @@ export default function GiftBuilder({
     const linhas: string[] = [];
     linhas.push("🎁 *Olá, Lavena!*");
     linhas.push("");
-    linhas.push(`Sou *${senderName.trim()}*${senderPhone.trim() ? ` (${senderPhone.trim()})` : ""} e gostaria de montar uma *sacola presente*${recipientName.trim() ? ` para *${recipientName.trim()}*` : ""}.`);
+    linhas.push(`Sou *${senderName.trim()}* e gostaria de montar uma *sacola presente*${recipientName.trim() ? ` para *${recipientName.trim()}*` : ""}.`);
     linhas.push("");
     linhas.push("━━━━━━━━━━━━━━━━━");
 
@@ -419,22 +421,13 @@ export default function GiftBuilder({
             <label>
               Seu nome <span className="required-mark">*</span>
               <input
+                ref={nameInputRef}
                 type="text"
                 className="admin-input"
                 value={senderName}
                 onChange={(e) => setSenderName(e.target.value)}
                 placeholder="Ex: Carla"
                 required
-              />
-            </label>
-            <label>
-              Seu WhatsApp <span className="text-muted">(opcional)</span>
-              <input
-                type="tel"
-                className="admin-input"
-                value={senderPhone}
-                onChange={(e) => setSenderPhone(e.target.value)}
-                placeholder="(11) 99999-9999"
               />
             </label>
 
@@ -505,7 +498,7 @@ export default function GiftBuilder({
 
           <button
             onClick={enviarPresente}
-            disabled={totalUnits === 0 || !senderName.trim()}
+            disabled={totalUnits === 0}
             className="btn btn-whatsapp gift-send-btn"
           >
             <MessageCircle size={18} /> Enviar pelo WhatsApp
@@ -525,7 +518,7 @@ export default function GiftBuilder({
             <span className="cart-sticky-label">{totalUnits} {totalUnits === 1 ? "item" : "itens"}</span>
             <span className="cart-sticky-value">{formatBRL(totalValue)}</span>
           </div>
-          <button onClick={enviarPresente} className="btn btn-whatsapp" disabled={!senderName.trim()}>
+          <button onClick={enviarPresente} className="btn btn-whatsapp">
             <MessageCircle size={18} /> Enviar
           </button>
         </div>

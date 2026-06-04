@@ -43,6 +43,9 @@ export default function Header() {
 
         {/* Mobile actions */}
         <div className="mobile-only header-mobile-actions">
+          <a href="/presente" className="cart-badge" aria-label="Monte seu presente" style={{ marginRight: '6px' }}>
+            <Gift size={18} />
+          </a>
           <a href="/carrinho" className="cart-badge" aria-label="Carrinho">
             <ShoppingBag size={18} />
             {totalItems > 0 && <span className="cart-count">{totalItems}</span>}

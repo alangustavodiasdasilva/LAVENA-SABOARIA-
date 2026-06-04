@@ -33,15 +33,43 @@ export default function Carousel({
 }: Props) {
   const validImages = images.filter(Boolean);
   const total = validImages.length;
-  const [index, setIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(true);
   const trackRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef(0);
 
+  // Criamos array com clones nas pontas para efeito infinito real
+  const slides = useMemo(() => {
+    if (total <= 1) return validImages;
+    return [validImages[total - 1], ...validImages, validImages[0]];
+  }, [validImages, total]);
+
+  const handleTransitionEnd = () => {
+    if (total <= 1) return;
+    if (currentIndex === 0) {
+      setIsTransitioning(false);
+      setCurrentIndex(total);
+    } else if (currentIndex === total + 1) {
+      setIsTransitioning(false);
+      setCurrentIndex(1);
+    }
+  };
+
+  useEffect(() => {
+    if (!isTransitioning) {
+      // Pequeno timeout para reativar transição após resetar posição sem transição
+      const id = setTimeout(() => {
+        setIsTransitioning(true);
+      }, 20);
+      return () => clearTimeout(id);
+    }
+  }, [isTransitioning]);
+
   const go = useCallback(
     (next: number) => {
-      if (total === 0) return;
-      setIndex(((next % total) + total) % total);
+      if (total <= 1) return;
+      setCurrentIndex(next);
     },
     [total]
   );
@@ -49,10 +77,10 @@ export default function Carousel({
   useEffect(() => {
     if (!autoPlay || total <= 1) return;
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % total);
+      go(currentIndex + 1);
     }, intervalMs);
     return () => clearInterval(id);
-  }, [autoPlay, intervalMs, total]);
+  }, [autoPlay, intervalMs, total, currentIndex, go]);
 
   if (total === 0) return null;
 
@@ -65,13 +93,24 @@ export default function Carousel({
     touchDeltaX.current = e.touches[0].clientX - touchStartX.current;
   };
   const onTouchEnd = () => {
-    if (Math.abs(touchDeltaX.current) > 50) {
-      if (touchDeltaX.current < 0) go(index + 1);
-      else go(index - 1);
+    if (Math.abs(touchDeltaX.current) > 40) {
+      if (touchDeltaX.current < 0) {
+        go(currentIndex + 1);
+      } else {
+        go(currentIndex - 1);
+      }
     }
     touchStartX.current = null;
     touchDeltaX.current = 0;
   };
+
+  const activeDotIndex = total > 1 
+    ? currentIndex === 0 
+      ? total - 1 
+      : currentIndex === total + 1 
+        ? 0 
+        : currentIndex - 1
+    : 0;
 
   return (
     <div
@@ -84,15 +123,19 @@ export default function Carousel({
       <div
         ref={trackRef}
         className="carousel-track"
-        style={{ transform: `translateX(-${index * 100}%)` }}
+        onTransitionEnd={handleTransitionEnd}
+        style={{
+          transform: `translateX(-${total > 1 ? currentIndex * 100 : 0}%)`,
+          transition: isTransitioning ? 'transform 0.5s cubic-bezier(0.16,1,0.3,1)' : 'none',
+        }}
       >
-        {validImages.map((src, i) => (
+        {slides.map((src, i) => (
           <div key={`${src}-${i}`} className="carousel-slide">
             <Image
               src={src}
-              alt={`${alt} ${i + 1}/${total}`}
+              alt={`${alt} ${i + 1}`}
               fill
-              priority={priority && i === 0}
+              priority={priority && i === 1}
               sizes={sizes}
               className="carousel-image"
               style={{ objectFit: fit }}
@@ -106,7 +149,7 @@ export default function Carousel({
           <button
             type="button"
             className="carousel-arrow carousel-arrow-left"
-            onClick={(e) => { e.stopPropagation(); go(index - 1); }}
+            onClick={(e) => { e.stopPropagation(); go(currentIndex - 1); }}
             aria-label="Imagem anterior"
           >
             <ChevronLeft size={18} />
@@ -114,7 +157,7 @@ export default function Carousel({
           <button
             type="button"
             className="carousel-arrow carousel-arrow-right"
-            onClick={(e) => { e.stopPropagation(); go(index + 1); }}
+            onClick={(e) => { e.stopPropagation(); go(currentIndex + 1); }}
             aria-label="Próxima imagem"
           >
             <ChevronRight size={18} />
@@ -128,10 +171,10 @@ export default function Carousel({
             <button
               type="button"
               key={i}
-              className={`carousel-dot ${i === index ? "active" : ""}`}
-              onClick={(e) => { e.stopPropagation(); go(i); }}
+              className={`carousel-dot ${i === activeDotIndex ? "active" : ""}`}
+              onClick={(e) => { e.stopPropagation(); go(i + 1); }}
               aria-label={`Ir para imagem ${i + 1}`}
-              aria-current={i === index}
+              aria-current={i === activeDotIndex}
             />
           ))}
         </div>

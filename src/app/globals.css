@@ -2298,10 +2298,7 @@ input, textarea, select {
   gap: 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  padding: 4px 4px 16px;
-  margin: 0 -16px;
-  padding-left: 16px;
-  padding-right: 16px;
+  padding: 4px 0 16px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: var(--color-gold-muted) transparent;
@@ -2312,9 +2309,6 @@ input, textarea, select {
 
 @media (min-width: 768px) {
   .kit-grid {
-    margin: 0;
-    padding-left: 0;
-    padding-right: 0;
     gap: 22px;
   }
 }
