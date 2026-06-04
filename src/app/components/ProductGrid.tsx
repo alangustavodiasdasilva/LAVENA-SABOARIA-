@@ -6,8 +6,6 @@ import { useCart } from "./CartContext";
 import Carousel from "./Carousel";
 import { Star, X, ShoppingBag } from "lucide-react";
 
-type StockStatus = "IN_STOCK" | "IN_PRODUCTION" | "OUT_OF_STOCK";
-
 type Product = {
   id: string;
   name: string;
@@ -94,9 +92,7 @@ export default function ProductGrid({
       const prodId = params.get("product");
       if (prodId) {
         const found = products.find((p) => p.id === prodId);
-        if (found) {
-          setSelectedProduct(found);
-        }
+        if (found) setSelectedProduct(found);
       }
     }
   }, [products]);

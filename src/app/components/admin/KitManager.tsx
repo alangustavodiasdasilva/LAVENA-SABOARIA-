@@ -6,7 +6,7 @@ import {
 } from "../../actions";
 import {
   Plus, Trash2, Edit2, Save, X, Upload, Star, Search,
-  Package, ToggleLeft, ToggleRight, Eye, EyeOff, ChevronDown,
+  Package, ToggleLeft, ToggleRight, Eye, EyeOff,
 } from "lucide-react";
 
 type Product = {

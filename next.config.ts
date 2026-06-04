@@ -14,8 +14,6 @@ const nextConfig: NextConfig = {
         pathname: "/storage/v1/object/public/**",
       },
     ],
-    // permite data URLs no <Image>
-    dangerouslyAllowSVG: false,
   },
 };
 

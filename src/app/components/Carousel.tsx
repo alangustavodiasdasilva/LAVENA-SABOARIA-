@@ -75,7 +75,7 @@ export default function Carousel({
     }
   }, [isTransitioning]);
 
-  // Reseta índice quando a lista de imagens prop muda (ex: abrindo outro modal ou atualizando produtos)
+  // Reseta índice quando a lista de imagens prop muda
   useEffect(() => {
     setCurrentIndex(1);
     setIsTransitioning(true);

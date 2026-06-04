@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import { CartProvider } from "./components/CartContext";
 import Header from "./components/Header";
 import FloatingCart from "./components/FloatingCart";
@@ -48,11 +49,22 @@ export default function RootLayout({
                   <p className="footer-slogan">Beleza que vem da natureza ♡</p>
                 </div>
                 <nav className="footer-nav">
-                  <a href="/#produtos">Produtos</a>
-                  <a href="/#sobre">Sobre</a>
-                  <a href="/presente">Monte um presente</a>
-                  <a href="/carrinho">Carrinho</a>
-                  <a href="/admin" className="footer-admin-link" style={{ border: '1px dashed var(--color-gold-muted)', borderRadius: '16px', padding: '3px 10px', fontSize: '0.8rem' }}>Configurar Produtos (Admin)</a>
+                  <Link href="/#produtos">Produtos</Link>
+                  <Link href="/#sobre">Sobre</Link>
+                  <Link href="/presente">Monte um presente</Link>
+                  <Link href="/carrinho">Carrinho</Link>
+                  <Link
+                    href="/admin"
+                    className="footer-admin-link"
+                    style={{
+                      border: "1px dashed var(--color-gold-muted)",
+                      borderRadius: "16px",
+                      padding: "3px 10px",
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    Configurar Produtos (Admin)
+                  </Link>
                 </nav>
               </div>
               <hr className="footer-divider" />

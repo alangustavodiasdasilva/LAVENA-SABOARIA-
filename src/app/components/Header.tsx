@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useCart } from "./CartContext";
 import { ShoppingBag, Menu, X, Gift } from "lucide-react";
 
@@ -9,14 +10,9 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    if (open) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   const close = () => setOpen(false);
@@ -24,32 +20,32 @@ export default function Header() {
   return (
     <header className="header">
       <div className="container header-content">
-        <a href="/" className="logo" aria-label="Lavena - Página inicial">
+        <Link href="/" className="logo" aria-label="Lavena - Página inicial">
           Lavena<span className="logo-dot">.</span>
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <nav className="header-nav desktop-only">
-          <a href="/#produtos">Produtos</a>
-          <a href="/#sobre">Sobre</a>
-          <a href="/presente" className="header-gift-link">
+          <Link href="/#produtos">Produtos</Link>
+          <Link href="/#sobre">Sobre</Link>
+          <Link href="/presente" className="header-gift-link">
             <Gift size={14} /> Monte um presente
-          </a>
-          <a href="/carrinho" className="cart-badge">
+          </Link>
+          <Link href="/carrinho" className="cart-badge">
             <ShoppingBag size={18} />
             {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
-          </a>
+          </Link>
         </nav>
 
         {/* Mobile actions */}
         <div className="mobile-only header-mobile-actions">
-          <a href="/presente" className="cart-badge" aria-label="Monte seu presente" style={{ marginRight: '6px' }}>
+          <Link href="/presente" className="cart-badge" aria-label="Monte seu presente" style={{ marginRight: "6px" }}>
             <Gift size={18} />
-          </a>
-          <a href="/carrinho" className="cart-badge" aria-label="Carrinho">
+          </Link>
+          <Link href="/carrinho" className="cart-badge" aria-label="Carrinho">
             <ShoppingBag size={18} />
             {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
-          </a>
+          </Link>
           <button
             className="hamburger-btn"
             onClick={() => setOpen(true)}
@@ -82,12 +78,12 @@ export default function Header() {
           </button>
         </div>
         <nav className="mobile-drawer-nav">
-          <a href="/#produtos" onClick={close}>Produtos</a>
-          <a href="/#sobre" onClick={close}>Sobre</a>
-          <a href="/presente" onClick={close} className="drawer-gift-link">
+          <Link href="/#produtos" onClick={close}>Produtos</Link>
+          <Link href="/#sobre" onClick={close}>Sobre</Link>
+          <Link href="/presente" onClick={close} className="drawer-gift-link">
             <Gift size={16} /> Monte um presente
-          </a>
-          <a href="/carrinho" onClick={close}>Carrinho{totalItems > 0 ? ` (${totalItems})` : ""}</a>
+          </Link>
+          <Link href="/carrinho" onClick={close}>Carrinho{totalItems > 0 ? ` (${totalItems})` : ""}</Link>
         </nav>
         <div className="mobile-drawer-footer">
           <p className="footer-tagline">Beleza que vem da natureza ♡</p>

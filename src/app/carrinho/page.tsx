@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useCart } from "../components/CartContext";
 import Image from "next/image";
 import { getSettings } from "../actions";
@@ -53,9 +54,9 @@ export default function CarrinhoPage() {
 
   return (
     <div className="container cart-page">
-      <a href="/" className="cart-back" aria-label="Voltar para loja">
+      <Link href="/" className="cart-back" aria-label="Voltar para loja">
         <ArrowLeft size={16} /> Continuar comprando
-      </a>
+      </Link>
 
       <h1 className="cart-title">Sua sacola</h1>
 
@@ -63,7 +64,7 @@ export default function CarrinhoPage() {
         <div className="cart-empty">
           <div className="cart-empty-icon" aria-hidden>🛒</div>
           <p>Sua sacola está vazia.</p>
-          <a href="/#produtos" className="btn btn-primary">Explorar Produtos</a>
+          <Link href="/#produtos" className="btn btn-primary">Explorar Produtos</Link>
         </div>
       ) : (
         <>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Gift, X, ShoppingBag, Star, Plus } from "lucide-react";
+import { Gift, X, ShoppingBag, Star } from "lucide-react";
 import { useCart } from "./CartContext";
 
 type Product = {
@@ -66,9 +66,7 @@ export default function KitShowcase({
       const kitId = params.get("kit");
       if (kitId) {
         const found = kits.find((k) => k.id === kitId);
-        if (found) {
-          setSelected(found);
-        }
+        if (found) setSelected(found);
       }
     }
   }, [kits]);

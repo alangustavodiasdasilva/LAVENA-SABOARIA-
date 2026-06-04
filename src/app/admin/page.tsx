@@ -15,6 +15,7 @@ import {
   Upload, Star, Search, Lock, ChevronDown, ArrowLeft, ArrowRight,
   Minus, AlertTriangle, TrendingDown,
 } from "lucide-react";
+import Link from "next/link";
 import KitManager from "../components/admin/KitManager";
 import Calculator from "../components/admin/Calculator";
 
@@ -98,6 +99,21 @@ export default function AdminPage() {
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const heroGalleryInputRef = useRef<HTMLInputElement>(null);
 
+  const linkOptions = useMemo(() => {
+    const list = [
+      { value: "", label: "Nenhum link (não clicável)" },
+      { value: "/presente", label: "Monte seu Presente (página)" },
+      { value: "/carrinho", label: "Sacola de Compras" },
+    ];
+    kits.forEach((k) => {
+      list.push({ value: `/?kit=${k.id}`, label: `Kit: ${k.name}` });
+    });
+    products.forEach((p) => {
+      list.push({ value: `/?product=${p.id}`, label: `Produto: ${p.name}` });
+    });
+    return list;
+  }, [products, kits]);
+
   useEffect(() => {
     (async () => {
       try {
@@ -111,6 +127,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isAuthenticated) loadData();
+    // loadData é estável neste contexto; chamamos somente quando autentica
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   function showToast(type: "success" | "error", msg: string) {
@@ -534,7 +552,7 @@ export default function AdminPage() {
             </button>
           </form>
           <div style={{ marginTop: "20px", textAlign: "center", borderTop: "1px solid var(--color-bg-dark)", paddingTop: "15px" }}>
-            <a
+            <Link
               href="/"
               style={{
                 display: "inline-flex",
@@ -544,12 +562,12 @@ export default function AdminPage() {
                 fontSize: "0.9rem",
                 textDecoration: "none",
                 fontWeight: "500",
-                transition: "color 0.2s"
+                transition: "color 0.2s",
               }}
               className="hover-gold"
             >
               <ArrowLeft size={16} /> Voltar para a Loja
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -565,21 +583,6 @@ export default function AdminPage() {
     return matchSearch && matchCat;
   });
 
-  const linkOptions = useMemo(() => {
-    const list = [
-      { value: "", label: "Nenhum link (não clicável)" },
-      { value: "/presente", label: "Monte seu Presente (página)" },
-      { value: "/carrinho", label: "Sacola de Compras" },
-    ];
-    kits.forEach((k) => {
-      list.push({ value: `/?kit=${k.id}`, label: `Kit: ${k.name}` });
-    });
-    products.forEach((p) => {
-      list.push({ value: `/?product=${p.id}`, label: `Produto: ${p.name}` });
-    });
-    return list;
-  }, [products, kits]);
-
   const featuredCount = products.filter((p) => p.isFeatured).length;
   const unavailableCount = products.filter((p) => p.stockStatus && p.stockStatus !== "IN_STOCK").length;
 
@@ -589,9 +592,9 @@ export default function AdminPage() {
       <div className="admin-topbar mobile-only">
         <h2 className="admin-topbar-logo">Lavena <span>Admin</span></h2>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <a href="/" className="btn-icon-only" aria-label="Ir para a loja" style={{ color: "var(--color-gold-dark)" }}>
+          <Link href="/" className="btn-icon-only" aria-label="Ir para a loja" style={{ color: "var(--color-gold-dark)" }}>
             <ArrowLeft size={18} />
-          </a>
+          </Link>
           <button onClick={handleLogout} className="btn-icon-only" aria-label="Sair">
             <LogOut size={18} />
           </button>
@@ -647,7 +650,7 @@ export default function AdminPage() {
           </button>
         </nav>
         <div className="admin-sidebar-footer desktop-only" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <a
+          <Link
             href="/"
             className="btn btn-outline w-full"
             style={{
@@ -656,11 +659,11 @@ export default function AdminPage() {
               justifyContent: "center",
               gap: "8px",
               textDecoration: "none",
-              fontSize: "0.9rem"
+              fontSize: "0.9rem",
             }}
           >
             <ArrowLeft size={16} /> Ir para a Loja
-          </a>
+          </Link>
           <button
             onClick={handleLogout}
             className="btn btn-outline w-full"
@@ -741,6 +744,7 @@ export default function AdminPage() {
                     <select
                       className="admin-input"
                       style={{ maxWidth: "400px" }}
+                      title="Link ao clicar na logo padrão"
                       value={heroImageUrlLink}
                       onChange={(e) => setHeroImageUrlLink(e.target.value)}
                     >
@@ -811,6 +815,7 @@ export default function AdminPage() {
                         <select
                           className="admin-input"
                           style={{ fontSize: "0.8rem", padding: "4px 8px", width: "100%" }}
+                          title="Link ao clicar na imagem do carrossel"
                           value={heroImageLinks[idx] || ""}
                           onChange={(e) => {
                             const val = e.target.value;

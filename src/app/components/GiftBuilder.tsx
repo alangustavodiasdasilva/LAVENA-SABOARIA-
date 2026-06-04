@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import {
-  Gift, Plus, Minus, MessageCircle, ArrowLeft, Search, Check, Info, X,
+  Gift, Plus, Minus, MessageCircle, ArrowLeft, Check, Info, X,
 } from "lucide-react";
 
 type Product = {
@@ -62,7 +63,7 @@ export default function GiftBuilder({
 }) {
   const [selection, setSelection] = useState<Record<string, number>>({});
   const [kitSelection, setKitSelection] = useState<Record<string, number>>({});
-  const [query, setQuery] = useState("");
+  const [query, _setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [senderName, setSenderName] = useState("");
   const [recipientName, setRecipientName] = useState("");
@@ -240,9 +241,9 @@ export default function GiftBuilder({
 
   return (
     <div className="container gift-page">
-      <a href="/" className="cart-back" aria-label="Voltar para loja">
+      <Link href="/" className="cart-back" aria-label="Voltar para loja">
         <ArrowLeft size={16} /> Voltar para a loja
-      </a>
+      </Link>
 
       <div className="gift-header" style={{ display: "block", textAlign: "center", marginBottom: "32px" }}>
         <h1 className="gift-title" style={{ fontFamily: "var(--font-heading)", fontStyle: "italic", fontSize: "2.4rem", color: "var(--color-primary-dark)" }}>
