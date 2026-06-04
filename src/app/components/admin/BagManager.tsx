@@ -243,7 +243,7 @@ export default function BagManager({ showToast }: { showToast: (type: "success" 
 
                 <div className="admin-form-group admin-mt-16">
                   <label>Observações internas (opcional)</label>
-                  <textarea className="admin-textarea" value={form.notes || ""} onChange={e => setForm({...form, notes: e.target.value})} placeholder="Ex: Comprado no Mercado Livre loja XPTO" rows={2} />
+                  <textarea className="admin-input admin-textarea" value={form.notes || ""} onChange={e => setForm({...form, notes: e.target.value})} placeholder="Ex: Comprado no Mercado Livre loja XPTO" rows={2} />
                 </div>
 
                 <div className="admin-form-group admin-mt-16">

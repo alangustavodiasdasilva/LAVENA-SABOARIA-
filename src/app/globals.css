@@ -2516,8 +2516,29 @@ body:has(.admin-login) .floating-cart {
 .bag-card-price-mt { margin-top: auto; }
 .bag-summary-li { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--color-border); }
 .bag-summary-icon { display: inline; vertical-align: middle; margin-right: 4px; }
-
-
+.admin-image-upload-area {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--t-fast);
+}
+.admin-image-upload-area:hover { border-color: var(--color-primary); }
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
 .gift-card {
   position: relative;
   background: var(--color-surface);
