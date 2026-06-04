@@ -20,6 +20,16 @@ import KitManager from "../components/admin/KitManager";
 import Calculator from "../components/admin/Calculator";
 
 type StockStatus = "IN_STOCK" | "IN_PRODUCTION" | "OUT_OF_STOCK";
+type AppSettings = {
+  id: string;
+  whatsappNumber?: string | null;
+  heroImageUrl?: string | null;
+  heroImageUrlLink?: string | null;
+  heroImages?: string[];
+  heroImageLinks?: string[];
+  adminPassword?: string | null;
+  updatedAt: Date;
+};
 type Cat = { id: string; name: string; slug: string };
 type Prod = {
   id: string; name: string; slug: string; description: string;
@@ -139,7 +149,7 @@ export default function AdminPage() {
   async function loadData() {
     setIsLoading(true);
     try {
-      const [settingsData, catsData, prodsData, kitsData, matsData, recsData] = await Promise.all([
+      const [rawSettings, catsData, prodsData, kitsData, matsData, recsData] = await Promise.all([
         getSettings(),
         getCategories(),
         getProducts(),
@@ -147,6 +157,7 @@ export default function AdminPage() {
         getMaterials(),
         getRecipes(),
       ]);
+      const settingsData = rawSettings as unknown as AppSettings;
       if (settingsData) {
         setWhatsappNumber(settingsData.whatsappNumber || "");
         setHeroImageUrl(settingsData.heroImageUrl || "");
@@ -551,20 +562,10 @@ export default function AdminPage() {
               {loginLoading ? "Entrando..." : "Entrar no Painel"}
             </button>
           </form>
-          <div style={{ marginTop: "20px", textAlign: "center", borderTop: "1px solid var(--color-bg-dark)", paddingTop: "15px" }}>
+          <div className="admin-login-footer">
             <Link
               href="/"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                color: "var(--color-gold-dark)",
-                fontSize: "0.9rem",
-                textDecoration: "none",
-                fontWeight: "500",
-                transition: "color 0.2s",
-              }}
-              className="hover-gold"
+              className="admin-login-back-link hover-gold"
             >
               <ArrowLeft size={16} /> Voltar para a Loja
             </Link>
@@ -591,8 +592,8 @@ export default function AdminPage() {
       {/* Topbar mobile */}
       <div className="admin-topbar mobile-only">
         <h2 className="admin-topbar-logo">Lavena <span>Admin</span></h2>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <Link href="/" className="btn-icon-only" aria-label="Ir para a loja" style={{ color: "var(--color-gold-dark)" }}>
+        <div className="admin-topbar-actions">
+          <Link href="/" className="btn-icon-only admin-topbar-store-link" aria-label="Ir para a loja">
             <ArrowLeft size={18} />
           </Link>
           <button onClick={handleLogout} className="btn-icon-only" aria-label="Sair">
@@ -649,33 +650,16 @@ export default function AdminPage() {
             <SettingsIcon size={18} /> <span>Configurações</span>
           </button>
         </nav>
-        <div className="admin-sidebar-footer desktop-only" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div className="admin-sidebar-footer desktop-only">
           <Link
             href="/"
-            className="btn btn-outline w-full"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              textDecoration: "none",
-              fontSize: "0.9rem",
-            }}
+            className="btn btn-outline w-full admin-sidebar-store-link"
           >
             <ArrowLeft size={16} /> Ir para a Loja
           </Link>
           <button
             onClick={handleLogout}
-            className="btn btn-outline w-full"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              borderColor: "rgba(220, 53, 69, 0.2)",
-              color: "#dc3545",
-              fontSize: "0.9rem"
-            }}
+            className="btn btn-outline w-full admin-sidebar-logout-btn"
           >
             <LogOut size={16} /> Sair
           </button>
@@ -739,11 +723,10 @@ export default function AdminPage() {
                   <small className="admin-hint">
                     Otimizada automaticamente (WEBP de alta qualidade até 2000px).
                   </small>
-                  <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "4px" }}>
-                    <label style={{ fontSize: "0.85rem", fontWeight: "600" }}>Link ao clicar na logo padrão:</label>
+                  <div className="admin-hero-link-wrap">
+                    <label className="admin-hero-link-label">Link ao clicar na logo padrão:</label>
                     <select
-                      className="admin-input"
-                      style={{ maxWidth: "400px" }}
+                      className="admin-input admin-hero-link-select"
                       title="Link ao clicar na logo padrão"
                       value={heroImageUrlLink}
                       onChange={(e) => setHeroImageUrlLink(e.target.value)}
@@ -759,8 +742,8 @@ export default function AdminPage() {
                   <Save size={16} /> Salvar configurações
                 </button>
 
-                <div className="admin-panel-header" style={{ marginTop: 28 }}>
-                  <h2 className="admin-title" style={{ fontSize: "1.3rem" }}>
+                <div className="admin-panel-header admin-panel-section-header">
+                  <h2 className="admin-title admin-panel-section-title">
                     Galeria do topo (carrossel)
                   </h2>
                   <p className="admin-subtitle">
@@ -769,31 +752,29 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                <div className="admin-gallery" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px" }}>
+                <div className="admin-gallery admin-gallery-grid">
                   {heroImages.map((url, idx) => (
-                    <div key={`${url}-${idx}`} className="admin-gallery-item" style={{ height: "auto", display: "flex", flexDirection: "column", gap: "8px", border: "1px solid var(--color-bg-dark)", padding: "10px", borderRadius: "12px", background: "#fff", position: "relative" }}>
-                      <div style={{ position: "relative", width: "100%", aspectRatio: "3/2", overflow: "hidden", borderRadius: "8px" }}>
+                    <div key={`${url}-${idx}`} className="admin-gallery-item admin-gallery-card">
+                      <div className="admin-gallery-card-thumb">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={url} alt={`Hero ${idx + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <img src={url} alt={`Hero ${idx + 1}`} className="admin-gallery-card-img" />
                         <button
                           type="button"
                           onClick={() => removeHeroImage(idx)}
-                          className="admin-gallery-item-remove"
-                          style={{ position: "absolute", top: "6px", right: "6px", background: "rgba(220,53,69,0.9)", color: "#fff", border: "none", borderRadius: "50%", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }}
+                          className="admin-gallery-item-remove admin-gallery-card-remove"
                           aria-label="Remover imagem"
                         >
                           <X size={14} />
                         </button>
                       </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: "0.8rem", color: "var(--color-text-light)" }}>Imagem ${idx + 1}</span>
-                        <div style={{ display: "flex", gap: "4px" }}>
+                      <div className="admin-gallery-card-footer">
+                        <span className="admin-gallery-card-label">Imagem {idx + 1}</span>
+                        <div className="admin-gallery-card-arrows">
                           <button
                             type="button"
                             onClick={() => moveHeroImage(idx, -1)}
                             disabled={idx === 0}
-                            className="btn btn-outline btn-xs"
-                            style={{ padding: "2px 6px", fontSize: "0.75rem" }}
+                            className="btn btn-outline btn-xs admin-gallery-card-arrow-btn"
                             aria-label="Mover para esquerda"
                           >
                             <ArrowLeft size={12} />
@@ -802,19 +783,17 @@ export default function AdminPage() {
                             type="button"
                             onClick={() => moveHeroImage(idx, 1)}
                             disabled={idx === heroImages.length - 1}
-                            className="btn btn-outline btn-xs"
-                            style={{ padding: "2px 6px", fontSize: "0.75rem" }}
+                            className="btn btn-outline btn-xs admin-gallery-card-arrow-btn"
                             aria-label="Mover para direita"
                           >
                             <ArrowRight size={12} />
                           </button>
                         </div>
                       </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "4px", width: "100%" }}>
-                        <label style={{ fontSize: "0.8rem", fontWeight: "600", color: "var(--color-text)" }}>Link ao clicar:</label>
+                      <div className="admin-gallery-card-link">
+                        <label className="admin-gallery-card-link-label">Link ao clicar:</label>
                         <select
-                          className="admin-input"
-                          style={{ fontSize: "0.8rem", padding: "4px 8px", width: "100%" }}
+                          className="admin-input admin-gallery-card-link-select"
                           title="Link ao clicar na imagem do carrossel"
                           value={heroImageLinks[idx] || ""}
                           onChange={(e) => {
@@ -1225,18 +1204,17 @@ export default function AdminPage() {
                               </span>
                               {(prod.stockQuantity ?? 0) > 0 &&
                                 (prod.stockQuantity ?? 0) <= (prod.lowStockAlert ?? 3) && (
-                                  <span className="pill warn" style={{ marginLeft: "auto" }}>
+                                  <span className="pill warn">
                                     <AlertTriangle size={10} /> baixo
                                   </span>
                                 )}
                             </div>
 
-                            <div className="admin-select-wrap" style={{ marginTop: 8 }}>
+                            <div className="admin-select-wrap">
                               <select
                                 value={status}
                                 onChange={(e) => handleQuickStockChange(prod.id, e.target.value as StockStatus)}
-                                className="admin-input"
-                                style={{ minHeight: 36, padding: "6px 28px 6px 10px", fontSize: "0.82rem" }}
+                                className="admin-input admin-stock-select"
                                 aria-label="Status de estoque"
                               >
                                 {STATUS_OPTIONS.map((s) => (
@@ -1319,7 +1297,7 @@ export default function AdminPage() {
               {/* Galeria do produto */}
               <div className="admin-form-group">
                 <label>Galeria de imagens (carrossel)</label>
-                <small className="admin-hint" style={{ marginTop: 0, marginBottom: 8 }}>
+                <small className="admin-hint admin-hint-nogap">
                   A imagem principal entra primeiro. Adicione mais imagens aqui — elas viram um carrossel na tela do produto.
                 </small>
                 <div className="admin-gallery">
