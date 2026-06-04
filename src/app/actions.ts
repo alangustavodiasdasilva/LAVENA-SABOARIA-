@@ -60,8 +60,8 @@ export async function uploadImage(formData: FormData) {
 
   const processedBuffer = await sharp(buffer)
     .rotate()
-    .resize(2000, 2000, { fit: "inside", withoutEnlargement: true, kernel: "lanczos3" })
-    .webp({ quality: 92, effort: 6, smartSubsample: true })
+    .resize(1200, 1200, { fit: "inside", withoutEnlargement: true, kernel: "lanczos3" })
+    .webp({ quality: 80, effort: 6, smartSubsample: true })
     .toBuffer();
 
   // Caminho 1: Supabase Storage (produção e dev com env configurado)
