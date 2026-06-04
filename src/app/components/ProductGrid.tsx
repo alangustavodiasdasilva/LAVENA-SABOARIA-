@@ -80,6 +80,7 @@ function isPurchasable(p: Product, variantId?: string) {
 
 function statusLabel(s: string): { label: string; tone: string } | null {
   if (s === "IN_PRODUCTION") return { label: "Reserva (Produção)", tone: "warn" };
+  if (s === "OUT_OF_STOCK") return { label: "Esgotado", tone: "danger" };
   return null;
 }
 
@@ -455,7 +456,8 @@ export default function ProductGrid({
                     </div>
                     {purchasable ? (
                       <button
-                        className="btn-add-cart"
+                        className={product.stockStatus === "IN_PRODUCTION" ? "btn btn-outline" : "btn-add-cart"}
+                        style={product.stockStatus === "IN_PRODUCTION" ? { padding: '0 12px', height: '32px', fontSize: '0.75rem', whiteSpace: 'nowrap', borderRadius: 'var(--radius-full)' } : undefined}
                         onClick={(e) => {
                           e.stopPropagation();
                           if (product.variants && product.variants.length > 0) {
@@ -475,10 +477,10 @@ export default function ProductGrid({
                         }
                         title={product.stockStatus === "IN_PRODUCTION" ? "Reservar Produto" : "Adicionar à Sacola"}
                       >
-                        <ShoppingBag size={16} />
+                        {product.stockStatus === "IN_PRODUCTION" ? "Reservar" : <ShoppingBag size={16} />}
                       </button>
                     ) : (
-                      <button className="btn btn-outline" disabled style={{ padding: '0 12px', height: '32px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
+                      <button className="btn btn-outline" disabled style={{ padding: '0 12px', height: '32px', fontSize: '0.75rem', whiteSpace: 'nowrap', borderRadius: 'var(--radius-full)' }}>
                         Esgotado
                       </button>
                     )}
