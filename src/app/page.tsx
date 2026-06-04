@@ -61,9 +61,6 @@ export default async function Home() {
           </div>
           <div className="hero-cta">
             <a href="#produtos" className="btn btn-gold btn-lg">Explorar Produtos</a>
-            <a href="/presente" className="btn btn-outline btn-lg hero-cta-gift">
-              🎁 Monte um presente
-            </a>
           </div>
         </div>
       </section>
