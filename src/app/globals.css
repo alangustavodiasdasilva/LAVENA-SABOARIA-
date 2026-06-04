@@ -2677,8 +2677,15 @@ input, textarea, select {
 .gift-kits-scroll::-webkit-scrollbar-track { background: transparent; }
 .gift-kits-scroll::-webkit-scrollbar-thumb { background: var(--color-gold-muted); border-radius: 9px; }
 .gift-kits-scroll .gift-card {
-  flex: 0 0 200px;
+  flex: 0 0 240px;
+  width: 240px;
   scroll-snap-align: start;
+}
+@media (min-width: 768px) {
+  .gift-kits-scroll .gift-card {
+    flex: 0 0 260px;
+    width: 260px;
+  }
 }
 
 .gift-card-info-btn {

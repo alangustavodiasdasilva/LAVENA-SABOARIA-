@@ -106,6 +106,9 @@ export default function ProductGrid({
 
   return (
     <>
+      <div style={{ textAlign: "center", marginBottom: "16px" }}>
+        <p className="section-label">Produtos</p>
+      </div>
       {/* Categorias */}
       {categories.length > 0 && (
         <div className="categories-strip">
