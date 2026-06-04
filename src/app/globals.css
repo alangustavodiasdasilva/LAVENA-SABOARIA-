@@ -657,8 +657,8 @@ input, textarea, select {
   text-transform: uppercase;
   text-align: center;
   color: white;
-  backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   z-index: 2;
 }
 .product-status-warn { background: rgba(196,153,60,0.92); }
@@ -1032,7 +1032,7 @@ input, textarea, select {
   padding: 32px 0 24px;
   margin-top: 24px;
 }
-.footer-inner { }
+.footer-inner { display: contents; }
 .footer-top {
   display: flex;
   align-items: center;
@@ -2931,6 +2931,7 @@ body:has(.admin-login) .floating-cart {
   background: var(--color-surface);
   color: var(--color-text);
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 .stock-qty-input::-webkit-inner-spin-button,
 .stock-qty-input::-webkit-outer-spin-button {
@@ -3432,3 +3433,68 @@ body:has(.admin-login) .floating-cart {
   margin-top: 0;
   margin-bottom: 8px;
 }
+/* ─────────────────────────────────────── */
+/* Component utility classes               */
+/* ─────────────────────────────────────── */
+
+/* Carousel */
+.carousel.has-aspect { aspect-ratio: var(--carousel-aspect, 16/9); }
+.carousel-track.is-transitioning {
+  transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* Header */
+.cart-badge-present { margin-right: 6px; }
+
+/* ProductGrid */
+.products-header-label { text-align: center; margin-bottom: 16px; }
+
+/* GiftBuilder */
+.gift-header-centered { display: block; text-align: center; margin-bottom: 32px; }
+.gift-title-hero {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 2.4rem;
+  color: var(--color-primary-dark);
+}
+.gift-subtitle-centered {
+  max-width: 580px;
+  margin: 8px auto 0;
+  font-size: 0.95rem;
+  color: var(--color-text-light);
+}
+.gift-section-title-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+.section-label-flex {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.gift-section-heading {
+  font-size: 1.4rem;
+  font-family: var(--font-heading);
+  font-style: italic;
+  color: var(--color-primary-dark);
+}
+.gift-card-price-wrap { margin-top: 6px; }
+.gift-price-original { font-size: 0.75rem; }
+.gift-summary-fields-top { margin-top: 0; }
+
+/* KitShowcase */
+.kit-category-label { color: var(--color-gold); }
+.kit-gift-icon { display: inline; vertical-align: middle; }
+.pre-line { white-space: pre-line; }
+
+/* page.tsx trust badges colors */
+.trust-badge-green { color: var(--color-primary); }
+.trust-badge-blue  { color: #4da6ff; }
+.trust-badge-rose  { color: var(--color-rose); }
+.trust-badge-purple { color: #b380ff; }
+
+/* page.tsx hero link */
+.hero-logo-link-block { display: block; }

@@ -231,8 +231,8 @@ export default function KitShowcase({
               </div>
 
               <div className="product-sheet-info">
-                <span className="product-category-label" style={{ color: "var(--color-gold)" }}>
-                  <Gift size={11} style={{ display: "inline", verticalAlign: "middle" }} /> KIT
+                <span className="product-category-label kit-category-label">
+                  <Gift size={11} className="kit-gift-icon" /> KIT
                 </span>
                 <h2 className="product-sheet-title">{selected.name}</h2>
                 <div className="product-sheet-price-wrap">
@@ -267,7 +267,7 @@ export default function KitShowcase({
                   {items.some((p) => p.benefits) && (
                     <section className="product-sheet-section">
                       <h4>Benefícios</h4>
-                      <p style={{ whiteSpace: "pre-line" }}>
+                      <p className="pre-line">
                         {items
                           .filter((p) => p.benefits)
                           .map((p) => `• ${p.name}: ${p.benefits}`)
@@ -280,7 +280,7 @@ export default function KitShowcase({
                   {items.some((p) => p.ingredients) && (
                     <section className="product-sheet-section">
                       <h4>Ingredientes</h4>
-                      <p style={{ whiteSpace: "pre-line" }}>
+                      <p className="pre-line">
                         {items
                           .filter((p) => p.ingredients)
                           .map((p) => `• ${p.name}: ${p.ingredients}`)

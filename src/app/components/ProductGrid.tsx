@@ -116,7 +116,7 @@ export default function ProductGrid({
 
   return (
     <>
-      <div style={{ textAlign: "center", marginBottom: "16px" }}>
+      <div className="products-header-label">
         <p className="section-label">Produtos</p>
       </div>
       {/* Categorias */}

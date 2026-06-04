@@ -245,11 +245,11 @@ export default function GiftBuilder({
         <ArrowLeft size={16} /> Voltar para a loja
       </Link>
 
-      <div className="gift-header" style={{ display: "block", textAlign: "center", marginBottom: "32px" }}>
-        <h1 className="gift-title" style={{ fontFamily: "var(--font-heading)", fontStyle: "italic", fontSize: "2.4rem", color: "var(--color-primary-dark)" }}>
+      <div className="gift-header gift-header-centered">
+        <h1 className="gift-title gift-title-hero">
           Monte seu presente
         </h1>
-        <p className="gift-subtitle" style={{ maxWidth: "580px", margin: "8px auto 0", fontSize: "0.95rem", color: "var(--color-text-light)" }}>
+        <p className="gift-subtitle gift-subtitle-centered">
           Selecione os kits prontos ou escolha produtos avulsos abaixo para criar uma combinação especial.
         </p>
       </div>
@@ -259,11 +259,11 @@ export default function GiftBuilder({
           {/* Passo 1: Kits prontos */}
           {activeKits.length > 0 && (
             <div className="gift-section">
-              <h2 className="gift-section-title" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "6px" }}>
-                <span className="section-label" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <h2 className="gift-section-title gift-section-title-center">
+                <span className="section-label section-label-flex">
                   <Gift size={14} /> Passo 1
                 </span>
-                <span style={{ fontSize: "1.4rem", fontFamily: "var(--font-heading)", fontStyle: "italic", color: "var(--color-primary-dark)" }}>Escolha um kit pronto</span>
+                <span className="gift-section-heading">Escolha um kit pronto</span>
               </h2>
               <div className="gift-kits-scroll">
                 {activeKits.map((kit) => {
@@ -299,9 +299,9 @@ export default function GiftBuilder({
                         <small className="text-muted">
                           {productsInKit.length} {productsInKit.length === 1 ? "item" : "itens"}
                         </small>
-                        <div style={{ marginTop: 6 }}>
+                        <div className="gift-card-price-wrap">
                           {hasSale && (
-                            <span className="product-price-original" style={{ fontSize: "0.75rem" }}>
+                            <span className="product-price-original gift-price-original">
                               R$ {kit.price.toFixed(2).replace(".", ",")}
                             </span>
                           )}
@@ -337,11 +337,11 @@ export default function GiftBuilder({
 
           {/* Passo 2 (ou 1 sem kits): Produtos individuais */}
           <div className="gift-section">
-              <h2 className="gift-section-title" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "6px" }}>
-                <span className="section-label" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <h2 className="gift-section-title gift-section-title-center">
+                <span className="section-label section-label-flex">
                   <Plus size={14} /> Passo {activeKits.length > 0 ? "2" : "1"}
                 </span>
-                <span style={{ fontSize: "1.4rem", fontFamily: "var(--font-heading)", fontStyle: "italic", color: "var(--color-primary-dark)" }}>
+                <span className="gift-section-heading">
                   {activeKits.length > 0 ? "Ou adicione produtos avulsos" : "Escolha os produtos"}
                 </span>
               </h2>
@@ -446,7 +446,7 @@ export default function GiftBuilder({
             <h2>Seu presente</h2>
           </div>
 
-          <div className="gift-summary-fields" style={{ marginTop: 0 }}>
+          <div className="gift-summary-fields gift-summary-fields-top">
             <div className="gift-fields-divider">Seus dados</div>
             <label>
               Seu nome <span className="required-mark">*</span>

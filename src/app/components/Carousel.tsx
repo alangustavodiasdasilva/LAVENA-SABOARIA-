@@ -129,20 +129,17 @@ export default function Carousel({
 
   return (
     <div
-      className={`carousel carousel-fit-${fit} ${rounded ? "is-rounded" : ""}`}
-      style={aspectRatio ? { aspectRatio } : undefined}
+      className={`carousel carousel-fit-${fit} ${rounded ? "is-rounded" : ""}${aspectRatio ? " has-aspect" : ""}`}
+      style={aspectRatio ? { ["--carousel-aspect" as string]: aspectRatio } as React.CSSProperties : undefined}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
       <div
         ref={trackRef}
-        className="carousel-track"
+        className={`carousel-track${isTransitioning ? " is-transitioning" : ""}`}
         onTransitionEnd={handleTransitionEnd}
-        style={{
-          transform: `translateX(-${total > 1 ? currentIndex * 100 : 0}%)`,
-          transition: isTransitioning ? 'transform 0.5s cubic-bezier(0.16,1,0.3,1)' : 'none',
-        }}
+        style={{ transform: `translateX(-${total > 1 ? currentIndex * 100 : 0}%)` }}
       >
         {slides.map((src, i) => {
           const href = slideLinks[i];

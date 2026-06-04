@@ -50,7 +50,7 @@ export default async function Home() {
               />
             ) : (
               heroLinks[0] ? (
-                <a href={heroLinks[0]} className="hero-logo-link" style={{ display: "block" }}>
+                <a href={heroLinks[0]} className="hero-logo-link hero-logo-link-block" title="Ver produto">
                   <Image
                     src={heroImages[0]}
                     alt="Lavena Saboaria Artesanal"
@@ -113,19 +113,19 @@ export default async function Home() {
 
           <div className="trust-badges">
             <div className="trust-badge">
-              <div className="trust-badge-icon" style={{ color: 'var(--color-primary)' }}><Leaf strokeWidth={1.5} size={28} /></div>
+              <div className="trust-badge-icon trust-badge-green"><Leaf strokeWidth={1.5} size={28} /></div>
               <span className="trust-badge-text">Base Vegetal</span>
             </div>
             <div className="trust-badge">
-              <div className="trust-badge-icon" style={{ color: '#4da6ff' }}><Droplets strokeWidth={1.5} size={28} /></div>
+              <div className="trust-badge-icon trust-badge-blue"><Droplets strokeWidth={1.5} size={28} /></div>
               <span className="trust-badge-text">Hidratante</span>
             </div>
             <div className="trust-badge">
-              <div className="trust-badge-icon" style={{ color: 'var(--color-rose)' }}><Flower2 strokeWidth={1.5} size={28} /></div>
+              <div className="trust-badge-icon trust-badge-rose"><Flower2 strokeWidth={1.5} size={28} /></div>
               <span className="trust-badge-text">Aromas Naturais</span>
             </div>
             <div className="trust-badge">
-              <div className="trust-badge-icon" style={{ color: '#b380ff' }}><Rabbit strokeWidth={1.5} size={28} /></div>
+              <div className="trust-badge-icon trust-badge-purple"><Rabbit strokeWidth={1.5} size={28} /></div>
               <span className="trust-badge-text">Cruelty Free</span>
             </div>
           </div>

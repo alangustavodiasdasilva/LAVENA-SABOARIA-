@@ -39,7 +39,7 @@ export default function Header() {
 
         {/* Mobile actions */}
         <div className="mobile-only header-mobile-actions">
-          <Link href="/presente" className="cart-badge" aria-label="Monte seu presente" style={{ marginRight: "6px" }}>
+          <Link href="/presente" className="cart-badge cart-badge-present" aria-label="Monte seu presente">
             <Gift size={18} />
           </Link>
           <Link href="/carrinho" className="cart-badge" aria-label="Carrinho">
