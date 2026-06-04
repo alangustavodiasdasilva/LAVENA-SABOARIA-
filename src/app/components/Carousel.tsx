@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -38,16 +38,14 @@ export default function Carousel({
   const validImages = useMemo(() => images.filter(Boolean), [images]);
   const total = validImages.length;
 
-  // currentIndex 1-based no array com clones (index 0 = clone do último, total+1 = clone do primeiro)
-  const [currentIndex, setCurrentIndex] = useState(1);
-  const trackRef = useRef<HTMLDivElement>(null);
-  // Quando true, próxima atualização de posição não tem animação (usado pra "snap" invisível dos clones)
-  const isJumpingRef = useRef(false);
-  const touchStartX = useRef<number | null>(null);
-  const touchDeltaX = useRef(0);
-  const isAnimatingRef = useRef(false);
+  // index = 0..total+1 (0 = clone do último, total+1 = clone do primeiro)
+  const [index, setIndex] = useState(1);
+  // Quando false, aplica transition: none (usado para o "snap" invisível depois do clone)
+  const [hasTransition, setHasTransition] = useState(true);
+  // Bloqueia novos movimentos enquanto está animando ou fazendo snap
+  const lockRef = useRef(false);
 
-  // Clones nas pontas: [último, ...originais, primeiro]
+  // [clone do último, ...originais, clone do primeiro]
   const slides = useMemo(() => {
     if (total <= 1) return validImages;
     return [validImages[total - 1], ...validImages, validImages[0]];
@@ -59,69 +57,84 @@ export default function Carousel({
     return [list[total - 1], ...list, list[0]];
   }, [links, total]);
 
-  // Aplica o transform manualmente via DOM, garantindo snap sem flash
-  useLayoutEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
+  // Quando termina a animação no clone, faz "teleporte" sem transição pro slide real correspondente
+  const handleTransitionEnd = useCallback(
+    (e: React.TransitionEvent) => {
+      if (e.propertyName !== "transform") return;
+      if (total <= 1) {
+        lockRef.current = false;
+        return;
+      }
+      if (index === total + 1) {
+        // Acabou de chegar no clone do primeiro → teleporta pra real primeiro
+        setHasTransition(false);
+        setIndex(1);
+      } else if (index === 0) {
+        // Acabou de chegar no clone do último → teleporta pra real último
+        setHasTransition(false);
+        setIndex(total);
+      } else {
+        // Animação normal terminou
+        lockRef.current = false;
+      }
+    },
+    [index, total]
+  );
 
-    if (isJumpingRef.current) {
-      // SNAP invisível: desliga transição, força reflow, religa
-      track.style.transition = "none";
-      track.style.transform = `translateX(-${currentIndex * 100}%)`;
-      // Força o navegador a aplicar o estilo agora (reflow)
-      void track.offsetWidth;
-      track.style.transition = TRANSITION;
-      isJumpingRef.current = false;
-      isAnimatingRef.current = false;
-    } else {
-      track.style.transition = TRANSITION;
-      track.style.transform = `translateX(-${currentIndex * 100}%)`;
-      isAnimatingRef.current = true;
-    }
-  }, [currentIndex]);
-
-  // Reset quando a lista de imagens prop muda (mas só se realmente mudou)
-  const imagesSig = useMemo(() => validImages.join("|"), [validImages]);
+  // Depois do teleporte (transition: none aplicado), aguardamos 2 frames pra religar a transição.
+  // Dois RAFs garantem que o navegador realmente pintou o frame sem transição antes.
   useEffect(() => {
-    isJumpingRef.current = true;
-    setCurrentIndex(1);
-  }, [imagesSig]);
-
-  const handleTransitionEnd = (e: React.TransitionEvent) => {
-    if (e.propertyName !== "transform") return;
-    if (total <= 1) return;
-    isAnimatingRef.current = false;
-    if (currentIndex === 0) {
-      isJumpingRef.current = true;
-      setCurrentIndex(total);
-    } else if (currentIndex === total + 1) {
-      isJumpingRef.current = true;
-      setCurrentIndex(1);
-    }
-  };
+    if (hasTransition) return;
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        setHasTransition(true);
+        lockRef.current = false;
+      });
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+    };
+  }, [hasTransition]);
 
   const go = useCallback(
-    (next: number) => {
+    (delta: number) => {
       if (total <= 1) return;
-      // Evita disparar novo movimento se ainda está animando o atual
-      if (isAnimatingRef.current) return;
-      setCurrentIndex(next);
+      if (lockRef.current) return;
+      lockRef.current = true;
+      setHasTransition(true);
+      setIndex((c) => c + delta);
     },
     [total]
   );
 
+  const goTo = useCallback(
+    (target: number) => {
+      if (total <= 1) return;
+      if (lockRef.current) return;
+      lockRef.current = true;
+      setHasTransition(true);
+      setIndex(target);
+    },
+    [total]
+  );
+
+  // Autoplay
   useEffect(() => {
     if (!autoPlay || total <= 1) return;
     const id = setInterval(() => {
-      if (!isAnimatingRef.current) {
-        setCurrentIndex((c) => c + 1);
-      }
+      if (lockRef.current) return;
+      lockRef.current = true;
+      setHasTransition(true);
+      setIndex((c) => c + 1);
     }, intervalMs);
     return () => clearInterval(id);
   }, [autoPlay, intervalMs, total]);
 
-  if (total === 0) return null;
-
+  // Touch
+  const touchStartX = useRef<number | null>(null);
+  const touchDeltaX = useRef(0);
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchDeltaX.current = 0;
@@ -132,20 +145,22 @@ export default function Carousel({
   };
   const onTouchEnd = () => {
     if (Math.abs(touchDeltaX.current) > 40) {
-      if (touchDeltaX.current < 0) go(currentIndex + 1);
-      else go(currentIndex - 1);
+      if (touchDeltaX.current < 0) go(1);
+      else go(-1);
     }
     touchStartX.current = null;
     touchDeltaX.current = 0;
   };
 
+  if (total === 0) return null;
+
   const activeDotIndex =
     total > 1
-      ? currentIndex === 0
+      ? index === 0
         ? total - 1
-        : currentIndex === total + 1
+        : index === total + 1
           ? 0
-          : currentIndex - 1
+          : index - 1
       : 0;
 
   return (
@@ -157,12 +172,11 @@ export default function Carousel({
       onTouchEnd={onTouchEnd}
     >
       <div
-        ref={trackRef}
         className="carousel-track"
         onTransitionEnd={handleTransitionEnd}
         style={{
-          // Posição inicial — useLayoutEffect substitui na hora certa
-          transform: `translateX(-${(total > 1 ? currentIndex : 0) * 100}%)`,
+          transform: `translateX(-${index * 100}%)`,
+          transition: hasTransition ? TRANSITION : "none",
         }}
       >
         {slides.map((src, i) => {
@@ -180,7 +194,7 @@ export default function Carousel({
             />
           );
           return (
-            <div key={`${src}-${i}`} className="carousel-slide">
+            <div key={`slide-${i}`} className="carousel-slide">
               {href ? (
                 <a href={href} className="carousel-slide-link">
                   {img}
@@ -200,7 +214,7 @@ export default function Carousel({
             className="carousel-arrow carousel-arrow-left"
             onClick={(e) => {
               e.stopPropagation();
-              go(currentIndex - 1);
+              go(-1);
             }}
             aria-label="Imagem anterior"
           >
@@ -211,7 +225,7 @@ export default function Carousel({
             className="carousel-arrow carousel-arrow-right"
             onClick={(e) => {
               e.stopPropagation();
-              go(currentIndex + 1);
+              go(1);
             }}
             aria-label="Próxima imagem"
           >
@@ -230,10 +244,10 @@ export default function Carousel({
               className={`carousel-dot ${i === activeDotIndex ? "active" : ""}`}
               onClick={(e) => {
                 e.stopPropagation();
-                go(i + 1);
+                goTo(i + 1);
               }}
               aria-label={`Ir para imagem ${i + 1}`}
-              aria-selected={i === activeDotIndex}
+              aria-selected={i === activeDotIndex ? "true" : "false"}
             />
           ))}
         </div>

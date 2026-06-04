@@ -96,7 +96,10 @@ export default async function Home() {
       {/* ═══ PRODUCTS ═══ */}
       <section id="produtos" className="section">
         <div className="container">
-          <ProductGrid products={products} categories={categories} />
+          <ProductGrid 
+            products={products} 
+            categories={categories.filter(c => products.some(p => p.categoryId === c.id))} 
+          />
         </div>
       </section>
 

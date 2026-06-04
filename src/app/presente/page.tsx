@@ -12,11 +12,13 @@ export default async function PresentePage() {
     getActiveBags(),
   ]);
 
+  const activeCategories = categories.filter(c => products.some(p => p.categoryId === c.id));
+
   return (
     <GiftBuilder
       products={products as any}
       kits={kits as any}
-      categories={categories as any}
+      categories={activeCategories as any}
       bags={bags as any}
       whatsappNumber={settings?.whatsappNumber || ""}
     />

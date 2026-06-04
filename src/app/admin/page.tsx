@@ -1259,7 +1259,7 @@ export default function AdminPage() {
 
       {/* PRODUCT MODAL */}
       {isProductModalOpen && (
-        <div className="admin-modal-overlay" onClick={closeProductModal}>
+        <div className="admin-modal-overlay">
           <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
             <div className="admin-modal-header">
               <h2>{prodForm.id ? "Editar produto" : "Novo produto"}</h2>

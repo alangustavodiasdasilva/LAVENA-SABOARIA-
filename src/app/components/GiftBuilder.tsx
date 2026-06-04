@@ -96,7 +96,7 @@ export default function GiftBuilder({
       const matchCat = selectedCategory ? p.categoryId === selectedCategory : true;
       const matchQ = q
         ? p.name.toLowerCase().includes(q) ||
-          (p.description || "").toLowerCase().includes(q)
+        (p.description || "").toLowerCase().includes(q)
         : true;
       return matchCat && matchQ;
     });
@@ -119,9 +119,9 @@ export default function GiftBuilder({
   );
 
   const selectedBag = useMemo(() => bags.find(b => b.id === selectedBagId), [bags, selectedBagId]);
-  
-  const bagPrice = selectedBag 
-    ? (selectedBag.amountPaid / Math.max(1, selectedBag.quantity)) * (1 + selectedBag.margin / 100) 
+
+  const bagPrice = selectedBag
+    ? (selectedBag.amountPaid / Math.max(1, selectedBag.quantity)) * (1 + selectedBag.margin / 100)
     : 0;
 
   const totalUnits =
@@ -364,14 +364,14 @@ export default function GiftBuilder({
 
           {/* Passo 2 (ou 1 sem kits): Produtos individuais */}
           <div className="gift-section">
-              <h2 className="gift-section-title gift-section-title-center">
-                <span className="section-label section-label-flex">
-                  <Plus size={14} /> Passo {activeKits.length > 0 ? "2" : "1"}
-                </span>
-                <span className="gift-section-heading">
-                  {activeKits.length > 0 ? "Ou adicione produtos avulsos" : "Escolha os produtos"}
-                </span>
-              </h2>
+            <h2 className="gift-section-title gift-section-title-center">
+              <span className="section-label section-label-flex">
+                <Plus size={14} /> Passo {activeKits.length > 0 ? "2" : "1"}
+              </span>
+              <span className="gift-section-heading">
+                {activeKits.length > 0 ? "Ou adicione produtos avulsos" : "Escolha os produtos"}
+              </span>
+            </h2>
 
             {categories.length > 0 && (
               <div className="categories-strip">
@@ -465,60 +465,60 @@ export default function GiftBuilder({
             )}
           </div>
 
-        {bags && bags.length > 0 && (
-          <section className="gift-section">
-            <h2 className="gift-section-title gift-section-title-center">
-              <span className="section-label section-label-flex">
-                <ShoppingBag size={14} /> Passo {activeKits.length > 0 ? "3" : "2"}
-              </span>
-              <span className="gift-section-heading">
-                Escolha a embalagem <span className="text-muted">(opcional)</span>
-              </span>
-            </h2>
-            <div className="bag-grid">
-              <div
-                className={`gift-card bag-card-no-bag ${!selectedBagId ? "selected" : ""}`}
-                onClick={() => setSelectedBagId(null)}
-              >
-                {!selectedBagId && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
-                <div className="bag-card-no-bag-content">
-                  <X size={24} className="bag-card-no-bag-icon" />
-                  <h3 style={{ fontSize: "1rem" }}>Embalagem simples</h3>
-                  <small className="text-muted">Apenas os produtos</small>
-                </div>
-              </div>
-
-              {bags.map(bag => {
-                const price = (bag.amountPaid / Math.max(1, bag.quantity)) * (1 + bag.margin / 100);
-                const isSelected = selectedBagId === bag.id;
-                return (
-                  <div
-                    key={bag.id}
-                    className={`gift-card bag-card-selectable ${isSelected ? "selected" : ""}`}
-                    onClick={() => setSelectedBagId(bag.id)}
-                  >
-                    {isSelected && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
-                    <div className="gift-card-thumb bag-card-thumb-height">
-                      {bag.imageUrl ? (
-                        <Image src={bag.imageUrl} alt={bag.name} fill sizes="200px" className="object-cover" unoptimized={bag.imageUrl.startsWith("data:")} />
-                      ) : (
-                        <div className="product-image-placeholder"><ShoppingBag size={24} /></div>
-                      )}
-                    </div>
-                    <div className="gift-card-body bag-card-body-flex">
-                      <h3>{bag.name}</h3>
-                      <strong className="gift-card-price bag-card-price-mt">+ {formatBRL(price)}</strong>
-                    </div>
+          {bags && bags.length > 0 && (
+            <section className="gift-section">
+              <h2 className="gift-section-title gift-section-title-center">
+                <span className="section-label section-label-flex">
+                  <ShoppingBag size={14} /> Passo {activeKits.length > 0 ? "3" : "2"}
+                </span>
+                <span className="gift-section-heading">
+                  Escolha a embalagem <span className="text-muted">(opcional)</span>
+                </span>
+              </h2>
+              <div className="bag-grid">
+                <div
+                  className={`gift-card bag-card-no-bag ${!selectedBagId ? "selected" : ""}`}
+                  onClick={() => setSelectedBagId(null)}
+                >
+                  {!selectedBagId && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
+                  <div className="bag-card-no-bag-content">
+                    <X size={24} className="bag-card-no-bag-icon" />
+                    <h3 style={{ fontSize: "1rem" }}>Embalagem simples</h3>
+                    <small className="text-muted">Apenas os produtos</small>
                   </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                </div>
+
+                {bags.map(bag => {
+                  const price = (bag.amountPaid / Math.max(1, bag.quantity)) * (1 + bag.margin / 100);
+                  const isSelected = selectedBagId === bag.id;
+                  return (
+                    <div
+                      key={bag.id}
+                      className={`gift-card bag-card-selectable ${isSelected ? "selected" : ""}`}
+                      onClick={() => setSelectedBagId(bag.id)}
+                    >
+                      {isSelected && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
+                      <div className="gift-card-thumb bag-card-thumb-height">
+                        {bag.imageUrl ? (
+                          <Image src={bag.imageUrl} alt={bag.name} fill sizes="200px" className="object-cover" unoptimized={bag.imageUrl.startsWith("data:")} />
+                        ) : (
+                          <div className="product-image-placeholder"><ShoppingBag size={24} /></div>
+                        )}
+                      </div>
+                      <div className="gift-card-body bag-card-body-flex">
+                        <h3>{bag.name}</h3>
+                        <strong className="gift-card-price bag-card-price-mt">+ {formatBRL(price)}</strong>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </section>
 
-      {/* Resumo do presente */}
-      <aside className="gift-summary">
+        {/* Resumo do presente */}
+        <aside className="gift-summary">
           <div className="gift-summary-header">
             <Gift size={20} />
             <h2>Seu presente</h2>
@@ -599,7 +599,7 @@ export default function GiftBuilder({
                     <strong>{formatBRL(effectivePrice(i.product) * i.qty)}</strong>
                   </li>
                 ))}
-                
+
                 {selectedBag && (
                   <li className="bag-summary-li">
                     <span><ShoppingBag size={14} className="bag-summary-icon" /> {selectedBag.name}</span>
