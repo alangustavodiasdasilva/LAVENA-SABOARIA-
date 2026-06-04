@@ -42,10 +42,18 @@ export default function RootLayout({
           <FloatingCart />
           <footer className="footer">
             <div className="container footer-inner">
-              <p className="footer-logo">
-                Lavena<span className="logo-dot">.</span>
-              </p>
-              <p className="footer-tagline">Beleza que vem da natureza ♡</p>
+              <div className="footer-top">
+                <div className="footer-brand">
+                  <p className="footer-logo">Lavena<span className="logo-dot">.</span></p>
+                  <p className="footer-slogan">Beleza que vem da natureza ♡</p>
+                </div>
+                <nav className="footer-nav">
+                  <a href="/#produtos">Produtos</a>
+                  <a href="/#sobre">Sobre</a>
+                  <a href="/presente">Monte um presente</a>
+                  <a href="/carrinho">Carrinho</a>
+                </nav>
+              </div>
               <hr className="footer-divider" />
               <p className="footer-copy">
                 &copy; {new Date().getFullYear()} Lavena Saboaria Artesanal. Todos os direitos reservados.
