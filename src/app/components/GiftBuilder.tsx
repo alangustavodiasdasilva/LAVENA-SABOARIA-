@@ -411,36 +411,7 @@ export default function GiftBuilder({
             <h2>Seu presente</h2>
           </div>
 
-          {totalUnits === 0 ? (
-            <div className="gift-empty">
-              <p>Nenhum item selecionado.</p>
-              <small>Escolha kits ou produtos no catálogo.</small>
-            </div>
-          ) : (
-            <>
-              <ul className="gift-summary-list">
-                {selectedKits.map((k) => (
-                  <li key={`k-${k.kit.id}`}>
-                    <span>🎀 {k.qty}× Kit {k.kit.name}</span>
-                    <strong>{formatBRL(effectivePrice(k.kit) * k.qty)}</strong>
-                  </li>
-                ))}
-                {selectedItems.map((it) => (
-                  <li key={`p-${it.product.id}`}>
-                    <span>{it.qty}× {it.product.name}</span>
-                    <strong>{formatBRL(effectivePrice(it.product) * it.qty)}</strong>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="gift-summary-row total">
-                <span>Total</span>
-                <strong>{formatBRL(totalValue)}</strong>
-              </div>
-            </>
-          )}
-
-          <div className="gift-summary-fields">
+          <div className="gift-summary-fields" style={{ marginTop: 0 }}>
             <div className="gift-fields-divider">Seus dados</div>
             <label>
               Seu nome <span className="required-mark">*</span>
@@ -497,6 +468,37 @@ export default function GiftBuilder({
               />
             </label>
           </div>
+
+          <div className="gift-fields-divider">Resumo do Pedido</div>
+
+          {totalUnits === 0 ? (
+            <div className="gift-empty">
+              <p>Nenhum item selecionado.</p>
+              <small>Escolha kits ou produtos no catálogo.</small>
+            </div>
+          ) : (
+            <>
+              <ul className="gift-summary-list">
+                {selectedKits.map((k) => (
+                  <li key={`k-${k.kit.id}`}>
+                    <span>🎀 {k.qty}× Kit {k.kit.name}</span>
+                    <strong>{formatBRL(effectivePrice(k.kit) * k.qty)}</strong>
+                  </li>
+                ))}
+                {selectedItems.map((it) => (
+                  <li key={`p-${it.product.id}`}>
+                    <span>{it.qty}× {it.product.name}</span>
+                    <strong>{formatBRL(effectivePrice(it.product) * it.qty)}</strong>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="gift-summary-row total">
+                <span>Total</span>
+                <strong>{formatBRL(totalValue)}</strong>
+              </div>
+            </>
+          )}
 
           <button
             onClick={enviarPresente}
