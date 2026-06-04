@@ -474,6 +474,23 @@ export default function GiftBuilder({
                         
                         {p.variants && p.variants.length > 0 && (
                           <div style={{ margin: '8px 0', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedVariants(prev => ({ ...prev, [p.id]: "" }));
+                              }}
+                              style={{
+                                padding: '4px 8px',
+                                fontSize: '0.75rem',
+                                borderRadius: '4px',
+                                border: `1px solid ${activeVariantId === "" ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                                background: activeVariantId === "" ? 'var(--color-surface)' : 'transparent',
+                                opacity: (p.stockStatus || "IN_STOCK") === "IN_STOCK" ? 1 : 0.5,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {p.size || "Padrão"}
+                            </button>
                             {p.variants.map(v => {
                               const vAvailable = (v.stockStatus || "IN_STOCK") === "IN_STOCK";
                               return (

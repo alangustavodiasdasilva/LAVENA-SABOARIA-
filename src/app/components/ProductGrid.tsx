@@ -196,7 +196,7 @@ export default function ProductGrid({
               {selectedProduct.category?.name || "Sem Categoria"}
             </span>
             <h2 className="product-sheet-title">{selectedProduct.name}</h2>
-            {selectedProduct.size && (
+            {selectedProduct.size && (!selectedProduct.variants || selectedProduct.variants.length === 0) && (
               <span className="product-sheet-size">{selectedProduct.size}</span>
             )}
             <div className="product-sheet-price-wrap">
@@ -216,6 +216,21 @@ export default function ProductGrid({
               <div style={{ marginTop: '15px' }}>
                 <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', color: 'var(--color-text)' }}>Opções de Tamanho / Peso</h4>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => setSelectedVariantId("")}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '4px',
+                      border: `1.5px solid ${selectedVariantId === "" ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                      background: selectedVariantId === "" ? 'var(--color-surface)' : 'transparent',
+                      color: (selectedProduct.stockStatus || "IN_STOCK") === "IN_STOCK" ? 'var(--color-text)' : 'var(--color-text-light)',
+                      cursor: 'pointer',
+                      opacity: (selectedProduct.stockStatus || "IN_STOCK") === "IN_STOCK" ? 1 : 0.6,
+                      fontWeight: selectedVariantId === "" ? 600 : 400
+                    }}
+                  >
+                    {selectedProduct.size || "Padrão"}
+                  </button>
                   {selectedProduct.variants.map(v => {
                     const isAvailable = (v.stockStatus || "IN_STOCK") === "IN_STOCK";
                     return (
