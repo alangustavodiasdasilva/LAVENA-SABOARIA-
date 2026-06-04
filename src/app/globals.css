@@ -223,9 +223,12 @@ input, textarea, select {
 .logo-dot { color: var(--color-gold); }
 
 .header-nav {
-  display: flex;
+  display: none;
   gap: 1.5rem;
   align-items: center;
+}
+@media (min-width: 768px) {
+  .header-nav { display: flex; }
 }
 .header-nav a {
   font-size: 0.92rem;
@@ -303,6 +306,9 @@ input, textarea, select {
 }
 
 .header-mobile-actions { display: flex; align-items: center; gap: 8px; }
+@media (min-width: 768px) {
+  .header-mobile-actions { display: none; }
+}
 .hamburger-btn {
   display: inline-flex;
   align-items: center;
