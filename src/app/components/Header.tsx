@@ -18,7 +18,6 @@ export default function Header() {
     if (searchQuery.trim()) {
       router.push(`/?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchOpen(false);
-      setSearchQuery("");
       setOpen(false);
       setTimeout(() => {
         const el = document.getElementById('produtos');
@@ -28,6 +27,12 @@ export default function Header() {
         }
       }, 400);
     }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSearchOpen(false);
+    router.push('/');
   };
 
   useEffect(() => {
@@ -57,7 +62,7 @@ export default function Header() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="header-search-input"
               />
-              <button type="button" onClick={() => setSearchOpen(false)} className="header-search-close">
+              <button type="button" onClick={clearSearch} className="header-search-close">
                 <X size={16} />
               </button>
             </form>

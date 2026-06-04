@@ -40,9 +40,6 @@ function effectivePrice(p: Product, variantId?: string) {
     const v = p.variants.find(x => x.id === variantId);
     if (v) return (v.salePrice && v.salePrice > 0 && v.salePrice < v.price) ? v.salePrice : v.price;
   }
-  if (variantId !== "" && p.variants && p.variants.length > 0) {
-    return Math.min(...p.variants.map(v => (v.salePrice && v.salePrice > 0 && v.salePrice < v.price) ? v.salePrice : v.price));
-  }
   if (p.salePrice && p.salePrice > 0 && p.salePrice < p.price) return p.salePrice;
   return p.price;
 }
@@ -54,15 +51,6 @@ function discountPct(p: Product, variantId?: string) {
       if (!v.salePrice || v.salePrice <= 0 || v.salePrice >= v.price) return 0;
       return Math.round(((v.price - v.salePrice) / v.price) * 100);
     }
-  }
-  if (variantId !== "" && p.variants && p.variants.length > 0) {
-    // Find min price variant just to show 'up to X% off' in grid, but simple logic uses base product for now, actually let's just use the best discount among variants if any
-    const bestDiscount = Math.max(...p.variants.map(v => {
-      if (!v.salePrice || v.salePrice <= 0 || v.salePrice >= v.price) return 0;
-      return Math.round(((v.price - v.salePrice) / v.price) * 100);
-    }));
-    const baseDiscount = (!p.salePrice || p.salePrice <= 0 || p.salePrice >= p.price) ? 0 : Math.round(((p.price - p.salePrice) / p.price) * 100);
-    return Math.max(bestDiscount, baseDiscount);
   }
   if (!p.salePrice || p.salePrice <= 0 || p.salePrice >= p.price) return 0;
   return Math.round(((p.price - p.salePrice) / p.price) * 100);
@@ -366,6 +354,34 @@ export default function ProductGrid({
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {searchQuery && (
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <span style={{ fontSize: '1.1rem', color: 'var(--color-text)' }}>
+            Resultados para: <strong>{searchQuery}</strong>
+          </span>
+          <button 
+            onClick={() => {
+              setSearchQuery("");
+              window.history.pushState(null, '', window.location.pathname);
+            }} 
+            style={{ 
+              marginLeft: '15px', 
+              fontSize: '0.85rem', 
+              color: 'var(--color-text)', 
+              background: 'transparent', 
+              border: '1.5px solid var(--color-border)', 
+              borderRadius: '20px', 
+              padding: '4px 12px', 
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+            <X size={14} /> Limpar
+          </button>
         </div>
       )}
 
