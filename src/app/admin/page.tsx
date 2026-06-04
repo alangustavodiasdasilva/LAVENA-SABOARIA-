@@ -45,6 +45,7 @@ type Prod = {
   stockQuantity?: number;
   lowStockAlert?: number;
   category?: Cat | null;
+  variants?: { id?: string; name: string; price: number; salePrice?: number | null; imageUrl?: string | null; stockStatus?: StockStatus; stockQuantity?: number; }[];
 };
 
 const emptyForm = {
@@ -63,6 +64,7 @@ const emptyForm = {
   stockStatus: "IN_STOCK" as StockStatus,
   stockQuantity: "0",
   lowStockAlert: "3",
+  variants: [] as any[],
 };
 
 const STATUS_OPTIONS: { value: StockStatus; label: string; key: string }[] = [
@@ -387,6 +389,15 @@ export default function AdminPage() {
         stockStatus: (prod.stockStatus as StockStatus) || "IN_STOCK",
         stockQuantity: (prod.stockQuantity ?? 0).toString(),
         lowStockAlert: (prod.lowStockAlert ?? 3).toString(),
+        variants: (prod.variants || []).map(v => ({
+          id: v.id,
+          name: v.name,
+          price: v.price.toString().replace(".", ","),
+          salePrice: v.salePrice ? v.salePrice.toString().replace(".", ",") : "",
+          imageUrl: v.imageUrl || "",
+          stockStatus: v.stockStatus || "IN_STOCK",
+          stockQuantity: (v.stockQuantity || 0).toString(),
+        }))
       });
     } else {
       setProdForm({ ...emptyForm, categoryId: categories[0]?.id || "" });
@@ -397,6 +408,45 @@ export default function AdminPage() {
   const closeProductModal = () => {
     setIsProductModalOpen(false);
     setFormError("");
+  };
+
+  const addVariant = () => {
+    setProdForm(prev => ({
+      ...prev,
+      variants: [...(prev.variants || []), { name: "", price: "", salePrice: "", imageUrl: "", stockStatus: "IN_STOCK", stockQuantity: "0" }]
+    }));
+  };
+  
+  const updateVariant = (index: number, key: string, value: any) => {
+    setProdForm(prev => {
+      const vars = [...(prev.variants || [])];
+      vars[index] = { ...vars[index], [key]: value };
+      return { ...prev, variants: vars };
+    });
+  };
+  
+  const removeVariant = (index: number) => {
+    setProdForm(prev => ({
+      ...prev,
+      variants: (prev.variants || []).filter((_, i) => i !== index)
+    }));
+  };
+  
+  const handleVariantUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const url = await uploadImage(fd);
+      if (url) updateVariant(index, "imageUrl", url);
+    } catch (err: any) {
+      showToast("error", err.message);
+    } finally {
+      setIsUploading(false);
+      if (e.target) e.target.value = "";
+    }
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -442,6 +492,15 @@ export default function AdminPage() {
       stockStatus: prodForm.stockStatus,
       stockQuantity: qty,
       lowStockAlert: Number.isNaN(lowAlert) ? 3 : Math.max(0, lowAlert),
+      variants: prodForm.variants?.map((v: any) => ({
+        id: v.id,
+        name: v.name,
+        price: parseFloat(String(v.price).replace(",", ".")),
+        salePrice: v.salePrice ? parseFloat(String(v.salePrice).replace(",", ".")) : null,
+        imageUrl: v.imageUrl,
+        stockStatus: v.stockStatus || "IN_STOCK",
+        stockQuantity: parseInt(String(v.stockQuantity || "0"), 10)
+      }))
     };
     try {
       if (prodForm.id) {
@@ -1530,6 +1589,74 @@ export default function AdminPage() {
                     placeholder="Glicerina vegetal, óleo essencial de lavanda..."
                   />
                 </div>
+              </div>
+
+              {/* Seção Variações */}
+              <div className="admin-form-group admin-variants-section" style={{ borderTop: '1px solid var(--color-border)', paddingTop: '20px', marginTop: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <label style={{ margin: 0 }}>Variações de Peso/Tamanho (Opcional)</label>
+                  <button type="button" onClick={addVariant} className="btn btn-sm btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Plus size={14} /> Adicionar Variação
+                  </button>
+                </div>
+                <small className="admin-hint">Se adicionar variações, o preço principal e estoque acima serão ignorados no site (o cliente escolherá uma destas variações).</small>
+
+                {prodForm.variants && prodForm.variants.map((v, idx) => (
+                  <div key={idx} className="admin-variant-card" style={{ background: 'var(--color-surface-warm)', padding: '15px', borderRadius: '8px', marginBottom: '15px', border: '1px solid var(--color-border-light)' }}>
+                    <div className="admin-modal-header" style={{ padding: 0, marginBottom: '10px' }}>
+                      <h4 style={{ margin: 0, fontSize: '0.9rem' }}>Variação {idx + 1}</h4>
+                      <button type="button" onClick={() => removeVariant(idx)} className="btn-icon-only" aria-label="Remover">
+                        <Trash2 size={16} color="var(--color-danger)" />
+                      </button>
+                    </div>
+
+                    <div className="admin-grid-2">
+                      <div className="admin-form-group">
+                        <label>Nome / Peso (ex: 80g) *</label>
+                        <input required type="text" className="admin-input" value={v.name} onChange={(e) => updateVariant(idx, "name", e.target.value)} />
+                      </div>
+                      <div className="admin-form-group">
+                        <label>Foto específica</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          {v.imageUrl && <img src={v.imageUrl} alt="variação" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 4 }} />}
+                          <label className="btn btn-sm btn-outline" style={{ cursor: 'pointer', flex: 1, textAlign: 'center' }}>
+                            {v.imageUrl ? "Trocar" : "Upload"}
+                            <input type="file" accept="image/*" hidden onChange={(e) => handleVariantUpload(e, idx)} disabled={isUploading} />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="admin-grid-2">
+                      <div className="admin-form-group">
+                        <label>Preço (R$) *</label>
+                        <input required type="text" inputMode="decimal" className="admin-input" value={v.price} onChange={(e) => updateVariant(idx, "price", e.target.value)} />
+                      </div>
+                      <div className="admin-form-group">
+                        <label>Preço promocional</label>
+                        <input type="text" inputMode="decimal" className="admin-input" value={v.salePrice || ""} onChange={(e) => updateVariant(idx, "salePrice", e.target.value)} />
+                      </div>
+                    </div>
+
+                    <div className="admin-grid-2">
+                      <div className="admin-form-group">
+                        <label>Estoque</label>
+                        <input type="number" className="admin-input" value={v.stockQuantity} min={0} onChange={(e) => updateVariant(idx, "stockQuantity", e.target.value)} />
+                      </div>
+                      <div className="admin-form-group">
+                        <label>Status</label>
+                        <div className="admin-select-wrap">
+                          <select className="admin-input" value={v.stockStatus} onChange={(e) => updateVariant(idx, "stockStatus", e.target.value)}>
+                            <option value="IN_STOCK">Em estoque</option>
+                            <option value="IN_PRODUCTION">Em produção</option>
+                            <option value="OUT_OF_STOCK">Esgotado</option>
+                          </select>
+                          <ChevronDown size={14} className="admin-select-chev" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <label className="admin-checkbox">

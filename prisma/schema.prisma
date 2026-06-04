@@ -40,7 +40,24 @@ model Product {
   isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  variants    ProductVariant[]
 
+  @@schema("saboaria")
+}
+
+model ProductVariant {
+  id            String   @id @default(uuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name          String
+  price         Float
+  salePrice     Float?
+  imageUrl      String?
+  stockStatus   String   @default("IN_STOCK")
+  stockQuantity Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
   @@schema("saboaria")
 }
 

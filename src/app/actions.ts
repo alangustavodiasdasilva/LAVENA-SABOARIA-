@@ -192,15 +192,24 @@ export async function deleteCategory(id: string) {
   return category;
 }
 
-// PRODUCTS
 export async function getProducts() {
   return await prisma.product.findMany({
-    include: { category: true },
+    include: { category: true, variants: true },
     orderBy: { createdAt: "desc" },
   });
 }
 
 export type StockStatus = "IN_STOCK" | "IN_PRODUCTION" | "OUT_OF_STOCK";
+
+export type ProductVariantInput = {
+  id?: string;
+  name: string;
+  price: number;
+  salePrice?: number | null;
+  imageUrl?: string | null;
+  stockStatus?: StockStatus;
+  stockQuantity?: number;
+};
 
 export type ProductInput = {
   name: string;
@@ -217,6 +226,7 @@ export type ProductInput = {
   stockStatus?: StockStatus;
   stockQuantity?: number;
   lowStockAlert?: number;
+  variants?: ProductVariantInput[];
 };
 
 function validateProduct(data: ProductInput) {
@@ -246,10 +256,22 @@ export async function createProduct(data: ProductInput) {
     counter++;
   }
 
+  const { variants, ...productData } = data;
+
   const product = await prisma.product.create({
     data: {
-      ...data,
+      ...productData,
       slug: uniqueSlug,
+      variants: variants ? {
+        create: variants.map(v => ({
+          name: v.name,
+          price: v.price,
+          salePrice: v.salePrice,
+          imageUrl: v.imageUrl,
+          stockStatus: v.stockStatus || "IN_STOCK",
+          stockQuantity: v.stockQuantity || 0
+        }))
+      } : undefined
     },
   });
   revalidatePath("/admin");
@@ -269,11 +291,24 @@ export async function updateProduct(id: string, data: ProductInput) {
     counter++;
   }
 
+  const { variants, ...productData } = data;
+
   const product = await prisma.product.update({
     where: { id },
     data: {
-      ...data,
+      ...productData,
       slug: uniqueSlug,
+      variants: {
+        deleteMany: {},
+        create: variants ? variants.map(v => ({
+          name: v.name,
+          price: v.price,
+          salePrice: v.salePrice,
+          imageUrl: v.imageUrl,
+          stockStatus: v.stockStatus || "IN_STOCK",
+          stockQuantity: v.stockQuantity || 0
+        })) : []
+      }
     },
   });
   revalidatePath("/admin");

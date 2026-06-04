@@ -21,6 +21,7 @@ type Product = {
   categoryId: string;
   stockStatus?: string;
   category?: { id: string; name: string } | null;
+  variants?: { id: string; name: string; price: number; salePrice?: number | null; imageUrl?: string | null; stockStatus?: string; stockQuantity?: number; }[];
 };
 
 type Kit = {
@@ -87,7 +88,29 @@ export default function GiftBuilder({
   const closeDetailRef = useRef<HTMLButtonElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  const purchasables = products.filter(isPurchasable);
+  const flattenedProducts = useMemo(() => {
+    const list: Product[] = [];
+    products.forEach((p) => {
+      if (p.variants && p.variants.length > 0) {
+        p.variants.forEach((v) => {
+          list.push({
+            ...p,
+            id: `${p.id}-${v.id}`,
+            name: `${p.name} (${v.name})`,
+            price: v.price,
+            salePrice: v.salePrice,
+            imageUrl: v.imageUrl || p.imageUrl,
+            stockStatus: v.stockStatus || "IN_STOCK",
+          });
+        });
+      } else {
+        list.push(p);
+      }
+    });
+    return list;
+  }, [products]);
+
+  const purchasables = flattenedProducts.filter(isPurchasable);
   const activeKits = kits.filter((k) => k.isActive);
 
   const filtered = useMemo(() => {
@@ -104,10 +127,10 @@ export default function GiftBuilder({
 
   const selectedItems = useMemo(
     () =>
-      products
+      flattenedProducts
         .filter((p) => selection[p.id] > 0)
         .map((p) => ({ product: p, qty: selection[p.id] })),
-    [products, selection]
+    [flattenedProducts, selection]
   );
 
   const selectedKits = useMemo(
