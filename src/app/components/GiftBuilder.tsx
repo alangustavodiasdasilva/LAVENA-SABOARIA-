@@ -215,16 +215,13 @@ export default function GiftBuilder({
         <ArrowLeft size={16} /> Voltar para a loja
       </a>
 
-      <div className="gift-header">
-        <div className="gift-header-icon">
-          <Gift size={28} />
-        </div>
-        <div>
-          <h1 className="gift-title">Monte um presente</h1>
-          <p className="gift-subtitle">
-            Escolha itens ou kits prontos, personalize a mensagem e envie pelo WhatsApp.
-          </p>
-        </div>
+      <div className="gift-header" style={{ display: "block", textAlign: "center", marginBottom: "32px" }}>
+        <h1 className="gift-title" style={{ fontFamily: "var(--font-heading)", fontStyle: "italic", fontSize: "2.4rem", color: "var(--color-primary-dark)" }}>
+          Monte seu presente
+        </h1>
+        <p className="gift-subtitle" style={{ maxWidth: "580px", margin: "8px auto 0", fontSize: "0.95rem", color: "var(--color-text-light)" }}>
+          Selecione os kits prontos ou escolha produtos avulsos abaixo para criar uma combinação especial.
+        </p>
       </div>
 
       <div className="gift-layout">
@@ -232,9 +229,11 @@ export default function GiftBuilder({
           {/* Passo 1: Kits prontos */}
           {activeKits.length > 0 && (
             <div className="gift-section">
-              <h2 className="gift-section-title">
-                <span className="gift-step">1</span>
-                <Gift size={18} /> Escolha um kit pronto
+              <h2 className="gift-section-title" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "6px" }}>
+                <span className="section-label" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Gift size={14} /> Passo 1
+                </span>
+                <span style={{ fontSize: "1.4rem", fontFamily: "var(--font-heading)", fontStyle: "italic", color: "var(--color-primary-dark)" }}>Escolha um kit pronto</span>
               </h2>
               <div className="gift-kits-scroll">
                 {activeKits.map((kit) => {
@@ -307,10 +306,14 @@ export default function GiftBuilder({
 
           {/* Passo 2 (ou 1 sem kits): Produtos individuais */}
           <div className="gift-section">
-            <h2 className="gift-section-title">
-              <span className="gift-step">{activeKits.length > 0 ? "2" : "1"}</span>
-              <Plus size={18} /> {activeKits.length > 0 ? "Ou adicione produtos avulsos" : "Escolha os produtos"}
-            </h2>
+              <h2 className="gift-section-title" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "6px" }}>
+                <span className="section-label" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                  <Plus size={14} /> Passo {activeKits.length > 0 ? "2" : "1"}
+                </span>
+                <span style={{ fontSize: "1.4rem", fontFamily: "var(--font-heading)", fontStyle: "italic", color: "var(--color-primary-dark)" }}>
+                  {activeKits.length > 0 ? "Ou adicione produtos avulsos" : "Escolha os produtos"}
+                </span>
+              </h2>
 
             {categories.length > 0 && (
               <div className="categories-strip">

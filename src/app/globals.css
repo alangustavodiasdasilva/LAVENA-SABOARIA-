@@ -1187,12 +1187,25 @@ input, textarea, select {
 .cart-back {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.88rem;
-  color: var(--color-text-light);
-  margin-bottom: 16px;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text);
+  background: var(--color-surface-warm);
+  border: 1px solid var(--color-border-light);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--t-fast), background var(--t-fast), border-color var(--t-fast);
 }
-.cart-back:hover { color: var(--color-primary); }
+.cart-back:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: translateX(-3px);
+}
 
 .cart-title {
   font-size: clamp(1.7rem, 5vw, 2.4rem);
@@ -2419,22 +2432,7 @@ input, textarea, select {
 @media (min-width: 900px) { .gift-page { padding: 32px 0; } }
 
 .gift-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-.gift-header-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-light));
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 16px rgba(196,153,60,0.3);
-  flex-shrink: 0;
+  margin-bottom: 32px;
 }
 .gift-title {
   font-size: clamp(1.6rem, 4vw, 2.2rem);
@@ -2662,20 +2660,7 @@ input, textarea, select {
   color: var(--color-gold);
 }
 .gift-section-title svg { color: var(--color-gold); }
-.gift-step {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--color-gold);
-  color: white;
-  font-size: 0.82rem;
-  font-weight: 700;
-  font-family: var(--font-body);
-  flex-shrink: 0;
-}
+/* Removido o .gift-step em favor do rótulo .section-label */
 
 /* Kits horizontal scroll dentro do gift builder */
 .gift-kits-scroll {
