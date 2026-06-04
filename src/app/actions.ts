@@ -379,9 +379,8 @@ export async function updateStockQuantity(id: string, quantity: number) {
   const existing = await prisma.product.findUnique({ where: { id } });
   if (!existing) throw new Error("Produto não encontrado.");
 
-  // Auto-status: se cai pra 0 e estava em estoque → esgotado; se sobe de 0 com status esgotado → em estoque
   let nextStatus = existing.stockStatus;
-  if (qty === 0 && existing.stockStatus === "IN_STOCK") {
+  if (qty <= 0 && (existing.stockStatus === "IN_STOCK" || existing.stockStatus === "IN_PRODUCTION")) {
     nextStatus = "OUT_OF_STOCK";
   } else if (qty > 0 && existing.stockStatus === "OUT_OF_STOCK") {
     nextStatus = "IN_STOCK";
@@ -400,8 +399,22 @@ export async function adjustStock(id: string, delta: number) {
   await requireAdmin();
   const existing = await prisma.product.findUnique({ where: { id } });
   if (!existing) throw new Error("Produto não encontrado.");
-  const next = Math.max(0, existing.stockQuantity + delta);
-  return updateStockQuantity(id, next);
+
+  const newQty = Math.max(0, existing.stockQuantity + delta);
+  let nextStatus = existing.stockStatus;
+  if (newQty <= 0 && (existing.stockStatus === "IN_STOCK" || existing.stockStatus === "IN_PRODUCTION")) {
+    nextStatus = "OUT_OF_STOCK";
+  } else if (newQty > 0 && existing.stockStatus === "OUT_OF_STOCK") {
+    nextStatus = "IN_STOCK";
+  }
+
+  const product = await prisma.product.update({
+    where: { id },
+    data: { stockQuantity: newQty, stockStatus: nextStatus },
+  });
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return product;
 }
 
 export async function bulkUpdateStock(updates: { id: string; quantity: number }[]) {

@@ -285,22 +285,27 @@ export default function ProductGrid({
             </div>
 
             <div className="product-sheet-cta">
-              {purchasable ? (
-                <button
-                  className="btn btn-primary w-full"
-                  onClick={() => {
-                    addToCart({
-                      id: activeVariant ? `${selectedProduct.id}-${activeVariant.id}` : selectedProduct.id,
-                      name: activeVariant ? `${selectedProduct.name} (${activeVariant.name})` : selectedProduct.name,
-                      price: effectivePrice(selectedProduct, selectedVariantId),
-                      imageUrl: (activeVariant?.imageUrl) || selectedProduct.imageUrl || "",
-                    });
-                    setSelectedProduct(null);
-                  }}
-                >
-                  <ShoppingBag size={18} /> Adicionar ao Carrinho
-                </button>
-              ) : (
+              {purchasable ? (() => {
+                const isReserva = activeVariant 
+                  ? activeVariant.stockStatus === "IN_PRODUCTION" 
+                  : selectedProduct.stockStatus === "IN_PRODUCTION";
+                return (
+                  <button
+                    className="btn btn-primary w-full"
+                    onClick={() => {
+                      addToCart({
+                        id: activeVariant ? `${selectedProduct.id}-${activeVariant.id}` : selectedProduct.id,
+                        name: activeVariant ? `${selectedProduct.name} (${activeVariant.name})` : selectedProduct.name,
+                        price: effectivePrice(selectedProduct, selectedVariantId),
+                        imageUrl: (activeVariant?.imageUrl) || selectedProduct.imageUrl || "",
+                      });
+                      setSelectedProduct(null);
+                    }}
+                  >
+                    <ShoppingBag size={18} /> {isReserva ? "Reservar Produto" : "Adicionar à Sacola"}
+                  </button>
+                );
+              })() : (
                 <button className="btn btn-outline w-full" disabled>
                   {status?.label || "Indisponível"}
                 </button>
@@ -454,7 +459,7 @@ export default function ProductGrid({
                       }}
                       aria-label={
                         purchasable
-                          ? `Adicionar ${product.name} ao carrinho`
+                          ? (product.stockStatus === "IN_PRODUCTION" ? `Reservar ${product.name}` : `Adicionar ${product.name} ao carrinho`)
                           : `${product.name} indisponível`
                       }
                       disabled={!purchasable}
