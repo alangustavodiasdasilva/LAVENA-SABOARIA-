@@ -62,6 +62,7 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scrollbar-gutter: stable;
+  overflow-x: hidden;
 }
 
 body {
@@ -381,11 +382,12 @@ input, textarea, select {
   content: '';
   position: absolute;
   top: -40%;
-  right: -30%;
-  width: 600px;
-  height: 600px;
+  right: 0;
+  width: 400px;
+  height: 400px;
   background: radial-gradient(circle, var(--color-gold-muted) 0%, transparent 70%);
   pointer-events: none;
+  overflow: hidden;
 }
 .hero-inner { text-align: center; position: relative; z-index: 1; }
 .hero-logo-wrap {
