@@ -105,3 +105,18 @@ model PricingRecipe {
 
   @@schema("saboaria")
 }
+
+model Bag {
+  id         String   @id @default(uuid())
+  name       String
+  imageUrl   String?
+  amountPaid Float    @default(0)
+  quantity   Int      @default(1)
+  margin     Float    @default(100)
+  isActive   Boolean  @default(true)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@schema("saboaria")
+}

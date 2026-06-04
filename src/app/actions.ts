@@ -583,3 +583,55 @@ export async function deleteRecipe(id: string) {
   revalidatePath("/admin");
   return r;
 }
+
+// BAGS (Sacolas de Presente)
+export async function getBags() {
+  return await prisma.bag.findMany({ orderBy: { createdAt: "asc" } });
+}
+
+export async function getActiveBags() {
+  return await prisma.bag.findMany({
+    where: { isActive: true },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
+export async function createBag(data: {
+  name: string;
+  imageUrl?: string;
+  amountPaid: number;
+  quantity: number;
+  margin: number;
+  isActive?: boolean;
+  notes?: string;
+}) {
+  await requireAdmin();
+  const bag = await prisma.bag.create({ data });
+  revalidatePath("/admin");
+  revalidatePath("/presente");
+  return bag;
+}
+
+export async function updateBag(id: string, data: {
+  name?: string;
+  imageUrl?: string | null;
+  amountPaid?: number;
+  quantity?: number;
+  margin?: number;
+  isActive?: boolean;
+  notes?: string | null;
+}) {
+  await requireAdmin();
+  const bag = await prisma.bag.update({ where: { id }, data });
+  revalidatePath("/admin");
+  revalidatePath("/presente");
+  return bag;
+}
+
+export async function deleteBag(id: string) {
+  await requireAdmin();
+  const bag = await prisma.bag.delete({ where: { id } });
+  revalidatePath("/admin");
+  revalidatePath("/presente");
+  return bag;
+}

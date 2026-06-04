@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Gift, Plus, Minus, MessageCircle, ArrowLeft, Check, Info, X,
+  Gift, Plus, Minus, MessageCircle, ArrowLeft, Check, Info, X, ShoppingBag,
 } from "lucide-react";
 
 type Product = {
@@ -35,6 +35,16 @@ type Kit = {
   isFeatured: boolean;
 };
 
+type Bag = {
+  id: string;
+  name: string;
+  imageUrl?: string | null;
+  amountPaid: number;
+  quantity: number;
+  margin: number;
+  isActive: boolean;
+};
+
 type Category = { id: string; name: string };
 
 function effectivePrice(p: { price: number; salePrice?: number | null }) {
@@ -54,15 +64,18 @@ export default function GiftBuilder({
   products,
   kits,
   categories,
+  bags = [],
   whatsappNumber,
 }: {
   products: Product[];
   kits: Kit[];
   categories: Category[];
+  bags?: Bag[];
   whatsappNumber: string;
 }) {
   const [selection, setSelection] = useState<Record<string, number>>({});
   const [kitSelection, setKitSelection] = useState<Record<string, number>>({});
+  const [selectedBagId, setSelectedBagId] = useState<string | null>(null);
   const [query, _setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [senderName, setSenderName] = useState("");
@@ -105,13 +118,21 @@ export default function GiftBuilder({
     [kits, kitSelection]
   );
 
+  const selectedBag = useMemo(() => bags.find(b => b.id === selectedBagId), [bags, selectedBagId]);
+  
+  const bagPrice = selectedBag 
+    ? (selectedBag.amountPaid / Math.max(1, selectedBag.quantity)) * (1 + selectedBag.margin / 100) 
+    : 0;
+
   const totalUnits =
     selectedItems.reduce((s, i) => s + i.qty, 0) +
-    selectedKits.reduce((s, k) => s + k.qty, 0);
+    selectedKits.reduce((s, k) => s + k.qty, 0) +
+    (selectedBag ? 1 : 0);
 
   const totalValue =
     selectedItems.reduce((s, i) => s + effectivePrice(i.product) * i.qty, 0) +
-    selectedKits.reduce((s, k) => s + effectivePrice(k.kit) * k.qty, 0);
+    selectedKits.reduce((s, k) => s + effectivePrice(k.kit) * k.qty, 0) +
+    bagPrice;
 
   const adjustQty = (id: string, delta: number) => {
     setSelection((s) => {
@@ -213,8 +234,14 @@ export default function GiftBuilder({
       const subtotal = price * it.qty;
       linhas.push(`🌿 *${it.product.name}*`);
       linhas.push(`   ${it.qty} un. × ${formatBRL(price)} = ${formatBRL(subtotal)}`);
-      if (idx < selectedItems.length - 1) linhas.push("");
+      linhas.push("");
     });
+
+    if (selectedBag) {
+      linhas.push(`🛍️ *Sacola/Embalagem: ${selectedBag.name}*`);
+      linhas.push(`   1 un. × ${formatBRL(bagPrice)} = ${formatBRL(bagPrice)}`);
+      linhas.push("");
+    }
 
     linhas.push("━━━━━━━━━━━━━━━━━");
     linhas.push("");
@@ -439,8 +466,59 @@ export default function GiftBuilder({
           </div>
         </section>
 
-        {/* Resumo do presente */}
-        <aside className="gift-summary">
+        {bags && bags.length > 0 && (
+          <section className="gift-section">
+            <div className="gift-section-header">
+              <div className="section-label-flex">
+                <span className="step-badge">3</span>
+                <h2 className="gift-section-heading">Escolha a embalagem <span className="text-muted">(opcional)</span></h2>
+              </div>
+            </div>
+            <div className="bag-grid">
+              <div
+                className={`gift-card ${!selectedBagId ? "selected" : ""}`}
+                onClick={() => setSelectedBagId(null)}
+                style={{ minHeight: "160px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", cursor: "pointer" }}
+              >
+                {!selectedBagId && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
+                <div style={{ padding: 16, textAlign: "center" }}>
+                  <X size={24} style={{ margin: "0 auto 8px", color: "var(--color-text-light)" }} />
+                  <h3 style={{ fontSize: "1rem" }}>Sem sacola</h3>
+                  <small className="text-muted">Apenas os produtos</small>
+                </div>
+              </div>
+
+              {bags.map(bag => {
+                const price = (bag.amountPaid / Math.max(1, bag.quantity)) * (1 + bag.margin / 100);
+                const isSelected = selectedBagId === bag.id;
+                return (
+                  <div
+                    key={bag.id}
+                    className={`gift-card ${isSelected ? "selected" : ""}`}
+                    onClick={() => setSelectedBagId(bag.id)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {isSelected && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
+                    <div className="gift-card-thumb" style={{ height: 160 }}>
+                      {bag.imageUrl ? (
+                        <Image src={bag.imageUrl} alt={bag.name} fill sizes="200px" className="object-cover" unoptimized={bag.imageUrl.startsWith("data:")} />
+                      ) : (
+                        <div className="product-image-placeholder"><ShoppingBag size={24} /></div>
+                      )}
+                    </div>
+                    <div className="gift-card-body">
+                      <h3>{bag.name}</h3>
+                      <strong className="gift-card-price" style={{ marginTop: "auto" }}>+ {formatBRL(price)}</strong>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+      {/* Resumo do presente */}
+      <aside className="gift-summary">
           <div className="gift-summary-header">
             <Gift size={20} />
             <h2>Seu presente</h2>
@@ -515,12 +593,19 @@ export default function GiftBuilder({
                     <strong>{formatBRL(effectivePrice(k.kit) * k.qty)}</strong>
                   </li>
                 ))}
-                {selectedItems.map((it) => (
-                  <li key={`p-${it.product.id}`}>
-                    <span>{it.qty}× {it.product.name}</span>
-                    <strong>{formatBRL(effectivePrice(it.product) * it.qty)}</strong>
+                {selectedItems.map((i) => (
+                  <li key={i.product.id}>
+                    <span>{i.qty}× {i.product.name}</span>
+                    <strong>{formatBRL(effectivePrice(i.product) * i.qty)}</strong>
                   </li>
                 ))}
+                
+                {selectedBag && (
+                  <li style={{ marginTop: 8, paddingTop: 8, borderTop: "1px dashed var(--color-border)" }}>
+                    <span><ShoppingBag size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} /> {selectedBag.name}</span>
+                    <strong>{formatBRL(bagPrice)}</strong>
+                  </li>
+                )}
               </ul>
 
               <div className="gift-summary-row total">

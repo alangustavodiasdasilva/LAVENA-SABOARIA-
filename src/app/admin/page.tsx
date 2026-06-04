@@ -18,6 +18,8 @@ import {
 import Link from "next/link";
 import KitManager from "../components/admin/KitManager";
 import Calculator from "../components/admin/Calculator";
+import BagManager from "../components/admin/BagManager";
+import { ShoppingBag } from "lucide-react";
 
 type StockStatus = "IN_STOCK" | "IN_PRODUCTION" | "OUT_OF_STOCK";
 type AppSettings = {
@@ -76,7 +78,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
 
-  const [activeTab, setActiveTab] = useState<"config" | "categorias" | "produtos" | "estoque" | "kits" | "calculadora">("produtos");
+  const [activeTab, setActiveTab] = useState<"config" | "categorias" | "produtos" | "estoque" | "kits" | "calculadora" | "sacolas">("produtos");
   const [stockEdits, setStockEdits] = useState<Record<string, string>>({});
   const [kits, setKits] = useState<any[]>([]);
   const [materials, setMaterials] = useState<any[]>([]);
@@ -640,8 +642,13 @@ export default function AdminPage() {
             className={`admin-nav-item ${activeTab === "calculadora" ? "active" : ""}`}
             onClick={() => setActiveTab("calculadora")}
           >
-            <CalcIcon size={18} /> <span>Calculadora</span>
-            <span className="admin-nav-count">{recipes.length}</span>
+            <CalcIcon size={18} /> <span>Calculadora de Preço</span>
+          </button>
+          <button
+            className={`admin-nav-item ${activeTab === "sacolas" ? "active" : ""}`}
+            onClick={() => setActiveTab("sacolas")}
+          >
+            <ShoppingBag size={18} /> <span>Sacolas</span>
           </button>
           <button
             className={`admin-nav-item ${activeTab === "config" ? "active" : ""}`}
@@ -1244,6 +1251,9 @@ export default function AdminPage() {
               </div>
             )}
           </div>
+        )}
+        {activeTab === "sacolas" && (
+          <BagManager showToast={showToast} />
         )}
       </main>
 

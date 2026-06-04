@@ -2484,6 +2484,19 @@ body:has(.admin-login) .floating-cart {
   .gift-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+.bag-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+@media (min-width: 600px) {
+  .bag-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
+@media (min-width: 1100px) {
+  .bag-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+}
+
 .gift-card {
   position: relative;
   background: var(--color-surface);

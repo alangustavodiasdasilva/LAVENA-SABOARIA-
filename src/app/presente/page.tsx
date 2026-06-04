@@ -1,14 +1,15 @@
-import { getProducts, getSettings, getCategories, getActiveKits } from "../actions";
+import { getProducts, getSettings, getCategories, getActiveKits, getActiveBags } from "../actions";
 import GiftBuilder from "../components/GiftBuilder";
 
 export const dynamic = "force-dynamic";
 
 export default async function PresentePage() {
-  const [products, settings, categories, kits] = await Promise.all([
+  const [products, settings, categories, kits, bags] = await Promise.all([
     getProducts(),
     getSettings(),
     getCategories(),
     getActiveKits(),
+    getActiveBags(),
   ]);
 
   return (
@@ -16,6 +17,7 @@ export default async function PresentePage() {
       products={products as any}
       kits={kits as any}
       categories={categories as any}
+      bags={bags as any}
       whatsappNumber={settings?.whatsappNumber || ""}
     />
   );
