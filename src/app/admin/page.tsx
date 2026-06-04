@@ -416,7 +416,7 @@ export default function AdminPage() {
       variants: [...(prev.variants || []), { name: "", price: "", salePrice: "", imageUrl: "", stockStatus: "IN_STOCK", stockQuantity: "0" }]
     }));
   };
-  
+
   const updateVariant = (index: number, key: string, value: any) => {
     setProdForm(prev => {
       const vars = [...(prev.variants || [])];
@@ -424,14 +424,14 @@ export default function AdminPage() {
       return { ...prev, variants: vars };
     });
   };
-  
+
   const removeVariant = (index: number) => {
     setProdForm(prev => ({
       ...prev,
       variants: (prev.variants || []).filter((_, i) => i !== index)
     }));
   };
-  
+
   const handleVariantUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
     if (!file) return;

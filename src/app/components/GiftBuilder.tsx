@@ -84,6 +84,7 @@ export default function GiftBuilder({
   const [cardMessage, setCardMessage] = useState("");
   const [extraNote, setExtraNote] = useState("");
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const closeDetailRef = useRef<HTMLButtonElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -110,7 +111,12 @@ export default function GiftBuilder({
     return list;
   }, [products]);
 
-  const purchasables = flattenedProducts.filter(isPurchasable);
+  const purchasables = products.filter(p => {
+    if (p.variants && p.variants.length > 0) {
+      return p.variants.some(v => (v.stockStatus || "IN_STOCK") === "IN_STOCK");
+    }
+    return (p.stockStatus || "IN_STOCK") === "IN_STOCK";
+  });
   const activeKits = kits.filter((k) => k.isActive);
 
   const filtered = useMemo(() => {
@@ -423,11 +429,17 @@ export default function GiftBuilder({
             ) : (
               <div className="gift-grid">
                 {filtered.map((p) => {
-                  const qty = selection[p.id] || 0;
-                  const img = p.imageUrl || p.images?.[0];
-                  const price = effectivePrice(p);
+                  const activeVariantId = selectedVariants[p.id] || (p.variants && p.variants.length > 0 ? p.variants[0].id : "");
+                  const selectionId = activeVariantId ? `${p.id}-${activeVariantId}` : p.id;
+                  const qty = selection[selectionId] || 0;
+                  
+                  const activeVariant = p.variants?.find(v => v.id === activeVariantId);
+                  const img = activeVariant?.imageUrl || p.imageUrl || p.images?.[0];
+                  const price = activeVariant ? effectivePrice(activeVariant) : effectivePrice(p);
+                  const isAvailable = activeVariant ? (activeVariant.stockStatus || "IN_STOCK") === "IN_STOCK" : (p.stockStatus || "IN_STOCK") === "IN_STOCK";
+
                   return (
-                    <div key={p.id} className={`gift-card ${qty > 0 ? "selected" : ""}`}>
+                    <div key={p.id} className={`gift-card ${qty > 0 ? "selected" : ""} ${!isAvailable ? "is-unavailable" : ""}`}>
                       {qty > 0 && (
                         <span className="gift-card-check" aria-hidden>
                           <Check size={14} />
@@ -458,23 +470,54 @@ export default function GiftBuilder({
                       </div>
                       <div className="gift-card-body">
                         <h3>{p.name}</h3>
-                        {p.size && <small className="text-muted">{p.size}</small>}
+                        {p.size && !p.variants?.length && <small className="text-muted">{p.size}</small>}
+                        
+                        {p.variants && p.variants.length > 0 && (
+                          <div style={{ margin: '8px 0', display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                            {p.variants.map(v => {
+                              const vAvailable = (v.stockStatus || "IN_STOCK") === "IN_STOCK";
+                              return (
+                                <button
+                                  key={v.id}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedVariants(prev => ({ ...prev, [p.id]: v.id }));
+                                  }}
+                                  style={{
+                                    padding: '4px 8px',
+                                    fontSize: '0.75rem',
+                                    borderRadius: '4px',
+                                    border: `1px solid ${activeVariantId === v.id ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                                    background: activeVariantId === v.id ? 'var(--color-surface)' : 'transparent',
+                                    opacity: vAvailable ? 1 : 0.5,
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {v.name}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+
                         <strong className="gift-card-price">{formatBRL(price)}</strong>
                         <div className="gift-card-controls">
-                          {qty === 0 ? (
+                          {!isAvailable ? (
+                            <button className="btn btn-outline btn-sm w-full" disabled>Esgotado</button>
+                          ) : qty === 0 ? (
                             <button
                               className="btn btn-outline btn-sm w-full"
-                              onClick={() => adjustQty(p.id, 1)}
+                              onClick={() => adjustQty(selectionId, 1)}
                             >
                               <Plus size={14} /> Adicionar
                             </button>
                           ) : (
                             <div className="qty-group">
-                              <button onClick={() => adjustQty(p.id, -1)} className="qty-btn" aria-label="Diminuir">
+                              <button onClick={() => adjustQty(selectionId, -1)} className="qty-btn" aria-label="Diminuir">
                                 <Minus size={14} />
                               </button>
                               <span className="cart-item-qty">{qty}</span>
-                              <button onClick={() => adjustQty(p.id, 1)} className="qty-btn" aria-label="Aumentar">
+                              <button onClick={() => adjustQty(selectionId, 1)} className="qty-btn" aria-label="Aumentar">
                                 <Plus size={14} />
                               </button>
                             </div>
