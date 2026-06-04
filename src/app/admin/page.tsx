@@ -1024,6 +1024,7 @@ export default function AdminPage() {
                         value={productCatFilter}
                         onChange={(e) => setProductCatFilter(e.target.value)}
                         className="admin-input"
+                        title="Filtrar por categoria"
                       >
                         <option value="">Todas as categorias</option>
                         {categories.map((c) => (
@@ -1147,6 +1148,7 @@ export default function AdminPage() {
                       value={productCatFilter}
                       onChange={(e) => setProductCatFilter(e.target.value)}
                       className="admin-input"
+                      title="Filtrar produtos por categoria"
                     >
                       <option value="">Todas as categorias</option>
                       {categories.map((c) => (
@@ -1389,6 +1391,7 @@ export default function AdminPage() {
                       className="admin-input"
                       value={prodForm.categoryId}
                       onChange={(e) => setProdForm({ ...prodForm, categoryId: e.target.value })}
+                      title="Categoria do produto"
                     >
                       <option value="">Selecionar...</option>
                       {categories.map((c) => (
