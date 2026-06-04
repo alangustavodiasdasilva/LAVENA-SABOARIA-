@@ -476,13 +476,12 @@ export default function GiftBuilder({
             </div>
             <div className="bag-grid">
               <div
-                className={`gift-card ${!selectedBagId ? "selected" : ""}`}
+                className={`gift-card bag-card-no-bag ${!selectedBagId ? "selected" : ""}`}
                 onClick={() => setSelectedBagId(null)}
-                style={{ minHeight: "160px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", cursor: "pointer" }}
               >
                 {!selectedBagId && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
-                <div style={{ padding: 16, textAlign: "center" }}>
-                  <X size={24} style={{ margin: "0 auto 8px", color: "var(--color-text-light)" }} />
+                <div className="bag-card-no-bag-content">
+                  <X size={24} className="bag-card-no-bag-icon" />
                   <h3 style={{ fontSize: "1rem" }}>Sem sacola</h3>
                   <small className="text-muted">Apenas os produtos</small>
                 </div>
@@ -494,21 +493,20 @@ export default function GiftBuilder({
                 return (
                   <div
                     key={bag.id}
-                    className={`gift-card ${isSelected ? "selected" : ""}`}
+                    className={`gift-card bag-card-selectable ${isSelected ? "selected" : ""}`}
                     onClick={() => setSelectedBagId(bag.id)}
-                    style={{ cursor: "pointer" }}
                   >
                     {isSelected && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
-                    <div className="gift-card-thumb" style={{ height: 160 }}>
+                    <div className="gift-card-thumb bag-card-thumb-height">
                       {bag.imageUrl ? (
                         <Image src={bag.imageUrl} alt={bag.name} fill sizes="200px" className="object-cover" unoptimized={bag.imageUrl.startsWith("data:")} />
                       ) : (
                         <div className="product-image-placeholder"><ShoppingBag size={24} /></div>
                       )}
                     </div>
-                    <div className="gift-card-body">
+                    <div className="gift-card-body bag-card-body-flex">
                       <h3>{bag.name}</h3>
-                      <strong className="gift-card-price" style={{ marginTop: "auto" }}>+ {formatBRL(price)}</strong>
+                      <strong className="gift-card-price bag-card-price-mt">+ {formatBRL(price)}</strong>
                     </div>
                   </div>
                 );
@@ -601,8 +599,8 @@ export default function GiftBuilder({
                 ))}
                 
                 {selectedBag && (
-                  <li style={{ marginTop: 8, paddingTop: 8, borderTop: "1px dashed var(--color-border)" }}>
-                    <span><ShoppingBag size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} /> {selectedBag.name}</span>
+                  <li className="bag-summary-li">
+                    <span><ShoppingBag size={14} className="bag-summary-icon" /> {selectedBag.name}</span>
                     <strong>{formatBRL(bagPrice)}</strong>
                   </li>
                 )}

@@ -126,7 +126,7 @@ export default function ProductGrid({
             <button
               className={`category-chip ${selectedCategory === null ? "active" : ""}`}
               onClick={() => setSelectedCategory(null)}
-              aria-pressed={selectedCategory === null ? "true" : "false"}
+              aria-pressed={selectedCategory === null}
             >
               Todos
             </button>
@@ -135,7 +135,7 @@ export default function ProductGrid({
                 key={cat.id}
                 className={`category-chip ${selectedCategory === cat.id ? "active" : ""}`}
                 onClick={() => setSelectedCategory(cat.id)}
-                aria-pressed={selectedCategory === cat.id ? "true" : "false"}
+                aria-pressed={selectedCategory === cat.id}
               >
                 {cat.name}
               </button>

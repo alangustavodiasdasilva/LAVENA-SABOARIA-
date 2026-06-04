@@ -168,14 +168,14 @@ export default function BagManager({ showToast }: { showToast: (type: "success" 
                 </div>
                 <div className="admin-card-body">
                   <h3 className="admin-card-title">{bag.name}</h3>
-                  <div className="admin-card-stats" style={{ marginTop: 8 }}>
+                  <div className="admin-card-stats bag-stats-mt">
                     <div className="admin-card-stat">
                       <span className="stat-label">Custo Unitário</span>
                       <span className="stat-value text-red">R$ {(bag.amountPaid / bag.quantity).toFixed(2).replace(".", ",")}</span>
                     </div>
                     <div className="admin-card-stat">
                       <span className="stat-label">Preço de Venda</span>
-                      <span className="stat-value text-green" style={{ fontSize: "1.1rem" }}>R$ {sellingPrice.toFixed(2).replace(".", ",")}</span>
+                      <span className="stat-value text-green bag-price-lg">R$ {sellingPrice.toFixed(2).replace(".", ",")}</span>
                     </div>
                   </div>
                 </div>
@@ -191,10 +191,10 @@ export default function BagManager({ showToast }: { showToast: (type: "success" 
 
       {isModalOpen && (
         <div className="admin-modal-overlay">
-          <div className="admin-modal" style={{ maxWidth: 600 }}>
+          <div className="admin-modal admin-modal-lg">
             <div className="admin-modal-header">
               <h3>{form.id ? "Editar Sacola" : "Nova Sacola"}</h3>
-              <button className="btn-icon" onClick={() => setIsModalOpen(false)}><X size={20} /></button>
+              <button className="btn-icon" onClick={() => setIsModalOpen(false)} title="Fechar" aria-label="Fechar"><X size={20} /></button>
             </div>
             <div className="admin-modal-body">
               <form onSubmit={handleSave}>
@@ -233,27 +233,27 @@ export default function BagManager({ showToast }: { showToast: (type: "success" 
                   </div>
                 </div>
 
-                <div className="admin-form-group" style={{ background: "var(--color-bg)", padding: 16, borderRadius: 8, marginTop: 16 }}>
-                  <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--color-text-light)" }}>Resumo Financeiro:</p>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+                <div className="admin-form-group bag-summary-box">
+                  <p className="bag-summary-title">Resumo Financeiro:</p>
+                  <div className="bag-summary-flex">
                     <span>Custo por unidade: <strong>R$ {(form.amountPaid / Math.max(1, form.quantity)).toFixed(2).replace(".", ",")}</strong></span>
-                    <span>Preço Final de Venda: <strong style={{ color: "var(--color-primary-dark)", fontSize: "1.1rem" }}>R$ {calcSellingPrice(form.amountPaid, form.quantity, form.margin).toFixed(2).replace(".", ",")}</strong></span>
+                    <span>Preço Final de Venda: <strong className="bag-summary-price">R$ {calcSellingPrice(form.amountPaid, form.quantity, form.margin).toFixed(2).replace(".", ",")}</strong></span>
                   </div>
                 </div>
 
-                <div className="admin-form-group" style={{ marginTop: 16 }}>
+                <div className="admin-form-group admin-mt-16">
                   <label>Observações internas (opcional)</label>
                   <textarea className="admin-textarea" value={form.notes || ""} onChange={e => setForm({...form, notes: e.target.value})} placeholder="Ex: Comprado no Mercado Livre loja XPTO" rows={2} />
                 </div>
 
-                <div className="admin-form-group" style={{ marginTop: 16 }}>
+                <div className="admin-form-group admin-mt-16">
                   <label className="admin-checkbox-label">
                     <input type="checkbox" checked={form.isActive} onChange={e => setForm({...form, isActive: e.target.checked})} />
                     <span>Sacola Ativa (aparece para o cliente)</span>
                   </label>
                 </div>
 
-                <div className="admin-modal-footer" style={{ marginTop: 24 }}>
+                <div className="admin-modal-footer admin-mt-24">
                   <button type="button" className="btn btn-outline" onClick={() => setIsModalOpen(false)}>Cancelar</button>
                   <button type="submit" className="btn btn-primary"><Check size={16} /> Salvar</button>
                 </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, useLayoutEffect } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -19,6 +19,8 @@ type Props = {
   showDots?: boolean;
 };
 
+const TRANSITION = "transform 0.5s cubic-bezier(0.16,1,0.3,1)";
+
 export default function Carousel({
   images,
   links = [],
@@ -33,57 +35,76 @@ export default function Carousel({
   fit = "cover",
   showDots = true,
 }: Props) {
-  const validImages = images.filter(Boolean);
+  const validImages = useMemo(() => images.filter(Boolean), [images]);
   const total = validImages.length;
+
+  // currentIndex 1-based no array com clones (index 0 = clone do último, total+1 = clone do primeiro)
   const [currentIndex, setCurrentIndex] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(true);
   const trackRef = useRef<HTMLDivElement>(null);
+  // Quando true, próxima atualização de posição não tem animação (usado pra "snap" invisível dos clones)
+  const isJumpingRef = useRef(false);
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef(0);
+  const isAnimatingRef = useRef(false);
 
-  // Criamos array com clones nas pontas para efeito infinito real
+  // Clones nas pontas: [último, ...originais, primeiro]
   const slides = useMemo(() => {
     if (total <= 1) return validImages;
     return [validImages[total - 1], ...validImages, validImages[0]];
   }, [validImages, total]);
 
-  // Alinhamos os links com o clone do carrossel infinito
   const slideLinks = useMemo(() => {
     if (total <= 1) return links;
     const list = Array.from({ length: total }, (_, i) => links[i] || "");
     return [list[total - 1], ...list, list[0]];
   }, [links, total]);
 
-  const handleTransitionEnd = () => {
+  // Aplica o transform manualmente via DOM, garantindo snap sem flash
+  useLayoutEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    if (isJumpingRef.current) {
+      // SNAP invisível: desliga transição, força reflow, religa
+      track.style.transition = "none";
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      // Força o navegador a aplicar o estilo agora (reflow)
+      void track.offsetWidth;
+      track.style.transition = TRANSITION;
+      isJumpingRef.current = false;
+      isAnimatingRef.current = false;
+    } else {
+      track.style.transition = TRANSITION;
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      isAnimatingRef.current = true;
+    }
+  }, [currentIndex]);
+
+  // Reset quando a lista de imagens prop muda (mas só se realmente mudou)
+  const imagesSig = useMemo(() => validImages.join("|"), [validImages]);
+  useEffect(() => {
+    isJumpingRef.current = true;
+    setCurrentIndex(1);
+  }, [imagesSig]);
+
+  const handleTransitionEnd = (e: React.TransitionEvent) => {
+    if (e.propertyName !== "transform") return;
     if (total <= 1) return;
+    isAnimatingRef.current = false;
     if (currentIndex === 0) {
-      setIsTransitioning(false);
+      isJumpingRef.current = true;
       setCurrentIndex(total);
     } else if (currentIndex === total + 1) {
-      setIsTransitioning(false);
+      isJumpingRef.current = true;
       setCurrentIndex(1);
     }
   };
 
-  useEffect(() => {
-    if (!isTransitioning) {
-      // Pequeno timeout para reativar transição após resetar posição sem transição
-      const id = setTimeout(() => {
-        setIsTransitioning(true);
-      }, 20);
-      return () => clearTimeout(id);
-    }
-  }, [isTransitioning]);
-
-  // Reseta índice quando a lista de imagens prop muda
-  useEffect(() => {
-    setCurrentIndex(1);
-    setIsTransitioning(true);
-  }, [images]);
-
   const go = useCallback(
     (next: number) => {
       if (total <= 1) return;
+      // Evita disparar novo movimento se ainda está animando o atual
+      if (isAnimatingRef.current) return;
       setCurrentIndex(next);
     },
     [total]
@@ -92,10 +113,12 @@ export default function Carousel({
   useEffect(() => {
     if (!autoPlay || total <= 1) return;
     const id = setInterval(() => {
-      go(currentIndex + 1);
+      if (!isAnimatingRef.current) {
+        setCurrentIndex((c) => c + 1);
+      }
     }, intervalMs);
     return () => clearInterval(id);
-  }, [autoPlay, intervalMs, total, currentIndex, go]);
+  }, [autoPlay, intervalMs, total]);
 
   if (total === 0) return null;
 
@@ -109,23 +132,21 @@ export default function Carousel({
   };
   const onTouchEnd = () => {
     if (Math.abs(touchDeltaX.current) > 40) {
-      if (touchDeltaX.current < 0) {
-        go(currentIndex + 1);
-      } else {
-        go(currentIndex - 1);
-      }
+      if (touchDeltaX.current < 0) go(currentIndex + 1);
+      else go(currentIndex - 1);
     }
     touchStartX.current = null;
     touchDeltaX.current = 0;
   };
 
-  const activeDotIndex = total > 1 
-    ? currentIndex === 0 
-      ? total - 1 
-      : currentIndex === total + 1 
-        ? 0 
-        : currentIndex - 1
-    : 0;
+  const activeDotIndex =
+    total > 1
+      ? currentIndex === 0
+        ? total - 1
+        : currentIndex === total + 1
+          ? 0
+          : currentIndex - 1
+      : 0;
 
   return (
     <div
@@ -140,13 +161,13 @@ export default function Carousel({
         className="carousel-track"
         onTransitionEnd={handleTransitionEnd}
         style={{
-          transform: `translateX(-${total > 1 ? currentIndex * 100 : 0}%)`,
-          transition: isTransitioning ? 'transform 0.5s cubic-bezier(0.16,1,0.3,1)' : 'none',
+          // Posição inicial — useLayoutEffect substitui na hora certa
+          transform: `translateX(-${(total > 1 ? currentIndex : 0) * 100}%)`,
         }}
       >
         {slides.map((src, i) => {
           const href = slideLinks[i];
-          const imgContent = (
+          const img = (
             <Image
               src={src}
               alt={`${alt} ${i + 1}`}
@@ -158,15 +179,14 @@ export default function Carousel({
               unoptimized={src.startsWith("data:")}
             />
           );
-
           return (
             <div key={`${src}-${i}`} className="carousel-slide">
               {href ? (
-                <a href={href} className="carousel-slide-link" >
-                  {imgContent}
+                <a href={href} className="carousel-slide-link">
+                  {img}
                 </a>
               ) : (
-                imgContent
+                img
               )}
             </div>
           );
@@ -178,7 +198,10 @@ export default function Carousel({
           <button
             type="button"
             className="carousel-arrow carousel-arrow-left"
-            onClick={(e) => { e.stopPropagation(); go(currentIndex - 1); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              go(currentIndex - 1);
+            }}
             aria-label="Imagem anterior"
           >
             <ChevronLeft size={18} />
@@ -186,7 +209,10 @@ export default function Carousel({
           <button
             type="button"
             className="carousel-arrow carousel-arrow-right"
-            onClick={(e) => { e.stopPropagation(); go(currentIndex + 1); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              go(currentIndex + 1);
+            }}
             aria-label="Próxima imagem"
           >
             <ChevronRight size={18} />
@@ -202,9 +228,12 @@ export default function Carousel({
               key={i}
               role="tab"
               className={`carousel-dot ${i === activeDotIndex ? "active" : ""}`}
-              onClick={(e) => { e.stopPropagation(); go(i + 1); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                go(i + 1);
+              }}
               aria-label={`Ir para imagem ${i + 1}`}
-              aria-selected={i === activeDotIndex ? "true" : "false"}
+              aria-selected={i === activeDotIndex}
             />
           ))}
         </div>
