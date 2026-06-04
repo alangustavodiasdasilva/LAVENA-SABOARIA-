@@ -438,7 +438,9 @@ export default function GiftBuilder({
                   const activeVariant = p.variants?.find(v => v.id === activeVariantId);
                   const img = activeVariant?.imageUrl || p.imageUrl || p.images?.[0];
                   const price = activeVariant ? effectivePrice(activeVariant) : effectivePrice(p);
-                  const isAvailable = activeVariant ? (activeVariant.stockStatus || "IN_STOCK") === "IN_STOCK" : (p.stockStatus || "IN_STOCK") === "IN_STOCK";
+                  const vStatus = activeVariant ? (activeVariant.stockStatus || "IN_STOCK") : (p.stockStatus || "IN_STOCK");
+                  const isAvailable = vStatus === "IN_STOCK" || vStatus === "IN_PRODUCTION";
+                  const isReserva = vStatus === "IN_PRODUCTION";
 
                   return (
                     <div key={p.id} className={`gift-card ${qty > 0 ? "selected" : ""} ${!isAvailable ? "is-unavailable" : ""}`}>
@@ -487,14 +489,14 @@ export default function GiftBuilder({
                                 borderRadius: '4px',
                                 border: `1px solid ${activeVariantId === "" ? 'var(--color-primary)' : 'var(--color-border)'}`,
                                 background: activeVariantId === "" ? 'var(--color-surface)' : 'transparent',
-                                opacity: (p.stockStatus || "IN_STOCK") === "IN_STOCK" ? 1 : 0.5,
+                                opacity: ((p.stockStatus || "IN_STOCK") === "IN_STOCK" || p.stockStatus === "IN_PRODUCTION") ? 1 : 0.5,
                                 cursor: 'pointer'
                               }}
                             >
                               {p.size || "Padrão"}
                             </button>
                             {p.variants.map(v => {
-                              const vAvailable = (v.stockStatus || "IN_STOCK") === "IN_STOCK";
+                              const vAvailable = (v.stockStatus || "IN_STOCK") === "IN_STOCK" || v.stockStatus === "IN_PRODUCTION";
                               return (
                                 <button
                                   key={v.id}
@@ -528,7 +530,7 @@ export default function GiftBuilder({
                               className="btn btn-outline btn-sm w-full"
                               onClick={() => adjustQty(selectionId, 1)}
                             >
-                              <Plus size={14} /> Adicionar
+                              <Plus size={14} /> {isReserva ? "Reservar" : "Adicionar"}
                             </button>
                           ) : (
                             <div className="qty-group">
