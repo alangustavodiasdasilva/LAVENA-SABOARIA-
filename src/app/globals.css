@@ -119,10 +119,10 @@ input, textarea, select {
 .object-cover { object-fit: cover; }
 
 .mobile-only { display: block; }
-.desktop-only { display: none; }
+.desktop-only { display: none !important; }
 @media (min-width: 768px) {
   .mobile-only { display: none !important; }
-  .desktop-only { display: block; }
+  .desktop-only { display: flex !important; }
 }
 
 /* ═══════════════════════════════════════ */
