@@ -91,21 +91,34 @@ function formatBRL(value: number) {
 export default function ProductGrid({
   products,
   categories = [],
+  initialSearchQuery = "",
 }: {
   products: Product[];
   categories?: Category[];
+  initialSearchQuery?: string;
 }) {
   const { addToCart } = useCart();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string>("");
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => {
+    setSearchQuery(initialSearchQuery);
+  }, [initialSearchQuery]);
+
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      return selectedCategory ? p.categoryId === selectedCategory : true;
-    });
-  }, [products, selectedCategory]);
+    let list = products;
+    if (selectedCategory) {
+      list = list.filter((p) => p.categoryId === selectedCategory);
+    }
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+    }
+    return list;
+  }, [products, selectedCategory, searchQuery]);
 
   // Auto open modal from URL query parameter (?product=ID)
   useEffect(() => {

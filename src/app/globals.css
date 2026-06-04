@@ -68,6 +68,7 @@ html {
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
+  padding-top: var(--header-h);
   font-family: var(--font-body);
   font-weight: 400;
   line-height: 1.6;
@@ -191,7 +192,9 @@ input, textarea, select {
 /* HEADER                                  */
 /* ═══════════════════════════════════════ */
 .header {
-  position: sticky;
+  position: fixed;
+  width: 100%;
+  left: 0;
   top: 0;
   z-index: 100;
   background: rgba(247,243,238,0.92);
@@ -247,7 +250,61 @@ input, textarea, select {
   background: var(--color-gold);
   transition: width var(--t-smooth);
 }
-.header-nav a:hover::after { width: 100%; }
+.header-nav a:hover::after {
+  width: 100%;
+}
+
+.header-search-form {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  height: 36px;
+  width: 250px;
+}
+.header-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  flex: 1;
+}
+.header-search-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header-search-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+.header-search-toggle:hover {
+  color: var(--color-primary);
+}
+
+.mobile-only.header-mobile-search {
+  padding: 8px 16px;
+  background: var(--color-surface-warm);
+  border-top: 1px solid var(--color-border-light);
+}
+.mobile-only.header-mobile-search .header-search-form {
+  width: 100%;
+  height: 40px;
+}
 
 .header-gift-link {
   display: inline-flex;

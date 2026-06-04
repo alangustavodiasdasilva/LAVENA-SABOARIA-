@@ -7,7 +7,7 @@ import { Leaf, Droplets, Flower2, Rabbit } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const [products, settings, categories, kits] = await Promise.all([
     getProducts(),
     getSettings(),
@@ -98,7 +98,8 @@ export default async function Home() {
         <div className="container">
           <ProductGrid 
             products={products.filter(p => p.isVisible !== false)} 
-            categories={categories.filter(c => products.filter(p => p.isVisible !== false).some(p => p.categoryId === c.id))} 
+            categories={categories}
+            initialSearchQuery={typeof searchParams?.q === 'string' ? searchParams.q : ""}
           />
         </div>
       </section>
