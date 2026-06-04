@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCart } from "./CartContext";
 import Carousel from "./Carousel";
 import { Star, X, ShoppingBag } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 type Product = {
   id: string;
@@ -104,9 +105,16 @@ export default function ProductGrid({
   const [selectedVariantId, setSelectedVariantId] = useState<string>("");
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
+  const searchParams = useSearchParams();
+  const q = searchParams.get('q');
+
   useEffect(() => {
-    setSearchQuery(initialSearchQuery);
-  }, [initialSearchQuery]);
+    if (q !== null) {
+      setSearchQuery(q);
+    } else {
+      setSearchQuery(initialSearchQuery);
+    }
+  }, [q, initialSearchQuery]);
 
   const filteredProducts = useMemo(() => {
     let list = products;

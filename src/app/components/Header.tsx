@@ -16,10 +16,17 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/?q=${encodeURIComponent(searchQuery.trim())}#produtos`);
+      router.push(`/?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchOpen(false);
       setSearchQuery("");
       setOpen(false);
+      setTimeout(() => {
+        const el = document.getElementById('produtos');
+        if (el) {
+          const y = el.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 400);
     }
   };
 
@@ -97,15 +104,19 @@ export default function Header() {
 
       {searchOpen && (
         <div className="mobile-only header-mobile-search">
-          <form onSubmit={handleSearch} className="header-search-form">
+          <form onSubmit={handleSearch} className="header-search-form" action="javascript:void(0);">
             <input 
-              type="text" 
+              type="search" 
               autoFocus
               placeholder="Pesquisar produtos..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="header-search-input"
+              enterKeyHint="search"
             />
+            <button type="submit" className="header-search-toggle" aria-label="Buscar">
+              <Search size={16} />
+            </button>
           </form>
         </div>
       )}
