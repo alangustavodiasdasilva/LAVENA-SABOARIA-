@@ -59,6 +59,20 @@ export default function KitShowcase({
 
   const active = kits.filter((k) => k.isActive);
 
+  // Auto open modal from URL query parameter (?kit=ID)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const kitId = params.get("kit");
+      if (kitId) {
+        const found = kits.find((k) => k.id === kitId);
+        if (found) {
+          setSelected(found);
+        }
+      }
+    }
+  }, [kits]);
+
   useEffect(() => {
     if (!selected) return;
     const html = document.documentElement;

@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Props = {
   images: string[];
+  links?: string[];
   alt: string;
   autoPlay?: boolean;
   intervalMs?: number;
@@ -20,6 +21,7 @@ type Props = {
 
 export default function Carousel({
   images,
+  links = [],
   alt,
   autoPlay = false,
   intervalMs = 5000,
@@ -44,6 +46,13 @@ export default function Carousel({
     if (total <= 1) return validImages;
     return [validImages[total - 1], ...validImages, validImages[0]];
   }, [validImages, total]);
+
+  // Alinhamos os links com o clone do carrossel infinito
+  const slideLinks = useMemo(() => {
+    if (total <= 1) return links;
+    const list = Array.from({ length: total }, (_, i) => links[i] || "");
+    return [list[total - 1], ...list, list[0]];
+  }, [links, total]);
 
   const handleTransitionEnd = () => {
     if (total <= 1) return;
@@ -135,8 +144,9 @@ export default function Carousel({
           transition: isTransitioning ? 'transform 0.5s cubic-bezier(0.16,1,0.3,1)' : 'none',
         }}
       >
-        {slides.map((src, i) => (
-          <div key={`${src}-${i}`} className="carousel-slide">
+        {slides.map((src, i) => {
+          const href = slideLinks[i];
+          const imgContent = (
             <Image
               src={src}
               alt={`${alt} ${i + 1}`}
@@ -147,8 +157,20 @@ export default function Carousel({
               style={{ objectFit: fit }}
               unoptimized={src.startsWith("data:")}
             />
-          </div>
-        ))}
+          );
+
+          return (
+            <div key={`${src}-${i}`} className="carousel-slide">
+              {href ? (
+                <a href={href} className="carousel-slide-link" style={{ display: "block", width: "100%", height: "100%", position: "relative" }}>
+                  {imgContent}
+                </a>
+              ) : (
+                imgContent
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {total > 1 && showArrows && (

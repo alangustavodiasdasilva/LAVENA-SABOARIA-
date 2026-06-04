@@ -87,6 +87,20 @@ export default function ProductGrid({
     });
   };
 
+  // Auto open modal from URL query parameter (?product=ID)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const prodId = params.get("product");
+      if (prodId) {
+        const found = products.find((p) => p.id === prodId);
+        if (found) {
+          setSelectedProduct(found);
+        }
+      }
+    }
+  }, [products]);
+
   // Modal: lock scroll sem piscada (scrollbar-gutter no html)
   useEffect(() => {
     if (!selectedProduct) return;

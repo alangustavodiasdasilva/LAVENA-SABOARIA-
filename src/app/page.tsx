@@ -16,9 +16,18 @@ export default async function Home() {
   ]);
 
   const fallbackLogo = settings?.heroImageUrl || "/images/logo-lavena.png";
-  const heroImages = [fallbackLogo, ...(settings?.heroImages || [])].filter(
-    (v, i, arr) => v && arr.indexOf(v) === i
-  );
+  const rawImages = [fallbackLogo, ...(settings?.heroImages || [])];
+  const rawLinks = [settings?.heroImageUrlLink || "", ...(settings?.heroImageLinks || [])];
+
+  const heroImages: string[] = [];
+  const heroLinks: string[] = [];
+
+  rawImages.forEach((img, idx) => {
+    if (img && !heroImages.includes(img)) {
+      heroImages.push(img);
+      heroLinks.push(rawLinks[idx] || "");
+    }
+  });
 
   return (
     <div>
@@ -29,6 +38,7 @@ export default async function Home() {
             {heroImages.length > 1 ? (
               <Carousel
                 images={heroImages}
+                links={heroLinks}
                 alt="Lavena Saboaria Artesanal"
                 autoPlay
                 intervalMs={4500}
@@ -39,15 +49,31 @@ export default async function Home() {
                 showArrows={false}
               />
             ) : (
-              <Image
-                src={heroImages[0]}
-                alt="Lavena Saboaria Artesanal"
-                width={900}
-                height={680}
-                priority
-                sizes="(max-width: 768px) 92vw, 900px"
-                className="hero-logo-image"
-              />
+              heroLinks[0] ? (
+                <a href={heroLinks[0]} className="hero-logo-link" style={{ display: "block" }}>
+                  <Image
+                    src={heroImages[0]}
+                    alt="Lavena Saboaria Artesanal"
+                    width={900}
+                    height={680}
+                    priority
+                    sizes="(max-width: 768px) 92vw, 900px"
+                    className="hero-logo-image"
+                    unoptimized={heroImages[0]?.startsWith("data:")}
+                  />
+                </a>
+              ) : (
+                <Image
+                  src={heroImages[0]}
+                  alt="Lavena Saboaria Artesanal"
+                  width={900}
+                  height={680}
+                  priority
+                  sizes="(max-width: 768px) 92vw, 900px"
+                  className="hero-logo-image"
+                  unoptimized={heroImages[0]?.startsWith("data:")}
+                />
+              )
             )}
           </div>
           <p className="hero-tagline">
@@ -59,7 +85,7 @@ export default async function Home() {
             <span className="hero-badge"><span className="hero-badge-dot"></span>Delicado</span>
           </div>
           <div className="hero-cta">
-            <a href={kits.some((k: any) => k.isActive) ? "#kits" : "#produtos"} className="btn btn-gold btn-lg">Explorar Produtos</a>
+            <a href={kits.some(k => k.isActive) ? "#kits" : "#produtos"} className="btn btn-gold btn-lg">Explorar Produtos</a>
           </div>
         </div>
       </section>
@@ -70,7 +96,7 @@ export default async function Home() {
       {/* ═══ PRODUCTS ═══ */}
       <section id="produtos" className="section">
         <div className="container">
-          <ProductGrid products={products as any} categories={categories as any} />
+          <ProductGrid products={products} categories={categories} />
         </div>
       </section>
 

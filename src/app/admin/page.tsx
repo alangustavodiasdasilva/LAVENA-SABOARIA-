@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   getSettings, updateSettings, updateHeroImages, uploadImage,
   getCategories, createCategory, updateCategory, deleteCategory,
@@ -77,7 +77,9 @@ export default function AdminPage() {
   // Settings
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [heroImageUrl, setHeroImageUrl] = useState("");
+  const [heroImageUrlLink, setHeroImageUrlLink] = useState("");
   const [heroImages, setHeroImages] = useState<string[]>([]);
+  const [heroImageLinks, setHeroImageLinks] = useState<string[]>([]);
 
   // Categories
   const [categories, setCategories] = useState<Cat[]>([]);
@@ -130,7 +132,9 @@ export default function AdminPage() {
       if (settingsData) {
         setWhatsappNumber(settingsData.whatsappNumber || "");
         setHeroImageUrl(settingsData.heroImageUrl || "");
+        setHeroImageUrlLink(settingsData.heroImageUrlLink || "");
         setHeroImages(settingsData.heroImages || []);
+        setHeroImageLinks(settingsData.heroImageLinks || []);
       }
       setCategories(catsData as Cat[]);
       setProducts(prodsData as unknown as Prod[]);
@@ -239,9 +243,11 @@ export default function AdminPage() {
     }
     if (urls.length > 0) {
       const next = [...heroImages, ...urls];
+      const nextLinks = [...heroImageLinks, ...urls.map(() => "")];
       setHeroImages(next);
+      setHeroImageLinks(nextLinks);
       try {
-        await updateHeroImages(next);
+        await updateHeroImages(next, nextLinks);
         showToast("success", `${urls.length} imagem(ns) adicionada(s) ao hero.`);
       } catch (err: any) {
         showToast("error", err?.message || "Erro ao salvar galeria.");
@@ -251,9 +257,11 @@ export default function AdminPage() {
 
   const removeHeroImage = async (idx: number) => {
     const next = heroImages.filter((_, i) => i !== idx);
+    const nextLinks = heroImageLinks.filter((_, i) => i !== idx);
     setHeroImages(next);
+    setHeroImageLinks(nextLinks);
     try {
-      await updateHeroImages(next);
+      await updateHeroImages(next, nextLinks);
       showToast("success", "Imagem removida.");
     } catch (err: any) {
       showToast("error", err?.message || "Erro.");
@@ -262,12 +270,16 @@ export default function AdminPage() {
 
   const moveHeroImage = async (idx: number, dir: -1 | 1) => {
     const arr = [...heroImages];
+    const arrLinks = [...heroImageLinks];
+    while (arrLinks.length < arr.length) arrLinks.push("");
     const newIdx = idx + dir;
     if (newIdx < 0 || newIdx >= arr.length) return;
     [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+    [arrLinks[idx], arrLinks[newIdx]] = [arrLinks[newIdx], arrLinks[idx]];
     setHeroImages(arr);
+    setHeroImageLinks(arrLinks);
     try {
-      await updateHeroImages(arr);
+      await updateHeroImages(arr, arrLinks);
     } catch (err: any) {
       showToast("error", err?.message || "Erro.");
     }
@@ -275,7 +287,12 @@ export default function AdminPage() {
 
   const handleSaveConfig = async () => {
     try {
-      await updateSettings({ whatsappNumber, heroImageUrl });
+      await updateSettings({
+        whatsappNumber,
+        heroImageUrl,
+        heroImageUrlLink,
+        heroImageLinks,
+      });
       showToast("success", "Configurações salvas!");
     } catch (e: any) {
       showToast("error", e?.message || "Erro ao salvar.");
@@ -548,6 +565,21 @@ export default function AdminPage() {
     return matchSearch && matchCat;
   });
 
+  const linkOptions = useMemo(() => {
+    const list = [
+      { value: "", label: "Nenhum link (não clicável)" },
+      { value: "/presente", label: "Monte seu Presente (página)" },
+      { value: "/carrinho", label: "Sacola de Compras" },
+    ];
+    kits.forEach((k) => {
+      list.push({ value: `/?kit=${k.id}`, label: `Kit: ${k.name}` });
+    });
+    products.forEach((p) => {
+      list.push({ value: `/?product=${p.id}`, label: `Produto: ${p.name}` });
+    });
+    return list;
+  }, [products, kits]);
+
   const featuredCount = products.filter((p) => p.isFeatured).length;
   const unavailableCount = products.filter((p) => p.stockStatus && p.stockStatus !== "IN_STOCK").length;
 
@@ -704,6 +736,19 @@ export default function AdminPage() {
                   <small className="admin-hint">
                     Otimizada automaticamente (WEBP de alta qualidade até 2000px).
                   </small>
+                  <div style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                    <label style={{ fontSize: "0.85rem", fontWeight: "600" }}>Link ao clicar na logo padrão:</label>
+                    <select
+                      className="admin-input"
+                      style={{ maxWidth: "400px" }}
+                      value={heroImageUrlLink}
+                      onChange={(e) => setHeroImageUrlLink(e.target.value)}
+                    >
+                      {linkOptions.map((opt: { value: string; label: string }) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <button onClick={handleSaveConfig} className="btn btn-primary admin-save-btn" disabled={isUploading}>
@@ -720,36 +765,67 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                <div className="admin-gallery">
+                <div className="admin-gallery" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px" }}>
                   {heroImages.map((url, idx) => (
-                    <div key={`${url}-${idx}`} className="admin-gallery-item">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt={`Hero ${idx + 1}`} />
-                      <button
-                        type="button"
-                        onClick={() => removeHeroImage(idx)}
-                        className="admin-gallery-item-remove"
-                        aria-label="Remover imagem"
-                      >
-                        <X size={14} />
-                      </button>
-                      <div className="admin-gallery-item-order">
+                    <div key={`${url}-${idx}`} className="admin-gallery-item" style={{ height: "auto", display: "flex", flexDirection: "column", gap: "8px", border: "1px solid var(--color-bg-dark)", padding: "10px", borderRadius: "12px", background: "#fff", position: "relative" }}>
+                      <div style={{ position: "relative", width: "100%", aspectRatio: "3/2", overflow: "hidden", borderRadius: "8px" }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt={`Hero ${idx + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         <button
                           type="button"
-                          onClick={() => moveHeroImage(idx, -1)}
-                          disabled={idx === 0}
-                          aria-label="Mover para esquerda"
+                          onClick={() => removeHeroImage(idx)}
+                          className="admin-gallery-item-remove"
+                          style={{ position: "absolute", top: "6px", right: "6px", background: "rgba(220,53,69,0.9)", color: "#fff", border: "none", borderRadius: "50%", width: "24px", height: "24px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 2 }}
+                          aria-label="Remover imagem"
                         >
-                          <ArrowLeft size={12} />
+                          <X size={14} />
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => moveHeroImage(idx, 1)}
-                          disabled={idx === heroImages.length - 1}
-                          aria-label="Mover para direita"
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: "0.8rem", color: "var(--color-text-light)" }}>Imagem ${idx + 1}</span>
+                        <div style={{ display: "flex", gap: "4px" }}>
+                          <button
+                            type="button"
+                            onClick={() => moveHeroImage(idx, -1)}
+                            disabled={idx === 0}
+                            className="btn btn-outline btn-xs"
+                            style={{ padding: "2px 6px", fontSize: "0.75rem" }}
+                            aria-label="Mover para esquerda"
+                          >
+                            <ArrowLeft size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveHeroImage(idx, 1)}
+                            disabled={idx === heroImages.length - 1}
+                            className="btn btn-outline btn-xs"
+                            style={{ padding: "2px 6px", fontSize: "0.75rem" }}
+                            aria-label="Mover para direita"
+                          >
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px", width: "100%" }}>
+                        <label style={{ fontSize: "0.8rem", fontWeight: "600", color: "var(--color-text)" }}>Link ao clicar:</label>
+                        <select
+                          className="admin-input"
+                          style={{ fontSize: "0.8rem", padding: "4px 8px", width: "100%" }}
+                          value={heroImageLinks[idx] || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setHeroImageLinks((prev) => {
+                              const next = [...prev];
+                              while (next.length <= idx) next.push("");
+                              next[idx] = val;
+                              return next;
+                            });
+                          }}
                         >
-                          <ArrowRight size={12} />
-                        </button>
+                          {linkOptions.map((opt: { value: string; label: string }) => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   ))}

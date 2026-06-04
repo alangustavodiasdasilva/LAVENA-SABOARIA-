@@ -102,7 +102,9 @@ export async function getSettings() {
 export async function updateSettings(data: {
   whatsappNumber?: string;
   heroImageUrl?: string;
+  heroImageUrlLink?: string;
   heroImages?: string[];
+  heroImageLinks?: string[];
 }) {
   await requireAdmin();
   const result = await prisma.settings.update({
@@ -115,18 +117,21 @@ export async function updateSettings(data: {
   return result;
 }
 
-export async function updateHeroImages(images: string[]) {
+export async function updateHeroImages(images: string[], links?: string[]) {
   await requireAdmin();
+  const updateData: { heroImages: string[]; heroImageLinks?: string[] } = { heroImages: images };
+  if (links) {
+    updateData.heroImageLinks = links;
+  }
   const result = await prisma.settings.update({
     where: { id: "default" },
-    data: { heroImages: images },
+    data: updateData,
   });
   revalidatePath("/admin");
   revalidatePath("/");
   return result;
 }
 
-// CATEGORIES
 export async function getCategories() {
   return await prisma.category.findMany({
     orderBy: { createdAt: "asc" },

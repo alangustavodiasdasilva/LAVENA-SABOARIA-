@@ -45,12 +45,14 @@ model Product {
 }
 
 model Settings {
-  id             String   @id @default("default")
-  whatsappNumber String?
-  heroImageUrl   String?
-  heroImages     String[] @default([])
-  adminPassword  String?
-  updatedAt      DateTime @updatedAt
+  id               String   @id @default("default")
+  whatsappNumber   String?
+  heroImageUrl     String?
+  heroImageUrlLink String?
+  heroImages       String[] @default([])
+  heroImageLinks   String[] @default([])
+  adminPassword    String?
+  updatedAt        DateTime @updatedAt
 
   @@schema("saboaria")
 }
