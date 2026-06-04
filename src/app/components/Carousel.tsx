@@ -162,7 +162,7 @@ export default function Carousel({
           return (
             <div key={`${src}-${i}`} className="carousel-slide">
               {href ? (
-                <a href={href} className="carousel-slide-link" style={{ display: "block", width: "100%", height: "100%", position: "relative" }}>
+                <a href={href} className="carousel-slide-link" >
                   {imgContent}
                 </a>
               ) : (
@@ -200,10 +200,11 @@ export default function Carousel({
             <button
               type="button"
               key={i}
+              role="tab"
               className={`carousel-dot ${i === activeDotIndex ? "active" : ""}`}
               onClick={(e) => { e.stopPropagation(); go(i + 1); }}
               aria-label={`Ir para imagem ${i + 1}`}
-              aria-current={i === activeDotIndex}
+              aria-selected={i === activeDotIndex}
             />
           ))}
         </div>
