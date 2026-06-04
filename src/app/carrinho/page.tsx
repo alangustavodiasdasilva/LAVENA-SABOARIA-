@@ -99,7 +99,12 @@ export default function CarrinhoPage() {
                     )}
                   </div>
                   <div className="cart-item-details">
-                    <h3 className="cart-item-name">{item.name}</h3>
+                    <h3 className="cart-item-name">
+                      {item.name}
+                      {item.stockStatus === "IN_PRODUCTION" && (
+                        <span style={{ marginLeft: '8px', fontSize: '0.75rem', padding: '2px 6px', background: 'var(--color-gold)', color: '#fff', borderRadius: '4px', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>Reserva</span>
+                      )}
+                    </h3>
                     <span className="cart-item-price">{formatPrice(item.price)}</span>
                     <span className="cart-item-subtotal">
                       Subtotal: {formatPrice(item.price * item.quantity)}
