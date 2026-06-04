@@ -34,25 +34,29 @@ export default function CarrinhoPage() {
     linhas.push("");
     linhas.push("Gostaria de fazer este pedido:");
     linhas.push("");
-    const hasReserva = items.some(i => i.stockStatus === "IN_PRODUCTION");
-    const hasProntaEntrega = items.some(i => i.stockStatus !== "IN_PRODUCTION");
+    const reservas = items.filter(i => i.stockStatus === "IN_PRODUCTION");
+    const prontaEntrega = items.filter(i => i.stockStatus !== "IN_PRODUCTION");
 
-    if (hasReserva && hasProntaEntrega) {
-      linhas.push("📋 *MEU PEDIDO (Pronta Entrega + Reserva):*");
-    } else if (hasReserva) {
-      linhas.push("📋 *MINHA RESERVA DE PRODUTOS:*");
-    } else {
-      linhas.push("📋 *MEU PEDIDO:*");
+    if (prontaEntrega.length > 0) {
+      linhas.push("📋 *MEU PEDIDO (Pronta Entrega):*");
+      prontaEntrega.forEach((item, idx) => {
+        const subtotal = item.price * item.quantity;
+        linhas.push(`🧼 *${item.name}*`);
+        linhas.push(`   ${item.quantity} un. × ${formatPrice(item.price)} = ${formatPrice(subtotal)}`);
+        if (idx < prontaEntrega.length - 1) linhas.push("");
+      });
+      linhas.push("");
     }
 
-    items.forEach((item, idx) => {
-      const subtotal = item.price * item.quantity;
-      const isReserva = item.stockStatus === "IN_PRODUCTION";
-      const nameLabel = isReserva ? `${item.name} (RESERVA)` : item.name;
-      linhas.push(`🧼 *${nameLabel}*`);
-      linhas.push(`   ${item.quantity} un. × ${formatPrice(item.price)} = ${formatPrice(subtotal)}`);
-      if (idx < items.length - 1) linhas.push("");
-    });
+    if (reservas.length > 0) {
+      linhas.push("📋 *MINHA RESERVA DE PRODUTOS:*");
+      reservas.forEach((item, idx) => {
+        const subtotal = item.price * item.quantity;
+        linhas.push(`🧼 *${item.name}*`);
+        linhas.push(`   ${item.quantity} un. × ${formatPrice(item.price)} = ${formatPrice(subtotal)}`);
+        if (idx < reservas.length - 1) linhas.push("");
+      });
+    }
     linhas.push("━━━━━━━━━━━━━━━━━");
     linhas.push("");
     linhas.push(`💰 *Total: ${formatPrice(total)}*`);
