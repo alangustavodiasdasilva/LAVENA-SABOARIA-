@@ -74,12 +74,6 @@ export default async function Home() {
       {/* ═══ PRODUCTS ═══ */}
       <section id="produtos" className="section">
         <div className="container">
-          <div className="section-header">
-            <p className="section-label">Nossos Produtos</p>
-            <h2 className="section-title">Beleza que vem da natureza</h2>
-            <p className="section-subtitle">Cada produto é feito à mão, com ingredientes selecionados e muito carinho.</p>
-          </div>
-
           <ProductGrid products={products} categories={categories} />
         </div>
       </section>

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useCart } from "./CartContext";
 import Carousel from "./Carousel";
-import { Star, X, ShoppingBag, Search } from "lucide-react";
+import { Star, X, ShoppingBag } from "lucide-react";
 
 type StockStatus = "IN_STOCK" | "IN_PRODUCTION" | "OUT_OF_STOCK";
 
@@ -68,19 +68,13 @@ export default function ProductGrid({
   const { addToCart } = useCart();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [query, setQuery] = useState("");
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   const filteredProducts = useMemo(() => {
-    const q = query.trim().toLowerCase();
     return products.filter((p) => {
-      const matchCat = selectedCategory ? p.categoryId === selectedCategory : true;
-      const matchQ = q
-        ? p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q)
-        : true;
-      return matchCat && matchQ;
+      return selectedCategory ? p.categoryId === selectedCategory : true;
     });
-  }, [products, selectedCategory, query]);
+  }, [products, selectedCategory]);
 
   const handleAddToCart = (product: Product, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -112,19 +106,6 @@ export default function ProductGrid({
 
   return (
     <>
-      {/* Busca */}
-      <div className="product-search">
-        <Search size={16} className="product-search-icon" aria-hidden />
-        <input
-          type="search"
-          placeholder="Buscar produto..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="product-search-input"
-          aria-label="Buscar produto"
-        />
-      </div>
-
       {/* Categorias */}
       {categories.length > 0 && (
         <div className="categories-strip">
