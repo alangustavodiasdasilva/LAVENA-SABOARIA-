@@ -35,11 +35,9 @@ export default function Carousel({
   const total = validImages.length;
   const [currentIndex, setCurrentIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(true);
-  const trackRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const touchDeltaX = useRef(0);
 
-  // Criamos array com clones nas pontas para efeito infinito real
   const slides = useMemo(() => {
     if (total <= 1) return validImages;
     return [validImages[total - 1], ...validImages, validImages[0]];
@@ -58,10 +56,7 @@ export default function Carousel({
 
   useEffect(() => {
     if (!isTransitioning) {
-      // Pequeno timeout para reativar transição após resetar posição sem transição
-      const id = setTimeout(() => {
-        setIsTransitioning(true);
-      }, 20);
+      const id = setTimeout(() => setIsTransitioning(true), 20);
       return () => clearTimeout(id);
     }
   }, [isTransitioning]);
@@ -76,9 +71,7 @@ export default function Carousel({
 
   useEffect(() => {
     if (!autoPlay || total <= 1) return;
-    const id = setInterval(() => {
-      go(currentIndex + 1);
-    }, intervalMs);
+    const id = setInterval(() => go(currentIndex + 1), intervalMs);
     return () => clearInterval(id);
   }, [autoPlay, intervalMs, total, currentIndex, go]);
 
@@ -94,23 +87,21 @@ export default function Carousel({
   };
   const onTouchEnd = () => {
     if (Math.abs(touchDeltaX.current) > 40) {
-      if (touchDeltaX.current < 0) {
-        go(currentIndex + 1);
-      } else {
-        go(currentIndex - 1);
-      }
+      if (touchDeltaX.current < 0) go(currentIndex + 1);
+      else go(currentIndex - 1);
     }
     touchStartX.current = null;
     touchDeltaX.current = 0;
   };
 
-  const activeDotIndex = total > 1 
-    ? currentIndex === 0 
-      ? total - 1 
-      : currentIndex === total + 1 
-        ? 0 
-        : currentIndex - 1
-    : 0;
+  const activeDotIndex =
+    total > 1
+      ? currentIndex === 0
+        ? total - 1
+        : currentIndex === total + 1
+          ? 0
+          : currentIndex - 1
+      : 0;
 
   return (
     <div
@@ -121,19 +112,18 @@ export default function Carousel({
       onTouchEnd={onTouchEnd}
     >
       <div
-        ref={trackRef}
         className="carousel-track"
-        onTransitionEnd={handleTransitionEnd}
         style={{
-          transform: `translateX(-${total > 1 ? currentIndex * 100 : 0}%)`,
-          transition: isTransitioning ? 'transform 0.5s cubic-bezier(0.16,1,0.3,1)' : 'none',
+          transform: `translateX(-${currentIndex * 100}%)`,
+          transition: isTransitioning ? "transform 0.5s cubic-bezier(0.16,1,0.3,1)" : "none",
         }}
+        onTransitionEnd={handleTransitionEnd}
       >
         {slides.map((src, i) => (
           <div key={`${src}-${i}`} className="carousel-slide">
             <Image
               src={src}
-              alt={`${alt} ${i + 1}`}
+              alt={`${alt} ${i + 1}/${total}`}
               fill
               priority={priority && i === 1}
               sizes={sizes}

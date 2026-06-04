@@ -283,6 +283,7 @@ export default function GiftBuilder({
                             fill
                             sizes="(max-width: 480px) 50vw, 200px"
                             className="object-cover"
+                            unoptimized={kit.imageUrl?.startsWith("data:")}
                           />
                         ) : (
                           <div className="product-image-placeholder">Sem imagem</div>
@@ -394,6 +395,7 @@ export default function GiftBuilder({
                             fill
                             sizes="(max-width: 480px) 50vw, 200px"
                             className="object-cover"
+                            unoptimized={img?.startsWith("data:")}
                           />
                         ) : (
                           <div className="product-image-placeholder">Sem imagem</div>
@@ -586,6 +588,7 @@ export default function GiftBuilder({
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
+                  unoptimized={(detailProduct.imageUrl || detailProduct.images?.[0])?.startsWith("data:")}
                 />
               ) : (
                 <div className="product-image-placeholder">Sem imagem</div>

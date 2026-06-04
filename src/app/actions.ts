@@ -2,10 +2,9 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import sharp from "sharp";
 import { cookies } from "next/headers";
+import { isStorageConfigured, uploadToSupabase } from "@/lib/storage";
 
 // ADMIN AUTH
 export async function loginAdmin(password: string) {
@@ -65,18 +64,20 @@ export async function uploadImage(formData: FormData) {
     .webp({ quality: 92, effort: 6, smartSubsample: true })
     .toBuffer();
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads");
-  try {
-    await mkdir(uploadDir, { recursive: true });
-  } catch (e) {}
+  // Caminho 1: Supabase Storage (produção e dev com env configurado)
+  if (isStorageConfigured) {
+    const filename = `img-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+    try {
+      const publicUrl = await uploadToSupabase(processedBuffer, filename, "image/webp");
+      return publicUrl;
+    } catch (err: any) {
+      console.error("Supabase upload falhou, caindo para data URL:", err?.message);
+    }
+  }
 
-  const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-  const filename = `img-${uniqueSuffix}.webp`;
-  const filepath = path.join(uploadDir, filename);
-
-  await writeFile(filepath, processedBuffer);
-
-  return `/uploads/${filename}`;
+  // Caminho 2: fallback em data URL (funciona em qualquer host, mas incha o banco)
+  const base64Data = processedBuffer.toString("base64");
+  return `data:image/webp;base64,${base64Data}`;
 }
 
 // SLUG HELPER

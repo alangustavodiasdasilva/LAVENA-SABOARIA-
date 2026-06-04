@@ -176,6 +176,7 @@ export default function ProductGrid({
                       fill
                       sizes="(max-width: 480px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="object-cover"
+                      unoptimized={mainImg?.startsWith("data:")}
                     />
                   ) : (
                     <div className="product-image-placeholder">Sem imagem</div>
@@ -273,6 +274,7 @@ export default function ProductGrid({
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
+                    unoptimized={imgs[0]?.startsWith("data:")}
                   />
                 ) : (
                   <Carousel

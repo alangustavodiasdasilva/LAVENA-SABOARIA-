@@ -22,7 +22,6 @@ export default function CarrinhoPage() {
 
   const finalizarPedido = () => {
     if (items.length === 0) return;
-
     const clean = (whatsappNumber || "").replace(/\D/g, "");
     if (!clean) {
       alert("WhatsApp não configurado. Entre em contato.");
@@ -35,14 +34,12 @@ export default function CarrinhoPage() {
     linhas.push("Gostaria de fazer este pedido:");
     linhas.push("");
     linhas.push("━━━━━━━━━━━━━━━━━");
-
     items.forEach((item, idx) => {
       const subtotal = item.price * item.quantity;
       linhas.push(`🧼 *${item.name}*`);
       linhas.push(`   ${item.quantity} un. × ${formatPrice(item.price)} = ${formatPrice(subtotal)}`);
       if (idx < items.length - 1) linhas.push("");
     });
-
     linhas.push("━━━━━━━━━━━━━━━━━");
     linhas.push("");
     linhas.push(`💰 *Total: ${formatPrice(total)}*`);
@@ -82,6 +79,7 @@ export default function CarrinhoPage() {
                         fill
                         sizes="100px"
                         style={{ objectFit: "cover" }}
+                        unoptimized={item.imageUrl?.startsWith("data:")}
                       />
                     ) : (
                       <div className="product-image-placeholder">—</div>
@@ -150,7 +148,6 @@ export default function CarrinhoPage() {
             </aside>
           </div>
 
-          {/* Sticky checkout (mobile) */}
           <div className="cart-sticky-checkout mobile-only">
             <div className="cart-sticky-total">
               <span className="cart-sticky-label">Total</span>

@@ -16,7 +16,6 @@ export default async function Home() {
   ]);
 
   const fallbackLogo = settings?.heroImageUrl || "/images/logo-lavena.png";
-  // Sempre incluir a logo padrão na rotação + as imagens da galeria
   const heroImages = [fallbackLogo, ...(settings?.heroImages || [])].filter(
     (v, i, arr) => v && arr.indexOf(v) === i
   );
@@ -60,7 +59,7 @@ export default async function Home() {
             <span className="hero-badge"><span className="hero-badge-dot"></span>Delicado</span>
           </div>
           <div className="hero-cta">
-            <a href={kits.some(k => k.isActive) ? "#kits" : "#produtos"} className="btn btn-gold btn-lg">Explorar Produtos</a>
+            <a href={kits.some((k: any) => k.isActive) ? "#kits" : "#produtos"} className="btn btn-gold btn-lg">Explorar Produtos</a>
           </div>
         </div>
       </section>
@@ -71,7 +70,7 @@ export default async function Home() {
       {/* ═══ PRODUCTS ═══ */}
       <section id="produtos" className="section">
         <div className="container">
-          <ProductGrid products={products} categories={categories} />
+          <ProductGrid products={products as any} categories={categories as any} />
         </div>
       </section>
 

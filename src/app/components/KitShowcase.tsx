@@ -122,6 +122,7 @@ export default function KitShowcase({
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover"
+                      unoptimized={kit.imageUrl?.startsWith("data:")}
                     />
                   ) : (
                     <div className="product-image-placeholder">Sem imagem</div>
@@ -207,6 +208,7 @@ export default function KitShowcase({
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
+                    unoptimized={selected.imageUrl?.startsWith("data:")}
                   />
                 ) : (
                   <div className="product-image-placeholder">Sem imagem</div>

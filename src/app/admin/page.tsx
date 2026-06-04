@@ -516,6 +516,24 @@ export default function AdminPage() {
               {loginLoading ? "Entrando..." : "Entrar no Painel"}
             </button>
           </form>
+          <div style={{ marginTop: "20px", textAlign: "center", borderTop: "1px solid var(--color-bg-dark)", paddingTop: "15px" }}>
+            <a
+              href="/"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                color: "var(--color-gold-dark)",
+                fontSize: "0.9rem",
+                textDecoration: "none",
+                fontWeight: "500",
+                transition: "color 0.2s"
+              }}
+              className="hover-gold"
+            >
+              <ArrowLeft size={16} /> Voltar para a Loja
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -538,9 +556,14 @@ export default function AdminPage() {
       {/* Topbar mobile */}
       <div className="admin-topbar mobile-only">
         <h2 className="admin-topbar-logo">Lavena <span>Admin</span></h2>
-        <button onClick={handleLogout} className="btn-icon-only" aria-label="Sair">
-          <LogOut size={18} />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <a href="/" className="btn-icon-only" aria-label="Ir para a loja" style={{ color: "var(--color-gold-dark)" }}>
+            <ArrowLeft size={18} />
+          </a>
+          <button onClick={handleLogout} className="btn-icon-only" aria-label="Sair">
+            <LogOut size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Sidebar */}
@@ -591,8 +614,34 @@ export default function AdminPage() {
             <SettingsIcon size={18} /> <span>Configurações</span>
           </button>
         </nav>
-        <div className="admin-sidebar-footer desktop-only">
-          <button onClick={handleLogout} className="btn btn-outline w-full">
+        <div className="admin-sidebar-footer desktop-only" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <a
+            href="/"
+            className="btn btn-outline w-full"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              textDecoration: "none",
+              fontSize: "0.9rem"
+            }}
+          >
+            <ArrowLeft size={16} /> Ir para a Loja
+          </a>
+          <button
+            onClick={handleLogout}
+            className="btn btn-outline w-full"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              borderColor: "rgba(220, 53, 69, 0.2)",
+              color: "#dc3545",
+              fontSize: "0.9rem"
+            }}
+          >
             <LogOut size={16} /> Sair
           </button>
         </div>
