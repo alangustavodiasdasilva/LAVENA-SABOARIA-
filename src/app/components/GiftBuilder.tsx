@@ -21,6 +21,7 @@ type Product = {
   categoryId: string;
   stockStatus?: string;
   category?: { id: string; name: string } | null;
+  isVisible?: boolean;
   variants?: { id: string; name: string; price: number; salePrice?: number | null; imageUrl?: string | null; stockStatus?: string; stockQuantity?: number; }[];
 };
 
@@ -112,6 +113,7 @@ export default function GiftBuilder({
   }, [products]);
 
   const purchasables = products.filter(p => {
+    if (p.isVisible === false) return false;
     if (p.variants && p.variants.length > 0) {
       return p.variants.some(v => (v.stockStatus || "IN_STOCK") === "IN_STOCK");
     }

@@ -19,6 +19,7 @@ type Product = {
   images?: string[];
   categoryId: string;
   isFeatured?: boolean;
+  isVisible?: boolean;
   stockStatus?: string;
   category?: { id: string; name: string } | null;
   variants?: { id: string; name: string; price: number; salePrice?: number | null; imageUrl?: string | null; stockStatus?: string; stockQuantity?: number; }[];

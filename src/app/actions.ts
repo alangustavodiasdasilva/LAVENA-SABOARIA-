@@ -223,6 +223,7 @@ export type ProductInput = {
   images?: string[];
   categoryId: string;
   isFeatured?: boolean;
+  isVisible?: boolean;
   stockStatus?: StockStatus;
   stockQuantity?: number;
   lowStockAlert?: number;
@@ -244,10 +245,10 @@ function validateProduct(data: ProductInput) {
   if (!data.description?.trim()) throw new Error("Descrição é obrigatória.");
 }
 
-export async function createProduct(data: ProductInput) {
+export async function createProduct(input: ProductInput) {
   await requireAdmin();
-  validateProduct(data);
-  const slug = generateSlug(data.name);
+  validateProduct(input);
+  const slug = generateSlug(input.name);
   
   let uniqueSlug = slug;
   let counter = 1;
@@ -256,14 +257,26 @@ export async function createProduct(data: ProductInput) {
     counter++;
   }
 
-  const { variants, ...productData } = data;
-
   const product = await prisma.product.create({
     data: {
-      ...productData,
+      name: input.name,
+      description: input.description,
+      benefits: input.benefits,
+      ingredients: input.ingredients,
+      price: input.price,
+      salePrice: input.salePrice,
+      size: input.size,
+      imageUrl: input.imageUrl,
+      images: input.images || [],
+      categoryId: input.categoryId,
+      isFeatured: input.isFeatured || false,
+      isVisible: input.isVisible ?? true,
       slug: uniqueSlug,
-      variants: variants ? {
-        create: variants.map(v => ({
+      stockStatus: input.stockStatus || "IN_STOCK",
+      stockQuantity: input.stockQuantity || 0,
+      lowStockAlert: input.lowStockAlert || 3,
+      variants: input.variants ? {
+        create: input.variants.map(v => ({
           name: v.name,
           price: v.price,
           salePrice: v.salePrice,
@@ -278,7 +291,6 @@ export async function createProduct(data: ProductInput) {
   revalidatePath("/");
   return product;
 }
-
 export async function updateProduct(id: string, data: ProductInput) {
   await requireAdmin();
   validateProduct(data);
@@ -297,6 +309,7 @@ export async function updateProduct(id: string, data: ProductInput) {
     where: { id },
     data: {
       ...productData,
+      isVisible: data.isVisible ?? true,
       slug: uniqueSlug,
       variants: {
         deleteMany: {},
@@ -329,6 +342,17 @@ export async function toggleFeatured(id: string, isFeatured: boolean) {
   const product = await prisma.product.update({
     where: { id },
     data: { isFeatured },
+  });
+  revalidatePath("/admin");
+  revalidatePath("/");
+  return product;
+}
+
+export async function toggleVisible(id: string, isVisible: boolean) {
+  await requireAdmin();
+  const product = await prisma.product.update({
+    where: { id },
+    data: { isVisible },
   });
   revalidatePath("/admin");
   revalidatePath("/");

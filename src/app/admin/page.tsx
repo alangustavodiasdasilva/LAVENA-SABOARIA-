@@ -4,16 +4,16 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   getSettings, updateSettings, updateHeroImages, uploadImage,
   getCategories, createCategory, updateCategory, deleteCategory,
-  getProducts, createProduct, updateProduct, deleteProduct, toggleFeatured,
+  getProducts, createProduct, updateProduct, deleteProduct, toggleFeatured, toggleVisible,
   updateStockStatus, updateStockQuantity, adjustStock,
   getKits, getMaterials, getRecipes,
   loginAdmin, logoutAdmin, checkAdmin,
 } from "../actions";
 import {
   Settings as SettingsIcon, LayoutGrid, Package, LogOut, Boxes, Gift, Calculator as CalcIcon,
-  Plus, Trash2, Edit2, Save, Image as ImageIcon, Phone, Check, X,
+  Plus, Trash2, Edit2, Save, ImageIcon, Phone, Check, X,
   Upload, Star, Search, Lock, ChevronDown, ArrowLeft, ArrowRight,
-  Minus, AlertTriangle, TrendingDown,
+  Minus, AlertTriangle, TrendingDown, Eye, EyeOff,
 } from "lucide-react";
 import Link from "next/link";
 import KitManager from "../components/admin/KitManager";
@@ -41,6 +41,7 @@ type Prod = {
   images?: string[];
   categoryId: string;
   isFeatured?: boolean;
+  isVisible?: boolean;
   stockStatus?: string;
   stockQuantity?: number;
   lowStockAlert?: number;
@@ -61,6 +62,7 @@ const emptyForm = {
   imageUrl: "",
   images: [] as string[],
   isFeatured: false,
+  isVisible: true,
   stockStatus: "IN_STOCK" as StockStatus,
   stockQuantity: "0",
   lowStockAlert: "3",
@@ -386,6 +388,7 @@ export default function AdminPage() {
         imageUrl: prod.imageUrl || "",
         images: prod.images || [],
         isFeatured: !!prod.isFeatured,
+        isVisible: prod.isVisible ?? true,
         stockStatus: (prod.stockStatus as StockStatus) || "IN_STOCK",
         stockQuantity: (prod.stockQuantity ?? 0).toString(),
         lowStockAlert: (prod.lowStockAlert ?? 3).toString(),
@@ -449,6 +452,18 @@ export default function AdminPage() {
     }
   };
 
+  async function handleToggleVisible(id: string, current: boolean) {
+    try {
+      await toggleVisible(id, !current);
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, isVisible: !current } : p))
+      );
+      showToast("success", `Produto marcado como ${!current ? "visível" : "oculto"}.`);
+    } catch (err: any) {
+      showToast("error", err.message || "Erro ao alternar visibilidade.");
+    }
+  }
+
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
@@ -489,6 +504,7 @@ export default function AdminPage() {
       images: prodForm.images,
       categoryId: prodForm.categoryId,
       isFeatured: prodForm.isFeatured,
+      isVisible: prodForm.isVisible,
       stockStatus: prodForm.stockStatus,
       stockQuantity: qty,
       lowStockAlert: Number.isNaN(lowAlert) ? 3 : Math.max(0, lowAlert),
@@ -1239,6 +1255,15 @@ export default function AdminPage() {
                               aria-label="Alternar destaque"
                             >
                               <Star size={14} fill={prod.isFeatured ? "currentColor" : "none"} />
+                            </button>
+                            <button
+                              onClick={() => handleToggleVisible(prod.id, prod.isVisible ?? true)}
+                              className={`admin-feature-toggle visibility-toggle ${!(prod.isVisible ?? true) ? "active" : ""}`}
+                              style={{ left: '32px' }}
+                              title={(prod.isVisible ?? true) ? "Ocultar produto no site" : "Mostrar produto no site"}
+                              aria-label="Alternar visibilidade"
+                            >
+                              {(prod.isVisible ?? true) ? <Eye size={14} /> : <EyeOff size={14} color="var(--color-danger)" />}
                             </button>
                             {status === "IN_PRODUCTION" && (
                               <div className="admin-product-status-pill warn">Em produção</div>

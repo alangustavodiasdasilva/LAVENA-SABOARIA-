@@ -97,8 +97,8 @@ export default async function Home() {
       <section id="produtos" className="section">
         <div className="container">
           <ProductGrid 
-            products={products} 
-            categories={categories.filter(c => products.some(p => p.categoryId === c.id))} 
+            products={products.filter(p => p.isVisible !== false)} 
+            categories={categories.filter(c => products.filter(p => p.isVisible !== false).some(p => p.categoryId === c.id))} 
           />
         </div>
       </section>
