@@ -114,6 +114,7 @@ export async function updateSettings(data: {
   revalidatePath("/admin");
   revalidatePath("/");
   revalidatePath("/carrinho");
+  revalidatePath("/presente");
   return result;
 }
 
