@@ -16,7 +16,7 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/?q=${encodeURIComponent(searchQuery.trim())}`, { scroll: false });
       setSearchOpen(false);
       setOpen(false);
       setTimeout(() => {
@@ -32,7 +32,7 @@ export default function Header() {
   const clearSearch = () => {
     setSearchQuery("");
     setSearchOpen(false);
-    router.push('/');
+    router.push('/', { scroll: false });
   };
 
   useEffect(() => {

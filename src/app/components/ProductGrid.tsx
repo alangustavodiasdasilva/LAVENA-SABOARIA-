@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useCart } from "./CartContext";
 import Carousel from "./Carousel";
 import { Star, X, ShoppingBag } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 type Product = {
   id: string;
@@ -92,6 +92,7 @@ export default function ProductGrid({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string>("");
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
 
   const searchParams = useSearchParams();
   const q = searchParams.get('q');
@@ -365,7 +366,7 @@ export default function ProductGrid({
           <button 
             onClick={() => {
               setSearchQuery("");
-              window.history.pushState(null, '', window.location.pathname);
+              router.push('/', { scroll: false });
             }} 
             style={{ 
               marginLeft: '15px', 
