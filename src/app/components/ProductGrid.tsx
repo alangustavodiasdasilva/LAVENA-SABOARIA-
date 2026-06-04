@@ -70,17 +70,16 @@ function discountPct(p: Product, variantId?: string) {
 function isPurchasable(p: Product, variantId?: string) {
   if (variantId && p.variants) {
     const v = p.variants.find(x => x.id === variantId);
-    if (v) return (v.stockStatus || "IN_STOCK") === "IN_STOCK";
+    if (v) return (v.stockStatus || "IN_STOCK") === "IN_STOCK" || v.stockStatus === "IN_PRODUCTION";
   }
   if (variantId !== "" && p.variants && p.variants.length > 0) {
-    return p.variants.some(v => (v.stockStatus || "IN_STOCK") === "IN_STOCK");
+    return p.variants.some(v => (v.stockStatus || "IN_STOCK") === "IN_STOCK" || v.stockStatus === "IN_PRODUCTION");
   }
-  return (p.stockStatus || "IN_STOCK") === "IN_STOCK";
+  return (p.stockStatus || "IN_STOCK") === "IN_STOCK" || p.stockStatus === "IN_PRODUCTION";
 }
 
 function statusLabel(s: string): { label: string; tone: string } | null {
-  if (s === "IN_PRODUCTION") return { label: "Em produção", tone: "warn" };
-  if (s === "OUT_OF_STOCK") return { label: "Esgotado", tone: "danger" };
+  if (s === "IN_PRODUCTION") return { label: "Reserva (Produção)", tone: "warn" };
   return null;
 }
 
@@ -454,32 +453,35 @@ export default function ProductGrid({
                         {formatBRL(effectivePrice(product))}
                       </span>
                     </div>
-                    <button
-                      className="btn-add-cart"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (product.variants && product.variants.length > 0) {
-                          setSelectedProduct(product);
-                          setSelectedVariantId(product.variants[0].id);
-                        } else {
-                          addToCart({
-                            id: product.id,
-                            name: product.name,
-                            price: effectivePrice(product),
-                            imageUrl: product.imageUrl || product.images?.[0] || "",
-                          });
+                    {purchasable ? (
+                      <button
+                        className="btn-add-cart"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (product.variants && product.variants.length > 0) {
+                            setSelectedProduct(product);
+                            setSelectedVariantId(product.variants[0].id);
+                          } else {
+                            addToCart({
+                              id: product.id,
+                              name: product.name,
+                              price: effectivePrice(product),
+                              imageUrl: product.imageUrl || product.images?.[0] || "",
+                            });
+                          }
+                        }}
+                        aria-label={
+                          product.stockStatus === "IN_PRODUCTION" ? `Reservar ${product.name}` : `Adicionar ${product.name} ao carrinho`
                         }
-                      }}
-                      aria-label={
-                        purchasable
-                          ? (product.stockStatus === "IN_PRODUCTION" ? `Reservar ${product.name}` : `Adicionar ${product.name} ao carrinho`)
-                          : `${product.name} indisponível`
-                      }
-                      disabled={!purchasable}
-                      title={!purchasable ? "Indisponível no momento" : undefined}
-                    >
-                      <ShoppingBag size={16} />
-                    </button>
+                        title={product.stockStatus === "IN_PRODUCTION" ? "Reservar Produto" : "Adicionar à Sacola"}
+                      >
+                        <ShoppingBag size={16} />
+                      </button>
+                    ) : (
+                      <button className="btn btn-outline" disabled style={{ padding: '0 12px', height: '32px', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
+                        Esgotado
+                      </button>
+                    )}
                   </div>
                 </div>
               </article>
