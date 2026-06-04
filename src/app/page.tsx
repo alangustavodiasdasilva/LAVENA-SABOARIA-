@@ -99,7 +99,6 @@ export default async function Home({ searchParams }: { searchParams: { [key: str
           <ProductGrid 
             products={products.filter(p => p.isVisible !== false)} 
             categories={categories}
-            initialSearchQuery={typeof searchParams?.q === 'string' ? searchParams.q : ""}
           />
         </div>
       </section>

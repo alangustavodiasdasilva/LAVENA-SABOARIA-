@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useCart } from "./CartContext";
 import Carousel from "./Carousel";
 import { Star, X, ShoppingBag } from "lucide-react";
-import { useSearchParams, useRouter } from "next/navigation";
 
 type Product = {
   id: string;
@@ -80,42 +79,23 @@ function formatBRL(value: number) {
 export default function ProductGrid({
   products,
   categories = [],
-  initialSearchQuery = "",
 }: {
   products: Product[];
   categories?: Category[];
-  initialSearchQuery?: string;
 }) {
   const { addToCart } = useCart();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string>("");
   const closeBtnRef = useRef<HTMLButtonElement>(null);
-  const router = useRouter();
-
-  const searchParams = useSearchParams();
-  const q = searchParams.get('q');
-
-  useEffect(() => {
-    if (q !== null) {
-      setSearchQuery(q);
-    } else {
-      setSearchQuery(initialSearchQuery);
-    }
-  }, [q, initialSearchQuery]);
 
   const filteredProducts = useMemo(() => {
     let list = products;
     if (selectedCategory) {
       list = list.filter((p) => p.categoryId === selectedCategory);
     }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
-    }
     return list;
-  }, [products, selectedCategory, searchQuery]);
+  }, [products, selectedCategory]);
 
   // Auto open modal from URL query parameter (?product=ID)
   useEffect(() => {
@@ -358,33 +338,6 @@ export default function ProductGrid({
         </div>
       )}
 
-      {searchQuery && (
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <span style={{ fontSize: '1.1rem', color: 'var(--color-text)' }}>
-            Resultados para: <strong>{searchQuery}</strong>
-          </span>
-          <button 
-            onClick={() => {
-              setSearchQuery("");
-              router.push('/', { scroll: false });
-            }} 
-            style={{ 
-              marginLeft: '15px', 
-              fontSize: '0.85rem', 
-              color: 'var(--color-text)', 
-              background: 'transparent', 
-              border: '1.5px solid var(--color-border)', 
-              borderRadius: '20px', 
-              padding: '4px 12px', 
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}>
-            <X size={14} /> Limpar
-          </button>
-        </div>
-      )}
 
       {filteredProducts.length === 0 ? (
         <div className="empty-state">
