@@ -158,27 +158,31 @@ export default function GiftBuilder({
 
   const enviarPresente = () => {
     if (totalUnits === 0) return;
-    
+
+    const focusAndScroll = (el: HTMLElement | null) => {
+      if (!el) return;
+      el.focus();
+      // Scrolla com um pequeno delay para aguardar o teclado do celular aparecer na tela
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 350);
+    };
+
     if (!senderName.trim()) {
       showToast("Por favor, informe seu nome.");
-      nameInputRef.current?.focus();
-      nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      focusAndScroll(nameInputRef.current);
       return;
     }
 
     if (!recipientName.trim()) {
       showToast("Por favor, preencha o nome de quem vai receber.");
-      const input = document.getElementById("recipientNameInput");
-      input?.focus();
-      input?.scrollIntoView({ behavior: "smooth", block: "center" });
+      focusAndScroll(document.getElementById("recipientNameInput"));
       return;
     }
 
     if (!cardMessage.trim()) {
       showToast("Por favor, escreva uma mensagem para o cartão.");
-      const input = document.getElementById("cardMessageInput");
-      input?.focus();
-      input?.scrollIntoView({ behavior: "smooth", block: "center" });
+      focusAndScroll(document.getElementById("cardMessageInput"));
       return;
     }
 
