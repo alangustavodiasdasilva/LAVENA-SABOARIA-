@@ -1460,9 +1460,20 @@ input, textarea, select {
   padding: 8px 12px;
 }
 
+/* Esconder cabeçalho, rodapé e carrinho flutuante da loja dentro do Admin */
+body:has(.admin-layout) .header,
+body:has(.admin-layout) .footer,
+body:has(.admin-layout) .floating-cart,
+body:has(.admin-login) .header,
+body:has(.admin-login) .footer,
+body:has(.admin-login) .floating-cart {
+  display: none !important;
+}
+
 .admin-layout {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   min-height: 100dvh;
   background: var(--color-bg);
 }
