@@ -62,7 +62,7 @@ export async function uploadImage(formData: FormData) {
   const processedBuffer = await sharp(buffer)
     .rotate()
     .resize(2000, 2000, { fit: "inside", withoutEnlargement: true, kernel: "lanczos3" })
-    .webp({ quality: 95, effort: 6, nearLossless: true })
+    .webp({ quality: 92, effort: 6, smartSubsample: true })
     .toBuffer();
 
   const uploadDir = path.join(process.cwd(), "public", "uploads");
@@ -371,14 +371,24 @@ export type KitInput = {
 };
 
 export async function getKits() {
-  return await prisma.kit.findMany({ orderBy: { createdAt: "desc" } });
+  try {
+    return await prisma.kit.findMany({ orderBy: { createdAt: "desc" } });
+  } catch (e) {
+    console.error("getKits failed (provavelmente Prisma stale, reinicie o dev):", e);
+    return [];
+  }
 }
 
 export async function getActiveKits() {
-  return await prisma.kit.findMany({
-    where: { isActive: true },
-    orderBy: { isFeatured: "desc" },
-  });
+  try {
+    return await prisma.kit.findMany({
+      where: { isActive: true },
+      orderBy: { isFeatured: "desc" },
+    });
+  } catch (e) {
+    console.error("getActiveKits failed:", e);
+    return [];
+  }
 }
 
 function validateKit(data: KitInput) {
@@ -458,7 +468,12 @@ export type MaterialInput = {
 };
 
 export async function getMaterials() {
-  return await prisma.pricingMaterial.findMany({ orderBy: { name: "asc" } });
+  try {
+    return await prisma.pricingMaterial.findMany({ orderBy: { name: "asc" } });
+  } catch (e) {
+    console.error("getMaterials failed:", e);
+    return [];
+  }
 }
 
 export async function createMaterial(data: MaterialInput) {
@@ -505,7 +520,12 @@ export type RecipeInput = {
 };
 
 export async function getRecipes() {
-  return await prisma.pricingRecipe.findMany({ orderBy: { updatedAt: "desc" } });
+  try {
+    return await prisma.pricingRecipe.findMany({ orderBy: { updatedAt: "desc" } });
+  } catch (e) {
+    console.error("getRecipes failed:", e);
+    return [];
+  }
 }
 
 export async function createRecipe(data: RecipeInput) {

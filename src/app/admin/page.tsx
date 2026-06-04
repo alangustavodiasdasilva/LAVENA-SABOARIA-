@@ -653,7 +653,7 @@ export default function AdminPage() {
                     </label>
                   </div>
                   <small className="admin-hint">
-                    Otimizada automaticamente (WEBP até 1400px).
+                    Otimizada automaticamente (WEBP de alta qualidade até 2000px).
                   </small>
                 </div>
 
