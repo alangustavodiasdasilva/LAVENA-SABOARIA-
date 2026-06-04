@@ -37,6 +37,7 @@ export default async function Home() {
                 priority
                 sizes="(max-width: 768px) 92vw, 900px"
                 fit="contain"
+                showArrows={false}
               />
             ) : (
               <Image
