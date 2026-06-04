@@ -204,7 +204,7 @@ export default function Carousel({
               className={`carousel-dot ${i === activeDotIndex ? "active" : ""}`}
               onClick={(e) => { e.stopPropagation(); go(i + 1); }}
               aria-label={`Ir para imagem ${i + 1}`}
-              aria-selected={i === activeDotIndex}
+              aria-selected={i === activeDotIndex ? "true" : "false"}
             />
           ))}
         </div>

@@ -54,7 +54,7 @@ export default function Header() {
             className="hamburger-btn"
             onClick={() => setOpen(true)}
             aria-label="Abrir menu"
-            aria-expanded={open}
+            aria-expanded={open ? "true" : "false"}
           >
             <Menu size={24} />
           </button>
@@ -65,11 +65,11 @@ export default function Header() {
       <div
         className={`mobile-drawer-overlay ${open ? "is-open" : ""}`}
         onClick={close}
-        aria-hidden={!open}
+        aria-hidden={!open ? "true" : "false"}
       />
       <aside
         className={`mobile-drawer ${open ? "is-open" : ""}`}
-        aria-hidden={!open}
+        aria-hidden={!open ? "true" : "false"}
         role="dialog"
         aria-modal="true"
       >
