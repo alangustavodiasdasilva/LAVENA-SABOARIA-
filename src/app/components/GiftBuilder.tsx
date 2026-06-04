@@ -468,12 +468,14 @@ export default function GiftBuilder({
 
         {bags && bags.length > 0 && (
           <section className="gift-section">
-            <div className="gift-section-header">
-              <div className="section-label-flex">
-                <span className="step-badge">3</span>
-                <h2 className="gift-section-heading">Escolha a embalagem <span className="text-muted">(opcional)</span></h2>
-              </div>
-            </div>
+            <h2 className="gift-section-title gift-section-title-center">
+              <span className="section-label section-label-flex">
+                <ShoppingBag size={14} /> Passo {activeKits.length > 0 ? "3" : "2"}
+              </span>
+              <span className="gift-section-heading">
+                Escolha a embalagem <span className="text-muted">(opcional)</span>
+              </span>
+            </h2>
             <div className="bag-grid">
               <div
                 className={`gift-card bag-card-no-bag ${!selectedBagId ? "selected" : ""}`}
@@ -482,7 +484,7 @@ export default function GiftBuilder({
                 {!selectedBagId && <span className="gift-card-check" aria-hidden><Check size={14} /></span>}
                 <div className="bag-card-no-bag-content">
                   <X size={24} className="bag-card-no-bag-icon" />
-                  <h3 style={{ fontSize: "1rem" }}>Sem sacola</h3>
+                  <h3 style={{ fontSize: "1rem" }}>Embalagem simples</h3>
                   <small className="text-muted">Apenas os produtos</small>
                 </div>
               </div>
