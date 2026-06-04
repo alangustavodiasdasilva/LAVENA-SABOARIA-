@@ -38,7 +38,7 @@ function effectivePrice(p: Product, variantId?: string) {
     const v = p.variants.find(x => x.id === variantId);
     if (v) return (v.salePrice && v.salePrice > 0 && v.salePrice < v.price) ? v.salePrice : v.price;
   }
-  if (p.variants && p.variants.length > 0) {
+  if (variantId !== "" && p.variants && p.variants.length > 0) {
     return Math.min(...p.variants.map(v => (v.salePrice && v.salePrice > 0 && v.salePrice < v.price) ? v.salePrice : v.price));
   }
   if (p.salePrice && p.salePrice > 0 && p.salePrice < p.price) return p.salePrice;
@@ -53,6 +53,15 @@ function discountPct(p: Product, variantId?: string) {
       return Math.round(((v.price - v.salePrice) / v.price) * 100);
     }
   }
+  if (variantId !== "" && p.variants && p.variants.length > 0) {
+    // Find min price variant just to show 'up to X% off' in grid, but simple logic uses base product for now, actually let's just use the best discount among variants if any
+    const bestDiscount = Math.max(...p.variants.map(v => {
+      if (!v.salePrice || v.salePrice <= 0 || v.salePrice >= v.price) return 0;
+      return Math.round(((v.price - v.salePrice) / v.price) * 100);
+    }));
+    const baseDiscount = (!p.salePrice || p.salePrice <= 0 || p.salePrice >= p.price) ? 0 : Math.round(((p.price - p.salePrice) / p.price) * 100);
+    return Math.max(bestDiscount, baseDiscount);
+  }
   if (!p.salePrice || p.salePrice <= 0 || p.salePrice >= p.price) return 0;
   return Math.round(((p.price - p.salePrice) / p.price) * 100);
 }
@@ -62,7 +71,7 @@ function isPurchasable(p: Product, variantId?: string) {
     const v = p.variants.find(x => x.id === variantId);
     if (v) return (v.stockStatus || "IN_STOCK") === "IN_STOCK";
   }
-  if (p.variants && p.variants.length > 0) {
+  if (variantId !== "" && p.variants && p.variants.length > 0) {
     return p.variants.some(v => (v.stockStatus || "IN_STOCK") === "IN_STOCK");
   }
   return (p.stockStatus || "IN_STOCK") === "IN_STOCK";
@@ -138,7 +147,7 @@ export default function ProductGrid({
 
     let galleryImgs = gallery(selectedProduct);
     if (activeVariant && activeVariant.imageUrl) {
-      galleryImgs = [activeVariant.imageUrl, ...galleryImgs.filter(img => img !== activeVariant.imageUrl)];
+      galleryImgs = [activeVariant.imageUrl];
     }
 
     return (
