@@ -52,6 +52,7 @@ export default function RootLayout({
                   <a href="/#sobre">Sobre</a>
                   <a href="/presente">Monte um presente</a>
                   <a href="/carrinho">Carrinho</a>
+                  <a href="/admin" className="footer-admin-link" style={{ border: '1px dashed var(--color-gold-muted)', borderRadius: '16px', padding: '3px 10px', fontSize: '0.8rem' }}>Configurar Produtos (Admin)</a>
                 </nav>
               </div>
               <hr className="footer-divider" />
