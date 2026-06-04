@@ -69,6 +69,7 @@ export default function GiftBuilder({
   const [cardMessage, setCardMessage] = useState("");
   const [extraNote, setExtraNote] = useState("");
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const closeDetailRef = useRef<HTMLButtonElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -150,18 +151,40 @@ export default function GiftBuilder({
     };
   }, [detailProduct]);
 
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 4000);
+  };
+
   const enviarPresente = () => {
     if (totalUnits === 0) return;
+    
     if (!senderName.trim()) {
-      alert("Por favor, informe seu nome.");
+      showToast("Por favor, informe seu nome.");
       nameInputRef.current?.focus();
       nameInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
+    if (!recipientName.trim()) {
+      showToast("Por favor, preencha o nome de quem vai receber.");
+      const input = document.getElementById("recipientNameInput");
+      input?.focus();
+      input?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    if (!cardMessage.trim()) {
+      showToast("Por favor, escreva uma mensagem para o cartão.");
+      const input = document.getElementById("cardMessageInput");
+      input?.focus();
+      input?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
     const clean = (whatsappNumber || "").replace(/\D/g, "");
     if (!clean) {
-      alert("WhatsApp da loja não configurado.");
+      showToast("WhatsApp da loja não configurado.");
       return;
     }
 
@@ -433,23 +456,27 @@ export default function GiftBuilder({
 
             <div className="gift-fields-divider">Presente</div>
             <label>
-              Nome de quem vai receber <span className="text-muted">(opcional)</span>
+              Nome de quem vai receber <span className="required-mark">*</span>
               <input
+                id="recipientNameInput"
                 type="text"
                 className="admin-input"
                 value={recipientName}
                 onChange={(e) => setRecipientName(e.target.value)}
                 placeholder="Ex: Maria"
+                required
               />
             </label>
             <label>
-              Mensagem do cartão <span className="text-muted">(opcional)</span>
+              Mensagem do cartão <span className="required-mark">*</span>
               <textarea
+                id="cardMessageInput"
                 className="admin-input admin-textarea"
                 value={cardMessage}
                 onChange={(e) => setCardMessage(e.target.value)}
                 placeholder="Feliz aniversário com muito carinho ♡"
                 maxLength={200}
+                required
               />
               <small className="text-muted">{cardMessage.length}/200</small>
             </label>
@@ -503,9 +530,9 @@ export default function GiftBuilder({
           >
             <MessageCircle size={18} /> Enviar pelo WhatsApp
           </button>
-          {totalUnits > 0 && !senderName.trim() && (
+          {totalUnits > 0 && (!senderName.trim() || !recipientName.trim() || !cardMessage.trim()) && (
             <small className="text-muted gift-send-hint">
-              Preencha seu nome para enviar.
+              Preencha todos os campos obrigatórios (*) para enviar.
             </small>
           )}
         </aside>
@@ -521,6 +548,14 @@ export default function GiftBuilder({
           <button onClick={enviarPresente} className="btn btn-whatsapp">
             <MessageCircle size={18} /> Enviar
           </button>
+        </div>
+      )}
+
+      {/* Notificação Toast Customizada Elegante */}
+      {toastMessage && (
+        <div className="lv-toast" role="status" aria-live="polite">
+          <span className="lv-toast-icon" aria-hidden>🌿</span>
+          <span className="lv-toast-msg">{toastMessage}</span>
         </div>
       )}
 
