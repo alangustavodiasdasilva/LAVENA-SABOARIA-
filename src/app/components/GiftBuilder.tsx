@@ -229,13 +229,14 @@ export default function GiftBuilder({
 
       <div className="gift-layout">
         <section className="gift-catalog">
-          {/* Kits prontos */}
+          {/* Passo 1: Kits prontos */}
           {activeKits.length > 0 && (
             <div className="gift-section">
               <h2 className="gift-section-title">
-                <Gift size={18} /> Kits prontos
+                <span className="gift-step">1</span>
+                <Gift size={18} /> Escolha um kit pronto
               </h2>
-              <div className="gift-grid">
+              <div className="gift-kits-scroll">
                 {activeKits.map((kit) => {
                   const qty = kitSelection[kit.id] || 0;
                   const price = effectivePrice(kit);
@@ -304,23 +305,12 @@ export default function GiftBuilder({
             </div>
           )}
 
-          {/* Produtos individuais */}
+          {/* Passo 2 (ou 1 sem kits): Produtos individuais */}
           <div className="gift-section">
             <h2 className="gift-section-title">
-              <Plus size={18} /> Ou monte seu próprio
+              <span className="gift-step">{activeKits.length > 0 ? "2" : "1"}</span>
+              <Plus size={18} /> {activeKits.length > 0 ? "Ou adicione produtos avulsos" : "Escolha os produtos"}
             </h2>
-
-            <div className="product-search">
-              <Search size={16} className="product-search-icon" aria-hidden />
-              <input
-                type="search"
-                placeholder="Buscar produto..."
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="product-search-input"
-                aria-label="Buscar produto"
-              />
-            </div>
 
             {categories.length > 0 && (
               <div className="categories-strip">

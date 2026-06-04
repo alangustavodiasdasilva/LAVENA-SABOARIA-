@@ -2281,21 +2281,25 @@ input, textarea, select {
 @media (min-width: 768px) { .kit-showcase { padding: 64px 0 24px; } }
 
 .kit-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold-muted) transparent;
 }
-@media (min-width: 700px) {
-  .kit-grid { grid-template-columns: repeat(2, 1fr); gap: 22px; }
-}
-@media (min-width: 1100px) {
-  .kit-grid { grid-template-columns: repeat(3, 1fr); }
-}
+.kit-grid::-webkit-scrollbar { height: 5px; }
+.kit-grid::-webkit-scrollbar-track { background: transparent; }
+.kit-grid::-webkit-scrollbar-thumb { background: var(--color-gold-muted); border-radius: 9px; }
 
 .kit-card {
   position: relative;
   display: flex;
   flex-direction: column;
+  flex: 0 0 280px;
+  width: 280px;
+  scroll-snap-align: start;
   background: var(--color-surface);
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -2303,6 +2307,9 @@ input, textarea, select {
   border: 1.5px solid var(--color-gold-muted);
   cursor: pointer;
   transition: transform var(--t-smooth), box-shadow var(--t-smooth), border-color var(--t-fast);
+}
+@media (min-width: 768px) {
+  .kit-card { flex: 0 0 320px; width: 320px; }
 }
 .kit-card:hover, .kit-card:focus-visible {
   transform: translateY(-4px);
@@ -2641,6 +2648,38 @@ input, textarea, select {
   color: var(--color-gold);
 }
 .gift-section-title svg { color: var(--color-gold); }
+.gift-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  flex-shrink: 0;
+}
+
+/* Kits horizontal scroll dentro do gift builder */
+.gift-kits-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold-muted) transparent;
+}
+.gift-kits-scroll::-webkit-scrollbar { height: 5px; }
+.gift-kits-scroll::-webkit-scrollbar-track { background: transparent; }
+.gift-kits-scroll::-webkit-scrollbar-thumb { background: var(--color-gold-muted); border-radius: 9px; }
+.gift-kits-scroll .gift-card {
+  flex: 0 0 200px;
+  scroll-snap-align: start;
+}
 
 .gift-card-info-btn {
   position: absolute;

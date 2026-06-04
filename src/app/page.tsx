@@ -59,7 +59,7 @@ export default async function Home() {
             <span className="hero-badge"><span className="hero-badge-dot"></span>Delicado</span>
           </div>
           <div className="hero-cta">
-            <a href="#produtos" className="btn btn-gold btn-lg">Explorar Produtos</a>
+            <a href={kits.length > 0 ? "#kits" : "#produtos"} className="btn btn-gold btn-lg">Explorar Produtos</a>
           </div>
         </div>
       </section>
