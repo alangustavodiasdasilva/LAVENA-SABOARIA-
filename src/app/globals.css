@@ -389,16 +389,19 @@ input, textarea, select {
 }
 .hero-inner { text-align: center; position: relative; z-index: 1; }
 .hero-logo-wrap {
-  display: flex;
-  justify-content: center;
+  display: block;
+  width: 100%;
   margin: 0 auto 28px;
   max-width: 800px;
   animation: fadeInUp 0.8s var(--t-smooth) forwards;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(62,54,46,0.08);
 }
 .hero-logo-image {
   width: 100%;
-  height: auto;
-  max-height: clamp(180px, 50vw, 450px);
+  height: 100%;
   object-fit: contain;
   border-radius: var(--radius-lg);
   filter: drop-shadow(0 12px 24px rgba(62,54,46,0.08));

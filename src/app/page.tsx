@@ -36,7 +36,6 @@ export default async function Home() {
                 rounded
                 priority
                 sizes="(max-width: 768px) 92vw, 900px"
-                aspectRatio="4 / 3"
                 fit="contain"
               />
             ) : (
