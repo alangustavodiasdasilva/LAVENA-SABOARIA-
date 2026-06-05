@@ -105,6 +105,7 @@ export default function GiftBuilder({
             stockStatus: v.stockStatus || "IN_STOCK",
           });
         });
+        list.push(p); // Inclui o produto base como opção padrão
       } else {
         list.push(p);
       }
@@ -431,7 +432,7 @@ export default function GiftBuilder({
             ) : (
               <div className="gift-grid">
                 {filtered.map((p) => {
-                  const activeVariantId = selectedVariants[p.id] || (p.variants && p.variants.length > 0 ? p.variants[0].id : "");
+                  const activeVariantId = selectedVariants[p.id] !== undefined ? selectedVariants[p.id] : (p.variants && p.variants.length > 0 ? p.variants[0].id : "");
                   const selectionId = activeVariantId ? `${p.id}-${activeVariantId}` : p.id;
                   const qty = selection[selectionId] || 0;
                   
