@@ -493,3 +493,11 @@ fieldset {
 legend {
   padding: 0;
 }
+
+/* ─── a barra flutuante da sacola não pode cobrir aviso nem conteúdo ─── */
+body:has(.floating-cart) .toast-region {
+  bottom: calc(92px + env(safe-area-inset-bottom));
+}
+body:has(.floating-cart) .site-footer {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
