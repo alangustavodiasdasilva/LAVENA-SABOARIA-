@@ -63,7 +63,7 @@ export function ProductCard({ product, priority = false }: { product: ProductDTO
         <Link href={`/produto/${product.slug}`} className="pcard-info">
           {product.category && <span className="pcard-cat">{product.category.name}</span>}
           <h3 className="pcard-name">{product.name}</h3>
-          <p className="pcard-meta">{hasChoices ? `${options.length} opções de tamanho` : product.size || "\u00a0"}</p>
+          <p className="pcard-meta">{hasChoices ? `${options.length} opções` : product.size || "\u00a0"}</p>
         </Link>
 
         <div className="pcard-foot">
