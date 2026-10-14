@@ -103,7 +103,7 @@ export function ProductDetail({
 
         {options.length > 1 && (
           <fieldset className="pd-options">
-            <legend>Tamanho / peso</legend>
+            <legend>Escolha a opção</legend>
             <div className="pd-pills">
               {options.map((o) => {
                 const out = o.stockStatus === "OUT_OF_STOCK";
