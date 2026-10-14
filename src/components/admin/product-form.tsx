@@ -221,7 +221,7 @@ export default function ProductForm({ product, categories }: { product?: Product
             <input id="p-sale" className="input" inputMode="decimal" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Opcional" />
           </div>
           <div className="field">
-            <label htmlFor="p-size">Tamanho / peso</label>
+            <label htmlFor="p-size">Tamanho / peso (ex.: 90g)</label>
             <input id="p-size" className="input" value={size} onChange={(e) => setSize(e.target.value)} maxLength={40} placeholder="Ex.: 90g" />
           </div>
         </div>
@@ -243,7 +243,7 @@ export default function ProductForm({ product, categories }: { product?: Product
           </button>
         </div>
         {variants.length === 0 ? (
-          <p className="soft small">Opcional. Use para o mesmo produto em outros tamanhos ou aromas (ex.: 200g, 500g). Cada variação tem preço e estoque próprios.</p>
+          <p className="soft small">Opcional. Use para o mesmo produto em outros aromas/essências ou tamanhos (ex.: Lavanda, Maracujá, 200g, 500g). Cada variação tem nome, preço e estoque próprios e aparece como botão na página do produto.</p>
         ) : (
           <div className="variant-list">
             {variants.map((v) => (

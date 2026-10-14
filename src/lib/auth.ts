@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import prisma from "./prisma";
+import { clearMemo } from "./memo";
 import { AuthError, UserError, runAction } from "./action";
 import { hashPassword, safeEqual, verifyPasswordHash } from "./password";
 import { rateLimit, resetRateLimit } from "./rate-limit";
@@ -68,7 +69,11 @@ export async function requireAdmin(): Promise<void> {
 export async function adminAction<T>(context: string, fn: () => Promise<T>): Promise<ActionResult<T>> {
   return runAction(context, async () => {
     await requireAdmin();
-    return fn();
+    try {
+      return await fn();
+    } finally {
+      clearMemo(); // o painel mudou algo: a loja precisa ler os dados novos
+    }
   });
 }
 

@@ -474,3 +474,22 @@
     transform: none;
   }
 }
+
+/* ─── alinhamento de formulários ─── */
+/* campos lado a lado começam na mesma linha, mesmo que um tenha dica/erro embaixo */
+.field {
+  align-content: start;
+}
+.cart-fields,
+.form-row {
+  align-items: start;
+}
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+legend {
+  padding: 0;
+}

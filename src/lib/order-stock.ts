@@ -5,50 +5,84 @@ import type { OrderItem, StockStatus } from "./types";
 
 type Tx = Prisma.TransactionClient;
 
+type StockRow = { id: string; stockStatus: string; stockQuantity: number };
+
+/** Operações de estoque de uma tabela (produto, variação ou kit). */
+type StockTable = {
+  find: (id: string) => Promise<StockRow | null>;
+  /** Altera a quantidade só se ela ainda for `expected` (atualização condicional, sem corrida). */
+  swap: (id: string, expected: number, data: { stockQuantity: number; stockStatus: StockStatus }) => Promise<number>;
+};
+
+function tables(tx: Tx): { variant: StockTable; product: StockTable; kit: StockTable } {
+  return {
+    variant: {
+      find: (id) => tx.productVariant.findUnique({ where: { id } }),
+      swap: async (id, expected, data) =>
+        (await tx.productVariant.updateMany({ where: { id, stockQuantity: expected }, data })).count,
+    },
+    product: {
+      find: (id) => tx.product.findUnique({ where: { id } }),
+      swap: async (id, expected, data) =>
+        (await tx.product.updateMany({ where: { id, stockQuantity: expected }, data })).count,
+    },
+    kit: {
+      find: (id) => tx.kit.findUnique({ where: { id } }),
+      swap: async (id, expected, data) =>
+        (await tx.kit.updateMany({ where: { id, stockQuantity: expected }, data })).count,
+    },
+  };
+}
+
+function tableFor(t: ReturnType<typeof tables>, it: OrderItem): { table: StockTable; id: string } | null {
+  if (it.kind === "product" && it.variantId) return { table: t.variant, id: it.variantId };
+  if (it.kind === "product" && it.productId) return { table: t.product, id: it.productId };
+  if (it.kind === "kit" && it.kitId) return { table: t.kit, id: it.kitId };
+  return null;
+}
+
+const MAX_TRIES = 5;
+
+/**
+ * Compare-and-swap: lê a quantidade, calcula a nova e só grava se ninguém mexeu nesse meio-tempo.
+ * Se mexeram, lê de novo e tenta outra vez. Evita descontar duas vezes em pedidos simultâneos.
+ * `compute` devolve a nova quantidade e quantas unidades mudaram (ou null para não mexer).
+ */
+async function adjust(
+  table: StockTable,
+  id: string,
+  compute: (row: StockRow) => { qty: number; moved: number } | null
+): Promise<number> {
+  for (let i = 0; i < MAX_TRIES; i++) {
+    const row = await table.find(id);
+    if (!row) return 0;
+    const next = compute(row);
+    if (!next) return 0;
+    const status = statusFromQuantity(row.stockStatus as StockStatus, next.qty);
+    if ((await table.swap(id, row.stockQuantity, { stockQuantity: next.qty, stockStatus: status })) === 1) {
+      return next.moved;
+    }
+  }
+  throw new Error("Estoque alterado ao mesmo tempo por outra operação. Tente de novo.");
+}
+
 /**
  * Desconta do estoque os itens do pedido que têm quantidade controlada.
  * Anota em cada item quantas unidades saíram (`deducted`) para poder devolver depois.
  * Itens sob encomenda (reserva) e itens sem controle de estoque não são tocados.
  */
 export async function deductOrderStock(tx: Tx, items: OrderItem[]): Promise<OrderItem[]> {
+  const t = tables(tx);
   const out: OrderItem[] = [];
   for (const it of items) {
     const item = { ...it, deducted: 0 };
-    if (!it.reserve && it.kind !== "bag") {
-      if (it.kind === "product" && it.variantId) {
-        const v = await tx.productVariant.findUnique({ where: { id: it.variantId } });
-        if (v && v.stockStatus === "IN_STOCK" && v.stockQuantity > 0) {
-          const dec = Math.min(v.stockQuantity, it.quantity);
-          const qty = v.stockQuantity - dec;
-          await tx.productVariant.update({
-            where: { id: v.id },
-            data: { stockQuantity: qty, stockStatus: statusFromQuantity(v.stockStatus as StockStatus, qty) },
-          });
-          item.deducted = dec;
-        }
-      } else if (it.kind === "product" && it.productId) {
-        const p = await tx.product.findUnique({ where: { id: it.productId } });
-        if (p && p.stockStatus === "IN_STOCK" && p.stockQuantity > 0) {
-          const dec = Math.min(p.stockQuantity, it.quantity);
-          const qty = p.stockQuantity - dec;
-          await tx.product.update({
-            where: { id: p.id },
-            data: { stockQuantity: qty, stockStatus: statusFromQuantity(p.stockStatus as StockStatus, qty) },
-          });
-          item.deducted = dec;
-        }
-      } else if (it.kind === "kit" && it.kitId) {
-        const k = await tx.kit.findUnique({ where: { id: it.kitId } });
-        if (k && k.stockStatus === "IN_STOCK" && k.stockQuantity > 0) {
-          const dec = Math.min(k.stockQuantity, it.quantity);
-          const qty = k.stockQuantity - dec;
-          await tx.kit.update({
-            where: { id: k.id },
-            data: { stockQuantity: qty, stockStatus: statusFromQuantity(k.stockStatus as StockStatus, qty) },
-          });
-          item.deducted = dec;
-        }
-      }
+    const target = !it.reserve && it.kind !== "bag" ? tableFor(t, it) : null;
+    if (target) {
+      item.deducted = await adjust(target.table, target.id, (row) => {
+        if (row.stockStatus !== "IN_STOCK" || row.stockQuantity <= 0) return null;
+        const dec = Math.min(row.stockQuantity, it.quantity);
+        return { qty: row.stockQuantity - dec, moved: dec };
+      });
     }
     out.push(item);
   }
@@ -57,38 +91,13 @@ export async function deductOrderStock(tx: Tx, items: OrderItem[]): Promise<Orde
 
 /** Devolve ao estoque o que foi descontado antes (pedido cancelado). */
 export async function restoreOrderStock(tx: Tx, items: OrderItem[]): Promise<OrderItem[]> {
+  const t = tables(tx);
   const out: OrderItem[] = [];
   for (const it of items) {
     const back = it.deducted || 0;
-    if (back > 0) {
-      if (it.kind === "product" && it.variantId) {
-        const v = await tx.productVariant.findUnique({ where: { id: it.variantId } });
-        if (v) {
-          const qty = v.stockQuantity + back;
-          await tx.productVariant.update({
-            where: { id: v.id },
-            data: { stockQuantity: qty, stockStatus: statusFromQuantity(v.stockStatus as StockStatus, qty) },
-          });
-        }
-      } else if (it.kind === "product" && it.productId) {
-        const p = await tx.product.findUnique({ where: { id: it.productId } });
-        if (p) {
-          const qty = p.stockQuantity + back;
-          await tx.product.update({
-            where: { id: p.id },
-            data: { stockQuantity: qty, stockStatus: statusFromQuantity(p.stockStatus as StockStatus, qty) },
-          });
-        }
-      } else if (it.kind === "kit" && it.kitId) {
-        const k = await tx.kit.findUnique({ where: { id: it.kitId } });
-        if (k) {
-          const qty = k.stockQuantity + back;
-          await tx.kit.update({
-            where: { id: k.id },
-            data: { stockQuantity: qty, stockStatus: statusFromQuantity(k.stockStatus as StockStatus, qty) },
-          });
-        }
-      }
+    const target = back > 0 ? tableFor(t, it) : null;
+    if (target) {
+      await adjust(target.table, target.id, (row) => ({ qty: row.stockQuantity + back, moved: back }));
     }
     out.push({ ...it, deducted: 0 });
   }

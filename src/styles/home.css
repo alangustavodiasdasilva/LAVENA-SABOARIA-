@@ -381,8 +381,10 @@
 }
 @media (min-width: 900px) {
   .gifts-inner {
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: 5rem;
+    /* colunas de largura fixa, centralizadas: imagem e texto formam um bloco só */
+    grid-template-columns: minmax(0, 460px) minmax(0, 560px);
+    justify-content: center;
+    gap: clamp(3rem, 6vw, 6rem);
   }
 }
 .gifts-visual {
@@ -459,8 +461,9 @@
 }
 @media (min-width: 900px) {
   .story-inner {
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: 5rem;
+    grid-template-columns: minmax(0, 340px) minmax(0, 640px);
+    justify-content: center;
+    gap: clamp(3rem, 6vw, 6rem);
   }
 }
 .story-seal {

@@ -10,6 +10,7 @@ import { getCatalogForOrder, getPublicSettings } from "@/lib/data";
 import { parseOrderItems } from "@/lib/mappers";
 import { deductOrderStock, restoreOrderStock } from "@/lib/order-stock";
 import { generateOrderCode, quoteCartLines, resolveOrderLines, type OrderLineInput } from "@/lib/orders";
+import { notifyNewOrder } from "@/lib/notify";
 import { rateLimit } from "@/lib/rate-limit";
 import { placeOrderSchema, type PlaceOrderInput } from "@/lib/schemas";
 import { ORDER_STATUSES, type OrderStatus, type PlacedOrder } from "@/lib/types";
@@ -94,6 +95,7 @@ export async function placeOrder(input: PlaceOrderInput) {
       total: resolved.subtotal,
     });
     revalidatePath("/admin", "layout");
+    await notifyNewOrder({ code, customerName: data.customerName, total: resolved.subtotal, items: resolved.items });
     return {
       code,
       total: resolved.subtotal,
@@ -137,12 +139,17 @@ export async function setOrderStatus(id: string, status: OrderStatus, deductStoc
       const order = await tx.order.findUniqueOrThrow({ where: { id: orderId } });
       let items = parseOrderItems(order.itemsJson);
       let stockDeducted = order.stockDeducted;
+      // "reserva" atômica da flag: só uma das chamadas simultâneas consegue virar o valor
       if (next === "CANCELED" && order.stockDeducted) {
-        items = await restoreOrderStock(tx, items);
+        const claimed = await tx.order.updateMany({ where: { id: orderId, stockDeducted: true }, data: { stockDeducted: false } });
+        if (claimed.count === 1) items = await restoreOrderStock(tx, items);
         stockDeducted = false;
       } else if ((next === "CONFIRMED" || next === "DELIVERED") && !order.stockDeducted && deductStock) {
-        items = await deductOrderStock(tx, items);
-        stockDeducted = true;
+        const claimed = await tx.order.updateMany({ where: { id: orderId, stockDeducted: false }, data: { stockDeducted: true } });
+        if (claimed.count === 1) {
+          items = await deductOrderStock(tx, items);
+          stockDeducted = true;
+        }
       }
       await tx.order.update({
         where: { id: orderId },
