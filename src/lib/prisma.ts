@@ -24,7 +24,7 @@ function createClient() {
     // O pooler do Supabase exige SSL; o certificado dele não está na lista padrão do Node.
     ssl: local || noSsl ? false : { rejectUnauthorized: false },
     // Em serverless cada instância abre poucas conexões para não esgotar o pooler.
-    max: process.env.VERCEL ? 4 : 8,
+    max: process.env.VERCEL ? 2 : 8,
     // Rodando no próprio computador, mantém a conexão aberta (reconectar com SSL leva mais de 1 s).
     idleTimeoutMillis: process.env.VERCEL ? 10_000 : 600_000,
     connectionTimeoutMillis: 8_000,
