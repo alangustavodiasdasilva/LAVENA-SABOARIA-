@@ -14,6 +14,8 @@ Loja virtual + painel de gestão da Lavena. Os clientes montam o pedido no site 
 | `SESSION_SECRET` | opcional | Segredo da sessão do painel. Se vazio, é derivado das outras variáveis. |
 | `ADMIN_PASSWORD` | opcional | Senha inicial do painel. Depois de trocar a senha no painel, ela passa a valer (guardada com hash). |
 | `NEXT_PUBLIC_SITE_URL` | opcional | Endereço público (sitemap, links de compartilhamento). |
+| `NTFY_TOPIC` | opcional | Aviso de pedido novo no celular: instale o app gratuito *ntfy* e assine este tópico (escolha um nome difícil de adivinhar). |
+| `RESEND_API_KEY` + `NOTIFY_EMAIL` | opcional | Aviso de pedido novo por e-mail (Resend). `NOTIFY_FROM` define o remetente. |
 
 ## Painel
 
@@ -34,6 +36,7 @@ Dados de exemplo (apenas local, apaga o que existir): `psql "$DATABASE_URL" -f s
 
 ```bash
 npm test          # testes unitários (vitest)
+npm run test:e2e  # ponta a ponta (Playwright); veja playwright.config.ts
 npm run typecheck # tsc
 npm run lint
 npm run build
