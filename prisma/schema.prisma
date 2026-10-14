@@ -1,6 +1,5 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
@@ -58,7 +57,8 @@ model ProductVariant {
   stockQuantity Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
+
+  @@index([productId])
   @@schema("saboaria")
 }
 
@@ -70,6 +70,11 @@ model Settings {
   heroImages       String[] @default([])
   heroImageLinks   String[] @default([])
   adminPassword    String?
+  instagramUrl     String?
+  announcement     String?
+  deliveryInfo     String?
+  // Sessões do admin emitidas antes desta data deixam de valer (troca de senha)
+  sessionsValidFrom DateTime?
   updatedAt        DateTime @updatedAt
 
   @@schema("saboaria")
@@ -136,5 +141,34 @@ model Bag {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  @@schema("saboaria")
+}
+
+// NEW | CONFIRMED | DELIVERED | CANCELED
+model Order {
+  id             String   @id @default(uuid())
+  code           String   @unique
+  // CART | GIFT
+  type           String   @default("CART")
+  status         String   @default("NEW")
+  paid           Boolean  @default(false)
+  customerName   String
+  customerPhone  String?
+  // PICKUP | DELIVERY | TO_ARRANGE
+  deliveryMethod String   @default("TO_ARRANGE")
+  address        String?
+  notes          String?
+  recipientName  String?
+  cardMessage    String?
+  itemsJson      Json     @default("[]")
+  subtotal       Float
+  total          Float
+  adminNotes     String?
+  stockDeducted  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@index([createdAt])
   @@schema("saboaria")
 }

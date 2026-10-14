@@ -1,80 +1,43 @@
-import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import Link from "next/link";
-import { CartProvider } from "./components/CartContext";
-import Header from "./components/Header";
-import FloatingCart from "./components/FloatingCart";
+import "@fontsource-variable/outfit";
+import "@fontsource/cormorant-garamond/400.css";
+import "@fontsource/cormorant-garamond/500.css";
+import "@fontsource/cormorant-garamond/600.css";
+import "@fontsource/cormorant-garamond/500-italic.css";
+import "@fontsource/great-vibes/400.css";
+import "@/styles/tokens.css";
+import "@/styles/ui.css";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: { default: `Lavena | Saboaria Artesanal — ${SITE_TAGLINE}`, template: "%s | Lavena" },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: SITE_NAME,
+    title: `Lavena | Saboaria Artesanal`,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: { card: "summary_large_image" },
+  appleWebApp: { capable: true, title: "Lavena", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
+};
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#F7F3EE",
+  themeColor: "#fbf8f2",
   colorScheme: "light",
 };
 
-export const metadata: Metadata = {
-  title: "Lavena | Saboaria Artesanal",
-  description:
-    "Beleza que vem da natureza, para você. Sabonetes artesanais feitos à mão com ingredientes naturais. Sinta a pureza. Viva Lavena.",
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/images/logo-lavena.png",
-  },
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    title: "Lavena",
-    statusBarStyle: "default",
-  },
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>
-        <CartProvider>
-          <Header />
-          <main>{children}</main>
-          <FloatingCart />
-          <footer className="footer">
-            <div className="container footer-inner">
-              <div className="footer-top">
-                <div className="footer-brand">
-                  <p className="footer-logo">Lavena<span className="logo-dot">.</span></p>
-                  <p className="footer-slogan">Beleza que vem da natureza ♡</p>
-                </div>
-                <nav className="footer-nav">
-                  <Link href="/#produtos">Produtos</Link>
-                  <Link href="/#sobre">Sobre</Link>
-                  <Link href="/presente">Monte um presente</Link>
-                  <Link href="/carrinho">Carrinho</Link>
-                  <Link
-                    href="/admin"
-                    className="footer-admin-link"
-                    style={{
-                      border: "1px dashed var(--color-gold-muted)",
-                      borderRadius: "16px",
-                      padding: "3px 10px",
-                      fontSize: "0.8rem",
-                    }}
-                  >
-                    Configurar Produtos (Admin)
-                  </Link>
-                </nav>
-              </div>
-              <hr className="footer-divider" />
-              <p className="footer-copy">
-                &copy; {new Date().getFullYear()} Lavena Saboaria Artesanal. Todos os direitos reservados.
-              </p>
-            </div>
-          </footer>
-        </CartProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
