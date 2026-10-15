@@ -41,6 +41,7 @@ export type AdminSettingsDTO = {
   deliveryInfo: string | null;
   heroSlides: HeroSlide[];
   siteTheme: string;
+  giftImage: string | null;
 };
 
 export type AdminCategoryDTO = { id: string; name: string; slug: string; productCount: number };

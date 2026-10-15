@@ -101,7 +101,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </div>
       </section>
 
-      <GiftsBand hasKits={kits.length > 0} copy={copy} />
+      <GiftsBand hasKits={kits.length > 0} copy={copy} image={settings.giftImage} />
 
       {kits.length > 0 && (
         <section className="section" id="kits">

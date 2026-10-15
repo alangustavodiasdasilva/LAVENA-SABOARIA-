@@ -149,6 +149,7 @@ export const settingsSchema = z.object({
   announcement: optionalText(160, "Aviso"),
   deliveryInfo: optionalText(600, "Informações de entrega"),
   siteTheme: z.enum(THEME_IDS, { error: "Versão do site inválida." }).default("padrao"),
+  giftImage: optionalImage,
   heroSlides: z
     .array(z.object({ src: imageRef, href: z.string().max(300).nullish().transform((v) => v || "") }))
     .max(10, "Use no máximo 10 imagens no topo."),

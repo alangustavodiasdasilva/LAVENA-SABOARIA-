@@ -106,6 +106,7 @@ export async function getAdminSettings(): Promise<AdminSettingsDTO> {
     deliveryInfo: s?.deliveryInfo ?? null,
     heroSlides: slides,
     siteTheme: s?.siteTheme || "padrao",
+    giftImage: s?.giftImageUrl || null,
   };
 }
 

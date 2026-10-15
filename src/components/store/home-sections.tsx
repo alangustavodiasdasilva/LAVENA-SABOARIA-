@@ -1,3 +1,4 @@
+import SmartImage from "@/components/ui/smart-image";
 import type { ThemeCopy } from "@/lib/theme-copy";
 import Image from "next/image";
 import Link from "next/link";
@@ -156,13 +157,13 @@ export function Lines({ categories }: { categories: CategoryDTO[] }) {
 }
 
 /* ─── Presentes ─── */
-export function GiftsBand({ hasKits, copy }: { hasKits: boolean; copy: ThemeCopy }) {
+export function GiftsBand({ hasKits, copy, image }: { hasKits: boolean; copy: ThemeCopy; image?: string | null }) {
   return (
     <section className="section section-alt gifts" id="presentes">
       <div className="container gifts-inner">
         <div className="gifts-visual reveal">
           <div className="gifts-arch">
-            <Image src="/brand/presente-cesta.webp" alt="Cesta de presente Lavena com sabonete líquido, geleia de banho e sabonetes" fill sizes="(max-width: 900px) 90vw, 460px" className="gifts-img" />
+            <SmartImage src={image || "/brand/presente-cesta.webp"} alt="Presente Lavena" fill sizes="(max-width: 900px) 90vw, 460px" className="gifts-img" />
           </div>
           <Sprig className="gifts-sprig" />
         </div>
