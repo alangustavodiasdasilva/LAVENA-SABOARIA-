@@ -15,7 +15,7 @@ import {
   safe,
 } from "@/lib/data";
 import { FALLBACK_SETTINGS, SITE_DESCRIPTION, SITE_TAGLINE } from "@/lib/site";
-import { THEME_COPY } from "@/lib/theme-copy";
+import { THEME_COPY, fillCopy } from "@/lib/theme-copy";
 import { resolveTheme } from "@/lib/themes";
 
 export const dynamic = "force-dynamic";
@@ -46,17 +46,17 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     safe(getStoreCategories, []),
   ]);
   const settings = settingsR.data;
-  const copy = THEME_COPY[resolveTheme(settings.siteTheme)];
   const products = productsR.data;
   const kits = kitsR.data.slice(0, 3);
   const failed = productsR.failed;
+  const copy = fillCopy(THEME_COPY[resolveTheme(settings.siteTheme)], categoriesR.data.map((c) => c.name));
   const featured = products.slice(0, 8);
 
   return (
     <>
       <Hero slides={settings.heroSlides} copy={copy} />
       <TrustStrip />
-      <Lines categories={categoriesR.data} />
+      <Lines categories={categoriesR.data} products={products} />
 
       <section className="section section-alt" id="produtos">
         <div className="container">

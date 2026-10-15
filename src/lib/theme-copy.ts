@@ -24,7 +24,7 @@ const DEFAULT_COPY: ThemeCopy = {
   heroTitle: "Sinta a pureza.",
   heroAccent: "Viva Lavena.",
   heroLead:
-    "Sabonetes, sabonetes líquidos, geleias e mousses de banho feitos à mão, com ingredientes selecionados e aromas delicados que transformam o seu banho em um momento de bem-estar.",
+    "{Produtos} feitos à mão, com ingredientes selecionados e aromas delicados que transformam o seu dia em um momento de bem-estar.",
   heroCta: "Conhecer os produtos",
   heroChips: ["Feito à mão", "Natural", "Delicado"],
   featuredPre: "Para o seu",
@@ -47,7 +47,7 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     heroTitle: "Um Natal cheio de",
     heroAccent: "aroma e afeto.",
     heroLead:
-      "Presentes artesanais feitos à mão para espalhar carinho nesta ceia: sabonetes, geleias e mousses de banho que viram lembrança de Natal.",
+      "Presentes artesanais feitos à mão para espalhar carinho nesta ceia: {produtos} que viram lembrança de Natal.",
     heroCta: "Ver presentes de Natal",
     heroChips: ["Feito à mão", "Edição de Natal", "Com muito carinho"],
     featuredPre: "Aromas para o seu",
@@ -65,7 +65,7 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     heroEyebrow: "Ano Novo",
     heroTitle: "Comece o ano",
     heroAccent: "cuidando de você.",
-    heroLead: "Um novo ciclo pede renovação: banho perfumado, pele macia e um agrado artesanal para brindar a virada.",
+    heroLead: "Um novo ciclo pede renovação: {produtos} feitos à mão para começar o ano com leveza e carinho.",
     heroCta: "Renovar o banho",
     heroChips: ["Feito à mão", "Renovação", "Bem-estar"],
     featuredPre: "Para um ano",
@@ -155,7 +155,7 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     heroEyebrow: "Black Friday Lavena",
     heroTitle: "Ofertas feitas à mão,",
     heroAccent: "só por poucos dias.",
-    heroLead: "Aproveite condições especiais nos nossos sabonetes, geleias e mousses de banho. Estoque limitado, feito com carinho.",
+    heroLead: "Aproveite condições especiais em {produtos}. Estoque limitado, feito com carinho.",
     heroCta: "Aproveitar ofertas",
     heroChips: ["Tempo limitado", "Feito à mão", "Estoque limitado"],
     featuredPre: "Ofertas para o seu",
@@ -169,3 +169,19 @@ export const THEME_COPY: Record<ThemeId, ThemeCopy> = {
     giftsLead: "Aproveite a Black Friday para montar as sacolas de presente de fim de ano: produtos, embalagem e cartão personalizado.",
   },
 };
+
+/** "sabonetes, geleias e mousses" a partir dos nomes das categorias que existem na loja. */
+export function productsPhrase(categoryNames: string[]): string {
+  const names = categoryNames.map((n) => n.trim().toLowerCase()).filter(Boolean).slice(0, 4);
+  if (names.length === 0) return "nossos produtos artesanais";
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(", ")} e ${names[names.length - 1]}`;
+}
+
+/** Troca {produtos}/{Produtos} pelas categorias reais: o texto acompanha o que está à venda. */
+export function fillCopy(copy: ThemeCopy, categoryNames: string[]): ThemeCopy {
+  const phrase = productsPhrase(categoryNames);
+  const cap = phrase.charAt(0).toUpperCase() + phrase.slice(1);
+  const fill = (s: string) => s.replaceAll("{produtos}", phrase).replaceAll("{Produtos}", cap);
+  return { ...copy, heroLead: fill(copy.heroLead), giftsLead: fill(copy.giftsLead) };
+}

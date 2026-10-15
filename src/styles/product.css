@@ -48,37 +48,38 @@
   border-radius: var(--radius-pill);
 }
 .shop-filters {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.8rem 1.4rem;
-  margin-top: 1rem;
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
 }
 .shop-chips {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
-  padding: 2px 2px 6px;
   margin-inline: calc(var(--gutter) * -1);
-  padding-inline: var(--gutter);
+  padding: 2px var(--gutter) 6px;
+  scroll-padding-inline: var(--gutter);
   scrollbar-width: none;
   scroll-snap-type: x proximity;
-  max-width: calc(100% + var(--gutter) * 2);
 }
 .shop-chips::-webkit-scrollbar {
   display: none;
 }
 .shop-chips .chip {
+  flex: none;
   scroll-snap-align: start;
 }
 @media (min-width: 900px) {
+  .shop-filters {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.8rem 1.4rem;
+  }
   .shop-chips {
     flex-wrap: wrap;
     overflow: visible;
     margin-inline: 0;
     padding-inline: 0;
-    max-width: none;
   }
 }
 .shop-avail {
