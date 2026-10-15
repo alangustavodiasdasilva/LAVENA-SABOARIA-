@@ -53,6 +53,7 @@ export default function GiftBuilder({
   const [kitQty, setKitQty] = useState<Record<string, number>>({});
   const [prodQty, setProdQty] = useState<Record<string, number>>({});
   const [chosen, setChosen] = useState<Record<string, string>>({});
+  const [detailId, setDetailId] = useState<string | null>(null);
   const [bagId, setBagId] = useState<string | null>(null);
 
   const [sender, setSender] = useState("");
@@ -78,6 +79,18 @@ export default function GiftBuilder({
     setSender(c.name);
     setPhone(c.phone);
   }, []);
+
+  useEffect(() => {
+    if (!detailId) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setDetailId(null);
+    window.addEventListener("keydown", onKey);
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.documentElement.style.overflow = prev;
+    };
+  }, [detailId]);
 
   const available = useMemo(() => products.filter((p) => productOptions(p).some((o) => isPurchasableStatus(o.stockStatus))), [products]);
   const activeCategories = categories.filter((c) => available.some((p) => p.category?.slug === c.slug));
@@ -118,6 +131,82 @@ export default function GiftBuilder({
     selectedKits.reduce((s, k) => s + effectivePrice(k.kit) * k.qty, 0) +
     selectedProducts.reduce((s, p) => s + effectivePrice(p.option) * p.qty, 0) +
     (bag?.price ?? 0);
+
+  const detail = detailId ? products.find((p) => p.id === detailId) ?? null : null;
+  const peek = (() => {
+    if (!detail) return null;
+    const opts = productOptions(detail);
+    const opt = optionFor(detail);
+    const k = keyOf(detail, opt);
+    const qty = prodQty[k] || 0;
+    const reserve = opt.stockStatus === "IN_PRODUCTION";
+    const max = availableUnits(opt);
+    const bullets = (t: string | null) =>
+      (t ?? "")
+        .split(/\r?\n/)
+        .map((l) => l.replace(/^\s*[-•*–]\s*/, "").trim())
+        .filter(Boolean);
+    const benefits = bullets(detail.benefits);
+    return (
+      <div className="dialog-backdrop" onClick={() => setDetailId(null)}>
+        <div className="dialog peek" role="dialog" aria-modal="true" aria-label={detail.name} onClick={(e) => e.stopPropagation()}>
+          <button type="button" className="peek-close" onClick={() => setDetailId(null)} aria-label="Fechar">
+            <X size={20} />
+          </button>
+          <div className="peek-media img-wrap">
+            <SmartImage src={opt.imageUrl || detail.imageUrl || detail.images[0]} alt={detail.name} fill sizes="(max-width: 640px) 100vw, 480px" />
+          </div>
+          {detail.category && <span className="peek-cat">{detail.category.name}</span>}
+          <h3>{detail.name}</h3>
+          <div className="gcard-price">
+            {isOnSale(opt) && <s>{formatBRL(opt.price)}</s>}
+            <strong>{formatBRL(effectivePrice(opt))}</strong>
+          </div>
+          {opts.length > 1 && (
+            <div className="gpills" role="group" aria-label={`Opções de ${detail.name}`}>
+              {opts.map((o) => (
+                <button key={o.id || "base"} type="button" className={`gpill ${o.id === opt.id ? "is-active" : ""}`} disabled={!isPurchasableStatus(o.stockStatus)} aria-pressed={o.id === opt.id} onClick={() => setChosen((c) => ({ ...c, [detail.id]: o.id }))}>
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          )}
+          <p className="peek-desc">{detail.description}</p>
+          {benefits.length > 0 && (
+            <ul className="peek-list">
+              {benefits.map((b) => (
+                <li key={b}>
+                  <Check size={14} /> {b}
+                </li>
+              ))}
+            </ul>
+          )}
+          {detail.ingredients && (
+            <p className="peek-ing">
+              <strong>Ingredientes:</strong> {detail.ingredients}
+            </p>
+          )}
+          <div className="dialog-actions peek-actions">
+            {qty === 0 ? (
+              <button type="button" className="btn btn-primary" onClick={() => setQty(setProdQty, k, 1)}>
+                <Plus size={16} /> {reserve ? "Reservar para o presente" : "Adicionar ao presente"}
+              </button>
+            ) : (
+              <>
+                <QtyStepper size="sm" value={qty} max={max} onChange={(n) => setQty(setProdQty, k, n)} label={`Quantidade de ${detail.name}`} />
+                <button type="button" className="btn btn-outline" onClick={() => setQty(setProdQty, k, 0)}>
+                  <X size={16} /> Remover
+                </button>
+              </>
+            )}
+            <button type="button" className="btn" onClick={() => setDetailId(null)}>
+              Voltar
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  })();
 
   const scrollTo = (el: HTMLElement | null) => {
     if (!el) return;
@@ -201,6 +290,7 @@ export default function GiftBuilder({
 
   return (
     <form className="gift-layout" onSubmit={submit} noValidate>
+      {peek}
       <div className="gift-main">
         {/* 1 — presentes */}
         <section className="card gstep" aria-labelledby="g1">
@@ -299,6 +389,7 @@ export default function GiftBuilder({
                       <article key={p.id} className={`gcard ${inGift > 0 ? "is-selected" : ""}`}>
                         <div className="gcard-media img-wrap">
                           <SmartImage src={opt.imageUrl || p.imageUrl || p.images[0]} alt={p.name} fill sizes="(max-width: 640px) 50vw, 220px" />
+                          <button type="button" className="gcard-open" onClick={() => setDetailId(p.id)} aria-label={`Ver detalhes de ${p.name}`} />
                           {reserve && <span className="badge badge-sage gcard-tag">Sob encomenda</span>}
                           {inGift > 0 && (
                             <span className="gcard-check">
@@ -307,7 +398,11 @@ export default function GiftBuilder({
                           )}
                         </div>
                         <div className="gcard-body">
-                          <h3>{p.name}</h3>
+                          <h3>
+                            <button type="button" className="gcard-name" onClick={() => setDetailId(p.id)}>
+                              {p.name}
+                            </button>
+                          </h3>
                           {opts.length > 1 ? (
                             <div className="gpills" role="group" aria-label={`Opções de ${p.name}`}>
                               {opts.map((o) => (
@@ -329,8 +424,16 @@ export default function GiftBuilder({
                               <Plus size={15} /> {reserve ? "Reservar" : "Adicionar"}
                             </button>
                           ) : (
-                            <QtyStepper size="sm" value={qty} max={max} onChange={(n) => setQty(setProdQty, k, n)} label={`Quantidade de ${p.name}`} />
+                            <>
+                              <QtyStepper size="sm" value={qty} max={max} onChange={(n) => setQty(setProdQty, k, n)} label={`Quantidade de ${p.name}`} />
+                              <button type="button" className="gcard-remove" onClick={() => setQty(setProdQty, k, 0)}>
+                                <X size={14} /> Remover do presente
+                              </button>
+                            </>
                           )}
+                          <button type="button" className="gcard-more" onClick={() => setDetailId(p.id)}>
+                            Ver detalhes
+                          </button>
                         </div>
                       </article>
                     );

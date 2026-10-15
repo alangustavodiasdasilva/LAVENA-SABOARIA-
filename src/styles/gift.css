@@ -332,3 +332,107 @@
   line-height: 1;
   color: var(--sage-800);
 }
+
+/* abrir o produto e tirar do presente */
+.gcard-media {
+  position: relative;
+}
+.gcard-open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: zoom-in;
+  background: transparent;
+}
+.gcard-check {
+  z-index: 2;
+}
+.gcard-name {
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.gcard-name:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.gcard-remove,
+.gcard-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  padding: 0.35rem 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+.gcard-remove {
+  color: var(--danger);
+}
+.gcard-remove:hover,
+.gcard-more:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.peek {
+  position: relative;
+  display: grid;
+  gap: 0.7rem;
+  max-width: 520px;
+}
+.peek-close {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+.peek-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--cream);
+}
+.peek-cat {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-700);
+}
+.peek-desc {
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+.peek-list {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.92rem;
+}
+.peek-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.peek-list svg {
+  flex: none;
+  color: var(--sage-600);
+}
+.peek-ing {
+  font-size: 0.85rem;
+  color: var(--ink-mute);
+}
+.peek-actions {
+  justify-content: space-between;
+  align-items: center;
+}
