@@ -77,7 +77,7 @@ export default function KitForm({ kit, products }: { kit?: KitDTO; products: Pro
         <div className="panel-head">
           <h2>Fotos</h2>
         </div>
-        <GalleryUploader value={gallery} onChange={setGallery} max={8} />
+        <GalleryUploader value={gallery} onChange={setGallery} max={8} aspect="land" />
       </section>
 
       <section className="card panel">

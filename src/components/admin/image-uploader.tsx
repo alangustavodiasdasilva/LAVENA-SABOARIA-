@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ImagePlus, Loader2, Star, X } from "lucide-react";
+import { Crop, ImagePlus, Loader2, Star, X } from "lucide-react";
+import ImageAdjuster, { type AspectKey } from "@/components/admin/image-adjuster";
 import { uploadImage } from "@/actions/upload";
 import { useToast } from "@/components/ui/toast";
 import SmartImage from "@/components/ui/smart-image";
@@ -57,16 +58,31 @@ export function useImageUpload() {
 
 const ACCEPT = "image/jpeg,image/png,image/webp";
 
-/** Uma imagem só (variação, sacola, kit). */
-export function SingleImage({ value, onChange, label = "Foto" }: { value: string | null; onChange: (url: string | null) => void; label?: string }) {
+/** Uma imagem só (variação, sacola, kit, seção de presentes). Ao escolher o arquivo abre o ajuste com prévia. */
+export function SingleImage({
+  value,
+  onChange,
+  label = "Foto",
+  aspect = "sq",
+}: {
+  value: string | null;
+  onChange: (url: string | null) => void;
+  label?: string;
+  aspect?: AspectKey;
+}) {
   const { upload, uploading } = useImageUpload();
   const input = useRef<HTMLInputElement>(null);
+  const [adjust, setAdjust] = useState<{ src: string; original: File | null } | null>(null);
 
-  const pick = async (files: FileList | null) => {
-    if (!files?.[0]) return;
-    const [url] = await upload([files[0]]);
-    if (url) onChange(url);
+  const pick = (files: FileList | null) => {
+    const f = files?.[0];
     if (input.current) input.current.value = "";
+    if (f) setAdjust({ src: URL.createObjectURL(f), original: f });
+  };
+  const send = async (file: File) => {
+    setAdjust(null);
+    const [url] = await upload([file]);
+    if (url) onChange(url);
   };
 
   return (
@@ -81,17 +97,31 @@ export function SingleImage({ value, onChange, label = "Foto" }: { value: string
         )}
       </button>
       {value && (
-        <button type="button" className="img-remove" onClick={() => onChange(null)} aria-label="Remover foto">
-          <X size={14} />
-        </button>
+        <>
+          <button type="button" className="img-remove" onClick={() => onChange(null)} aria-label="Remover foto">
+            <X size={14} />
+          </button>
+          <button type="button" className="img-adjust" onClick={() => setAdjust({ src: value, original: null })} aria-label="Ajustar foto" title="Ajustar foto">
+            <Crop size={14} />
+          </button>
+        </>
       )}
       <input ref={input} type="file" accept={ACCEPT} hidden onChange={(e) => pick(e.target.files)} />
+      {adjust && (
+        <ImageAdjuster
+          src={adjust.src}
+          initialAspect={aspect}
+          onClose={() => setAdjust(null)}
+          onApply={send}
+          onSkip={adjust.original ? () => send(adjust.original as File) : undefined}
+        />
+      )}
     </div>
   );
 }
 
 /** Galeria: a primeira foto é a capa. */
-export function GalleryUploader({ value, onChange, max = 12 }: { value: string[]; onChange: (urls: string[]) => void; max?: number }) {
+export function GalleryUploader({ value, onChange, max = 12, aspect = "port" }: { value: string[]; onChange: (urls: string[]) => void; max?: number; aspect?: AspectKey }) {
   const { upload, uploading } = useImageUpload();
   const input = useRef<HTMLInputElement>(null);
   const toast = useToast();
@@ -107,6 +137,14 @@ export function GalleryUploader({ value, onChange, max = 12 }: { value: string[]
   };
 
   const makeCover = (i: number) => onChange([value[i], ...value.filter((_, x) => x !== i)]);
+  const [adjustIdx, setAdjustIdx] = useState<number | null>(null);
+  const applyAdjust = async (file: File) => {
+    const i = adjustIdx;
+    setAdjustIdx(null);
+    if (i == null) return;
+    const [url] = await upload([file]);
+    if (url) onChange(value.map((v, x) => (x === i ? url : v)));
+  };
 
   return (
     <div className="gallery-up">
@@ -115,6 +153,9 @@ export function GalleryUploader({ value, onChange, max = 12 }: { value: string[]
           <SmartImage src={src} alt={`Foto ${i + 1}`} fill sizes="120px" style={{ objectFit: "cover" }} />
           {i === 0 && <span className="cover-tag">Capa</span>}
           <div className="thumb-actions">
+            <button type="button" onClick={() => setAdjustIdx(i)} aria-label="Ajustar foto" title="Ajustar foto">
+              <Crop size={14} />
+            </button>
             {i !== 0 && (
               <button type="button" onClick={() => makeCover(i)} aria-label="Usar como capa" title="Usar como capa">
                 <Star size={14} />
@@ -133,6 +174,7 @@ export function GalleryUploader({ value, onChange, max = 12 }: { value: string[]
         </button>
       )}
       <input ref={input} type="file" accept={ACCEPT} multiple hidden onChange={(e) => pick(e.target.files)} />
+      {adjustIdx != null && value[adjustIdx] && <ImageAdjuster src={value[adjustIdx]} initialAspect={aspect} onClose={() => setAdjustIdx(null)} onApply={applyAdjust} />}
     </div>
   );
 }
