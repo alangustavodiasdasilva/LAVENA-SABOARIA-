@@ -1,5 +1,6 @@
 import SmartImage from "@/components/ui/smart-image";
 import type { ThemeCopy } from "@/lib/theme-copy";
+import type { ProductDTO } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -120,11 +121,19 @@ function norm(s: string) {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
-export function Lines({ categories }: { categories: CategoryDTO[] }) {
-  const hrefFor = (key: string) => {
-    const match = categories.find((c) => norm(c.name + " " + c.slug).includes(key));
-    return match ? `/loja?categoria=${match.slug}` : "/loja";
-  };
+export function Lines({ categories, products }: { categories: CategoryDTO[]; products: ProductDTO[] }) {
+  if (categories.length === 0) return null;
+  const items = categories.slice(0, 8).map((c) => {
+    const key = norm(c.name + " " + c.slug);
+    const preset = LINES.find((l) => key.includes(l.key));
+    const first = products.find((p) => p.category?.slug === c.slug);
+    return {
+      slug: c.slug,
+      title: c.name,
+      text: preset?.text ?? "Conheça os produtos desta linha, feitos à mão com carinho.",
+      image: preset?.image ?? first?.imageUrl ?? first?.images[0] ?? null,
+    };
+  });
   return (
     <section className="section" id="linhas">
       <div className="container">
@@ -133,13 +142,13 @@ export function Lines({ categories }: { categories: CategoryDTO[] }) {
           <h2>
             Cuidado em cada <span className="title-accent">detalhe</span>
           </h2>
-          <p>Da espuma suave ao perfume delicado que envolve a pele: conheça o que a Lavena prepara para o seu autocuidado.</p>
+          <p>Conheça o que a Lavena prepara para o seu autocuidado.</p>
         </div>
         <div className="lines-grid">
-          {LINES.map((l) => (
-            <Link key={l.key} href={hrefFor(l.key)} className="line-card reveal">
+          {items.map((l) => (
+            <Link key={l.slug} href={`/loja?categoria=${l.slug}`} className="line-card reveal">
               <div className="line-media img-wrap">
-                <Image src={l.image} alt="" fill sizes="(max-width: 720px) 50vw, 25vw" className="line-img" />
+                <SmartImage src={l.image} alt="" fill sizes="(max-width: 720px) 50vw, 25vw" className="line-img" />
               </div>
               <div className="line-body">
                 <h3>{l.title}</h3>
