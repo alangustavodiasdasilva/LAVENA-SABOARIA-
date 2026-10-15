@@ -46,7 +46,10 @@ export default function Header({ whatsappNumber, instagramUrl }: { whatsappNumbe
 
   const cartLabel = hydrated && count > 0 ? `Sacola, ${count} ${count === 1 ? "item" : "itens"}` : "Sacola";
 
+  // A gaveta fica FORA do <header>: o header tem backdrop-filter, e isso faz um filho
+  // com position: fixed ficar preso à altura do header (menu cortado no celular).
   return (
+    <>
     <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
       <div className="container site-header-inner">
         <button type="button" className="header-icon-btn hide-desktop" onClick={() => setOpen(true)} aria-label="Abrir menu" aria-expanded={open}>
@@ -73,6 +76,7 @@ export default function Header({ whatsappNumber, instagramUrl }: { whatsappNumbe
           </Link>
         </div>
       </div>
+    </header>
 
       <div className={`drawer-overlay ${open ? "is-open" : ""}`} onClick={() => setOpen(false)} aria-hidden />
       <aside className={`drawer ${open ? "is-open" : ""}`} aria-hidden={!open} aria-label="Menu" {...(open ? { role: "dialog", "aria-modal": true } : {})}>
@@ -106,6 +110,6 @@ export default function Header({ whatsappNumber, instagramUrl }: { whatsappNumbe
           <p className="script drawer-tag">Sinta a pureza. Viva Lavena.</p>
         </div>
       </aside>
-    </header>
+    </>
   );
 }
