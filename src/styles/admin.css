@@ -982,3 +982,6 @@
 .img-adjust { position: absolute; left: 6px; bottom: 6px; z-index: 3; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.94); color: var(--ink); box-shadow: var(--shadow-xs); }
 .img-adjust:hover { background: #fff; color: var(--sage-700); }
 .single-img { position: relative; }
+
+.story-edit { display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap; }
+.story-edit .single-img { width: 120px; flex: none; }

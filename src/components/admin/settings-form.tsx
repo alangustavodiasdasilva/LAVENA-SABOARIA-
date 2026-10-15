@@ -40,6 +40,8 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
   const [slides, setSlides] = useState<HeroSlide[]>(settings.heroSlides);
   const [theme, setTheme] = useState<string>(settings.siteTheme);
   const [giftImage, setGiftImage] = useState<string | null>(settings.giftImage);
+  const [storyImage, setStoryImage] = useState<string | null>(settings.storyImage);
+  const [storyCaption, setStoryCaption] = useState(settings.storyCaption ?? "");
   const [adjustSlide, setAdjustSlide] = useState<number | null>(null);
 
   const [cur, setCur] = useState("");
@@ -64,7 +66,7 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    run(() => saveSettings({ whatsappNumber: whatsapp, instagramUrl: instagram, announcement, deliveryInfo: delivery, heroSlides: slides, siteTheme: theme as ThemeChoice, giftImage }), { success: "Configurações salvas." });
+    run(() => saveSettings({ whatsappNumber: whatsapp, instagramUrl: instagram, announcement, deliveryInfo: delivery, heroSlides: slides, siteTheme: theme as ThemeChoice, giftImage, storyImage, storyCaption }), { success: "Configurações salvas." });
   };
 
   const submitPw = async (e: React.FormEvent) => {
@@ -132,6 +134,21 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
             })}
           </div>
           {theme === "auto" && <p className="hint">Hoje o site estaria no tema: <strong>{THEMES[resolveTheme("auto")].label}</strong>.</p>}
+        </section>
+
+        <section className="card panel" id="foto-historia">
+          <div className="panel-head">
+            <h2>Foto da &quot;Nossa história&quot;</h2>
+          </div>
+          <p className="soft small">Coloque a foto de quem conta a história da Lavena (ex.: a Raquel). Ao enviar, você ajusta o enquadramento e vê a prévia. A foto aparece na página inicial, junto ao texto e ao selo da marca.</p>
+          <div className="story-edit">
+            <SingleImage value={storyImage} onChange={setStoryImage} label="Foto" aspect="port" />
+            <div className="field grow">
+              <label htmlFor="s-story-cap">Legenda (nome)</label>
+              <input id="s-story-cap" className="input" value={storyCaption} onChange={(e) => setStoryCaption(e.target.value)} maxLength={60} placeholder="Ex.: Raquel" />
+              <span className="hint">Aparece sob a foto, em letra de assinatura.</span>
+            </div>
+          </div>
         </section>
 
         <section className="card panel" id="foto-presentes">

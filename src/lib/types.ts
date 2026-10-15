@@ -82,6 +82,9 @@ export type PublicSettings = {
   siteTheme: string;
   /** Foto da seção de presentes da página inicial (null = foto padrão da marca). */
   giftImage: string | null;
+  /** Foto da seção "Nossa história" e a legenda (nome) que aparece com ela. */
+  storyImage: string | null;
+  storyCaption: string | null;
 };
 
 /** Linha de pedido, já com preço resolvido pelo servidor. */
