@@ -76,6 +76,24 @@ export function optionGroups(p: ProductDTO): OptionGroups {
   };
 }
 
+/**
+ * Ao clicar num tamanho: mantém a essência atual se ela existir nesse tamanho; senão passa para
+ * a primeira essência que tenha esse tamanho (o tamanho nunca fica "indisponível" só porque a
+ * essência atual não o tem).
+ */
+export function pickBySize(opts: ProductOption[], size: string, currentEssence: string): ProductOption | null {
+  const ess = (o: ProductOption) => o.essence ?? "Padrão";
+  const siz = (o: ProductOption) => o.size ?? "Único";
+  const same = opts.filter((o) => siz(o) === size);
+  return (
+    same.find((o) => ess(o) === currentEssence && isPurchasableStatus(o.stockStatus)) ??
+    same.find((o) => isPurchasableStatus(o.stockStatus)) ??
+    same.find((o) => ess(o) === currentEssence) ??
+    same[0] ??
+    null
+  );
+}
+
 /** Escolhe a opção que combina essência e tamanho; se não existir, a primeira disponível da essência. */
 export function pickOption(opts: ProductOption[], essence: string, size: string): ProductOption | null {
   const ess = (o: ProductOption) => o.essence ?? "Padrão";

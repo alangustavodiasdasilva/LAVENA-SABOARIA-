@@ -75,7 +75,7 @@ describe("disponibilidade", () => {
   });
 });
 
-import { optionDisplayName, optionGroups, pickOption } from "../stock";
+import { optionDisplayName, optionGroups, pickBySize, pickOption } from "../stock";
 
 describe("essência e tamanho", () => {
   const prod = product({
@@ -110,5 +110,22 @@ describe("essência e tamanho", () => {
     const opts = productOptions(prod);
     expect(optionDisplayName(prod, opts[0])).toBe("Sabonete de Colher (Lavanda · 100g)");
     expect(optionDisplayName(prod, opts[2])).toBe("Sabonete de Colher (Maçã verde · 100g)");
+  });
+});
+
+describe("escolha por tamanho", () => {
+  const prod = product({
+    essence: "Lavanda",
+    size: "90",
+    variants: [
+      { id: "a", name: "Jaca", size: "90", price: 20, salePrice: null, imageUrl: null, stockStatus: "IN_STOCK", stockQuantity: 0 },
+      { id: "b", name: "Abil", size: "350", price: 90, salePrice: null, imageUrl: null, stockStatus: "IN_STOCK", stockQuantity: 0 },
+    ],
+  });
+  it("mantém a essência quando ela existe no tamanho", () => {
+    expect(pickBySize(productOptions(prod), "90", "Jaca")?.id).toBe("a");
+  });
+  it("troca de essência quando a atual não tem o tamanho", () => {
+    expect(pickBySize(productOptions(prod), "350", "Lavanda")?.id).toBe("b");
   });
 });
