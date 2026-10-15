@@ -3,7 +3,9 @@
  * então repetir a mesma consulta a cada visita deixa o site lento. Qualquer ação do painel
  * limpa o cache na hora (`clearMemo`); no pior caso os dados ficam até `TTL_MS` desatualizados.
  */
-const TTL_MS = 60_000;
+// Na Vercel cada instância tem a própria memória e uma edição do painel só limparia a
+// instância que a recebeu: o cache ficaria desatualizado nas outras. Lá não há cache.
+const TTL_MS = process.env.VERCEL ? 0 : 60_000;
 
 type Entry = { at: number; value: Promise<unknown> };
 const g = globalThis as unknown as { __lavenaMemo?: Map<string, Entry> };
