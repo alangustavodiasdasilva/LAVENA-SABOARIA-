@@ -91,7 +91,7 @@ export default function Header({ whatsappNumber, instagramUrl }: { whatsappNumbe
           </Link>
           <Link href="/carrinho" className="header-icon-btn cart-btn" aria-label={cartLabel}>
             <ShoppingBag size={22} />
-            {hydrated && count > 0 && <span className="cart-count">{count > 99 ? "99+" : count}</span>}
+            {hydrated && count > 0 && <span key={count} className="cart-count">{count > 99 ? "99+" : count}</span>}
           </Link>
         </div>
       </div>

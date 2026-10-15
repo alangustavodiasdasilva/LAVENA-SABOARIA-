@@ -1,0 +1,274 @@
+/* ═══════════════════════════════════════════════════════════
+   Efeitos visuais da loja. Tudo respeita "reduzir movimento".
+   ═══════════════════════════════════════════════════════════ */
+
+/* transição suave entre páginas (Chrome, Edge, Safari 18+) */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root) {
+    animation: 0.22s ease both vt-out;
+  }
+  ::view-transition-new(root) {
+    animation: 0.32s var(--ease) both vt-in;
+  }
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* entrada dos blocos: fallback por JS onde não há scroll-timeline */
+@supports not (animation-timeline: view()) {
+  .has-reveal .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  }
+  .has-reveal .reveal.in-view {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* cartões e linhas entram em sequência */
+.lines-grid > :nth-child(2),
+.pgrid > :nth-child(2) {
+  animation-delay: 0.06s;
+  transition-delay: 0.06s;
+}
+.lines-grid > :nth-child(3),
+.pgrid > :nth-child(3) {
+  animation-delay: 0.12s;
+  transition-delay: 0.12s;
+}
+.lines-grid > :nth-child(4),
+.pgrid > :nth-child(4) {
+  animation-delay: 0.18s;
+  transition-delay: 0.18s;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* abertura da página inicial */
+  .hero-copy > * {
+    animation: hero-in 0.9s var(--ease) both;
+  }
+  .hero-copy > :nth-child(1) {
+    animation-delay: 0.05s;
+  }
+  .hero-copy > :nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .hero-copy > :nth-child(3) {
+    animation-delay: 0.28s;
+  }
+  .hero-copy > :nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  .hero-copy > :nth-child(5) {
+    animation-delay: 0.5s;
+  }
+  .hero-frame {
+    animation: hero-frame-in 1.1s var(--ease) 0.15s both;
+  }
+  /* zoom lento (Ken Burns) na imagem ativa do carrossel */
+  .hcar-slide.is-active .hcar-img {
+    animation: kenburns 9s ease-out both;
+  }
+  /* brilho que passa no botão principal */
+  .btn-primary {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.28) 50%, transparent 70%);
+    transform: translateX(-120%);
+  }
+  .btn-primary:hover::after {
+    transform: translateX(120%);
+    transition: transform 0.8s var(--ease);
+  }
+  .btn:active,
+  .pcard-add:active {
+    transform: scale(0.96);
+  }
+  /* sacola: o número "pula" quando muda */
+  .cart-count {
+    animation: bump 0.5s var(--ease);
+  }
+  /* imagens aparecem com fade ao carregar */
+  .img-wrap img {
+    animation: img-in 0.7s var(--ease) both;
+  }
+  .pcard:hover,
+  .line-card:hover {
+    box-shadow: var(--shadow-lg);
+  }
+  /* selo da marca gira de leve ao passar o mouse */
+  .story-seal-ring {
+    transition: transform 1.2s var(--ease);
+  }
+  .story-seal-ring:hover {
+    transform: rotate(6deg) scale(1.03);
+  }
+}
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+@keyframes hero-frame-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.97);
+  }
+}
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+@keyframes bump {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes img-in {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+/* esqueleto de carregamento */
+.skel {
+  border-radius: 18px;
+  background: linear-gradient(100deg, var(--cream) 30%, color-mix(in srgb, var(--paper) 70%, var(--cream)) 50%, var(--cream) 70%);
+  background-size: 220% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+.skel-title {
+  height: 46px;
+  width: min(360px, 70%);
+  margin-bottom: 14px;
+}
+.skel-line {
+  height: 16px;
+  width: min(520px, 90%);
+  margin-bottom: 28px;
+}
+.skel-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.skel-card {
+  aspect-ratio: 4 / 5.2;
+}
+@media (min-width: 720px) {
+  .skel-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.4rem;
+  }
+}
+@keyframes shimmer {
+  to {
+    background-position: -220% 0;
+  }
+}
+
+/* ─── partículas por tema ─── */
+.fx {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  overflow: hidden;
+}
+.fx span {
+  position: absolute;
+  top: -8%;
+  left: var(--x);
+  animation: fx-fall var(--d) linear var(--delay) infinite;
+}
+.fx-snow span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+  opacity: 0.85;
+}
+.fx-sparkle span {
+  width: 7px;
+  height: 7px;
+  background: var(--gold-400);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0.9;
+}
+.fx-heart span {
+  font-size: 18px;
+  color: var(--sage-300);
+  opacity: 0.7;
+  top: auto;
+  bottom: -8%;
+  animation-name: fx-rise;
+}
+.fx-bubble span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--sage-300) 80%, transparent);
+  background: color-mix(in srgb, var(--sage-100) 50%, transparent);
+  top: auto;
+  bottom: -8%;
+  animation-name: fx-rise;
+}
+@keyframes fx-fall {
+  from {
+    transform: translate3d(0, -6vh, 0) scale(var(--s));
+  }
+  to {
+    transform: translate3d(var(--drift), 112vh, 0) scale(var(--s));
+  }
+}
+@keyframes fx-rise {
+  from {
+    transform: translate3d(0, 0, 0) scale(var(--s));
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.75;
+  }
+  to {
+    transform: translate3d(var(--drift), -112vh, 0) scale(var(--s));
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fx {
+    display: none;
+  }
+}
