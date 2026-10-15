@@ -42,6 +42,7 @@ model Product {
   updatedAt   DateTime @updatedAt
   variants    ProductVariant[]
 
+  @@index([categoryId])
   @@schema("saboaria")
 }
 
@@ -73,6 +74,8 @@ model Settings {
   instagramUrl     String?
   announcement     String?
   deliveryInfo     String?
+  // Versão sazonal do site: auto | padrao | natal | ano-novo | ...
+  siteTheme        String   @default("padrao")
   // Sessões do admin emitidas antes desta data deixam de valer (troca de senha)
   sessionsValidFrom DateTime?
   updatedAt        DateTime @updatedAt

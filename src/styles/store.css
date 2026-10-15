@@ -36,14 +36,14 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(251, 248, 242, 0.86);
+  background: color-mix(in srgb, var(--ivory) 86%, transparent);
   backdrop-filter: saturate(1.4) blur(14px);
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
   border-bottom: 1px solid transparent;
   transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
 }
 .site-header.is-scrolled {
-  background: rgba(251, 248, 242, 0.94);
+  background: color-mix(in srgb, var(--ivory) 94%, transparent);
   border-color: var(--linen);
   box-shadow: 0 6px 24px rgba(58, 51, 45, 0.05);
 }

@@ -76,6 +76,8 @@ export type PublicSettings = {
   announcement: string | null;
   deliveryInfo: string | null;
   heroSlides: HeroSlide[];
+  /** Escolha do dono: "auto" ou o id de um tema (ver lib/themes). */
+  siteTheme: string;
 };
 
 /** Linha de pedido, já com preço resolvido pelo servidor. */

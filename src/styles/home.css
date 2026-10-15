@@ -13,9 +13,9 @@
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(60% 55% at 85% 20%, rgba(202, 215, 193, 0.55), transparent 70%),
-    radial-gradient(45% 45% at 8% 80%, rgba(236, 220, 174, 0.4), transparent 70%),
-    radial-gradient(40% 40% at 50% 100%, rgba(246, 231, 226, 0.6), transparent 70%);
+    radial-gradient(60% 55% at 85% 20%, color-mix(in srgb, var(--sage-200) 55%, transparent), transparent 70%),
+    radial-gradient(45% 45% at 8% 80%, color-mix(in srgb, var(--gold-200) 40%, transparent), transparent 70%),
+    radial-gradient(40% 40% at 50% 100%, color-mix(in srgb, var(--rose-100) 60%, transparent), transparent 70%);
 }
 .hero-inner {
   position: relative;
@@ -774,10 +774,10 @@
 }
 .contact-sprig {
   position: absolute;
-  right: -14px;
-  bottom: -26px;
-  width: 190px;
-  opacity: 0.18;
+  right: 28px;
+  bottom: 18px;
+  width: 150px;
+  opacity: 0.16;
   filter: brightness(2);
   pointer-events: none;
 }

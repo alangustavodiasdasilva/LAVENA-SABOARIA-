@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DELIVERY_METHODS, STOCK_STATUSES } from "./types";
+import { THEME_IDS } from "./themes";
 
 const text = (max: number, label = "Texto") =>
   z.string().trim().max(max, `${label} muito longo (máx. ${max} caracteres).`);
@@ -145,6 +146,7 @@ export const settingsSchema = z.object({
   instagramUrl: z.string().max(200).nullish(),
   announcement: optionalText(160, "Aviso"),
   deliveryInfo: optionalText(600, "Informações de entrega"),
+  siteTheme: z.enum(THEME_IDS, { error: "Versão do site inválida." }).default("padrao"),
   heroSlides: z
     .array(z.object({ src: imageRef, href: z.string().max(300).nullish().transform((v) => v || "") }))
     .max(10, "Use no máximo 10 imagens no topo."),

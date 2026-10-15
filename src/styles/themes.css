@@ -1,0 +1,131 @@
+/* Versões sazonais do site: só trocam as cores (tokens). O tema vem de data-theme no .theme-root. */
+.theme-root {
+  min-height: 100vh;
+  background: var(--ivory);
+}
+
+.theme-root[data-theme="natal"] {
+  --sage-50: #fbf1f2;
+  --sage-100: #f4dde0;
+  --sage-200: #e8bcc3;
+  --sage-300: #d994a0;
+  --sage-400: #c46f80;
+  --sage-500: #a84a5e;
+  --sage-600: #8c3248;
+  --sage-700: #732639;
+  --sage-800: #5a1c2c;
+  --sage-900: #43141f;
+  --ivory: #fbf6f1;
+  --cream: #f5ebe3;
+  --linen: #ecdcd0;
+}
+
+.theme-root[data-theme="ano-novo"] {
+  --sage-50: #f0f3fa;
+  --sage-100: #dde4f3;
+  --sage-200: #bcc8e3;
+  --sage-300: #94a5cf;
+  --sage-400: #6b80b8;
+  --sage-500: #4d639f;
+  --sage-600: #3b4d84;
+  --sage-700: #2f3f6b;
+  --sage-800: #232f52;
+  --sage-900: #182038;
+  --ivory: #f8f7f4;
+  --cream: #efeef0;
+  --linen: #e2e0e6;
+  --gold-100: #fbf1d0;
+  --gold-200: #f5e29b;
+  --gold-300: #efd06a;
+  --gold-400: #e6b93f;
+  --gold-500: #d3a026;
+  --gold-600: #b2851c;
+  --gold-700: #8c6611;
+}
+
+.theme-root[data-theme="pascoa"] {
+  --sage-50: #f6f3fb;
+  --sage-100: #ebe5f6;
+  --sage-200: #d6caec;
+  --sage-300: #bba9de;
+  --sage-400: #9d86cb;
+  --sage-500: #8470b6;
+  --sage-600: #6e5b9d;
+  --sage-700: #5a4a83;
+  --sage-800: #473a68;
+  --sage-900: #342a4d;
+  --ivory: #fbf8fc;
+  --cream: #f3eef8;
+  --linen: #e6def0;
+}
+
+.theme-root[data-theme="dia-das-maes"] {
+  --sage-50: #fcf1f4;
+  --sage-100: #f8dfe6;
+  --sage-200: #f0bfcd;
+  --sage-300: #e496ac;
+  --sage-400: #d36f8e;
+  --sage-500: #bc4f72;
+  --sage-600: #a03b5b;
+  --sage-700: #852f4b;
+  --sage-800: #682539;
+  --sage-900: #4c1a29;
+  --ivory: #fdf7f6;
+  --cream: #f8ece9;
+  --linen: #efddd9;
+}
+
+.theme-root[data-theme="namorados"] {
+  --sage-50: #fdf0f1;
+  --sage-100: #f9dbde;
+  --sage-200: #f1b7be;
+  --sage-300: #e68c98;
+  --sage-400: #d6606f;
+  --sage-500: #c13c4e;
+  --sage-600: #a82b3e;
+  --sage-700: #8c2234;
+  --sage-800: #6e1a29;
+  --sage-900: #51121e;
+  --ivory: #fcf6f5;
+  --cream: #f7ebe9;
+  --linen: #eddcd8;
+}
+
+.theme-root[data-theme="dia-dos-pais"] {
+  --sage-50: #eff5f6;
+  --sage-100: #dae7ea;
+  --sage-200: #b6cfd5;
+  --sage-300: #8ab1ba;
+  --sage-400: #62919d;
+  --sage-500: #47737f;
+  --sage-600: #3a6270;
+  --sage-700: #2f5460;
+  --sage-800: #243f49;
+  --sage-900: #1a2e36;
+  --ivory: #f6f8f7;
+  --cream: #ebf0ef;
+  --linen: #dce4e3;
+}
+
+.theme-root[data-theme="black-friday"] {
+  --sage-50: #f4f3f1;
+  --sage-100: #e5e3df;
+  --sage-200: #cac7c1;
+  --sage-300: #a9a59d;
+  --sage-400: #86827a;
+  --sage-500: #67635c;
+  --sage-600: #4e4a44;
+  --sage-700: #3a3732;
+  --sage-800: #2a2825;
+  --sage-900: #1c1b19;
+  --ivory: #f7f5f0;
+  --cream: #eeebe4;
+  --linen: #e0dbd0;
+  --gold-100: #f7efd2;
+  --gold-200: #f1e0a3;
+  --gold-300: #ecd07e;
+  --gold-400: #e0b94f;
+  --gold-500: #c79a2a;
+  --gold-600: #a67e1f;
+  --gold-700: #85650f;
+}

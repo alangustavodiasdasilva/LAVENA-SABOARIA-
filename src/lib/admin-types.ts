@@ -40,6 +40,7 @@ export type AdminSettingsDTO = {
   announcement: string | null;
   deliveryInfo: string | null;
   heroSlides: HeroSlide[];
+  siteTheme: string;
 };
 
 export type AdminCategoryDTO = { id: string; name: string; slug: string; productCount: number };

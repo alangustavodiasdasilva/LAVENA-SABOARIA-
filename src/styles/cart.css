@@ -307,7 +307,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.8rem 1rem calc(0.8rem + env(safe-area-inset-bottom));
-  background: rgba(251, 248, 242, 0.96);
+  background: color-mix(in srgb, var(--ivory) 96%, transparent);
   backdrop-filter: blur(12px);
   border-top: 1px solid var(--linen);
   box-shadow: 0 -10px 30px rgba(58, 51, 45, 0.08);
