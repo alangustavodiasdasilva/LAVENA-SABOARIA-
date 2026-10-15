@@ -114,6 +114,7 @@ export const getPublicSettings = cache(async (): Promise<PublicSettings> => {
     deliveryInfo: s?.deliveryInfo || null,
     heroSlides: slides,
     siteTheme: s?.siteTheme || "padrao",
+    giftImage: s?.giftImageUrl || null,
   };
 });
 

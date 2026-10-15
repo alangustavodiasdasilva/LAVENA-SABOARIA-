@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { ArrowDown, ArrowUp, CheckCircle2, ImagePlus, KeyRound, Loader2, Trash2, XCircle } from "lucide-react";
 import { changePassword } from "@/actions/auth";
 import { saveSettings } from "@/actions/settings";
-import { useImageUpload } from "@/components/admin/image-uploader";
+import { SingleImage, useImageUpload } from "@/components/admin/image-uploader";
 import { useRun } from "@/components/admin/use-run";
 import SmartImage from "@/components/ui/smart-image";
 import { formatPhone } from "@/lib/format";
@@ -38,6 +38,7 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
   const [delivery, setDelivery] = useState(settings.deliveryInfo ?? "");
   const [slides, setSlides] = useState<HeroSlide[]>(settings.heroSlides);
   const [theme, setTheme] = useState<string>(settings.siteTheme);
+  const [giftImage, setGiftImage] = useState<string | null>(settings.giftImage);
 
   const [cur, setCur] = useState("");
   const [next, setNext] = useState("");
@@ -61,7 +62,7 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    run(() => saveSettings({ whatsappNumber: whatsapp, instagramUrl: instagram, announcement, deliveryInfo: delivery, heroSlides: slides, siteTheme: theme as ThemeChoice }), { success: "Configurações salvas." });
+    run(() => saveSettings({ whatsappNumber: whatsapp, instagramUrl: instagram, announcement, deliveryInfo: delivery, heroSlides: slides, siteTheme: theme as ThemeChoice, giftImage }), { success: "Configurações salvas." });
   };
 
   const submitPw = async (e: React.FormEvent) => {
@@ -129,6 +130,14 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
             })}
           </div>
           {theme === "auto" && <p className="hint">Hoje o site estaria no tema: <strong>{THEMES[resolveTheme("auto")].label}</strong>.</p>}
+        </section>
+
+        <section className="card panel" id="foto-presentes">
+          <div className="panel-head">
+            <h2>Foto da seção de presentes</h2>
+          </div>
+          <p className="soft small">Aparece na página inicial, ao lado de &quot;Presenteie com carinho&quot;. Use uma foto vertical ou quadrada. Sem foto, o site usa a cesta padrão da Lavena. Troque por uma foto de Natal, Dia das Mães etc. quando quiser.</p>
+          <SingleImage value={giftImage} onChange={setGiftImage} label="Foto" />
         </section>
 
         <section className="card panel" id="topo">

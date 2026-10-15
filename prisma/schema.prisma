@@ -81,6 +81,8 @@ model Settings {
   deliveryInfo     String?
   // Versão sazonal do site: auto | padrao | natal | ano-novo | ...
   siteTheme        String   @default("padrao")
+  // Foto da seção "Presentes" da página inicial
+  giftImageUrl     String?
   // Sessões do admin emitidas antes desta data deixam de valer (troca de senha)
   sessionsValidFrom DateTime?
   updatedAt        DateTime @updatedAt

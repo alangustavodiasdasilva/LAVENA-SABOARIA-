@@ -80,6 +80,8 @@ export type PublicSettings = {
   heroSlides: HeroSlide[];
   /** Escolha do dono: "auto" ou o id de um tema (ver lib/themes). */
   siteTheme: string;
+  /** Foto da seção de presentes da página inicial (null = foto padrão da marca). */
+  giftImage: string | null;
 };
 
 /** Linha de pedido, já com preço resolvido pelo servidor. */
