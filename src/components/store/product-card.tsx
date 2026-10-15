@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, Plus, Star } from "lucide-react";
+import { ArrowRight, Check, Plus, Star } from "lucide-react";
 import { useState } from "react";
 import SmartImage from "@/components/ui/smart-image";
 import { useCart } from "./cart";
@@ -75,8 +75,8 @@ export function ProductCard({ product, priority = false }: { product: ProductDTO
 
           {!sold &&
             (hasChoices ? (
-              <Link href={`/produto/${product.slug}`} className="pcard-add is-text" aria-label={`Ver opções de ${product.name}`}>
-                Ver opções
+              <Link href={`/produto/${product.slug}`} className="pcard-add" aria-label={`Ver opções de ${product.name}`} title="Ver opções">
+                <ArrowRight size={20} />
               </Link>
             ) : (
               <button

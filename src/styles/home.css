@@ -318,7 +318,9 @@
   transform: scale(1.06);
 }
 .line-body {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   gap: 0.4rem;
   padding: 1rem 1.1rem 1.2rem;
 }
@@ -334,7 +336,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin-top: 0.3rem;
+  margin-top: auto;
+  padding-top: 0.3rem;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--sage-700);
@@ -797,4 +800,17 @@
   .kits-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+/* a coluna de texto nunca passa da sua largura, mesmo com título comprido (temas) */
+.gifts-copy {
+  min-width: 0;
+  width: 100%;
+}
+.gifts-copy > * {
+  max-width: 100%;
+}
+.gifts-copy h2 {
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }

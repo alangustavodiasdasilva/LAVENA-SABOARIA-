@@ -722,3 +722,11 @@
   width: 36px;
 }
 
+
+/* cartões da loja: rodapé igual em todos (preço à esquerda, botão redondo à direita) */
+.pcard-foot {
+  flex-wrap: nowrap;
+}
+.pcard-price {
+  min-width: 0;
+}
