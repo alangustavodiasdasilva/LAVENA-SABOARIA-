@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Gift, Menu, ShoppingBag, X } from "lucide-react";
 import { useCart } from "./cart";
 import Wordmark from "./wordmark";
@@ -17,6 +17,7 @@ const NAV = [
 
 export default function Header({ whatsappNumber, instagramUrl }: { whatsappNumber: string | null; instagramUrl: string | null }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { count, hydrated } = useCart();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -41,6 +42,24 @@ export default function Header({ whatsappNumber, instagramUrl }: { whatsappNumbe
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  // Links do menu do celular: fecha a gaveta ANTES de navegar. Com a gaveta aberta o scroll da página
+  // fica travado (overflow hidden), então links de âncora (/#historia) não rolavam até a seção.
+  const go = (e: React.MouseEvent, href: string) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    setOpen(false);
+    window.setTimeout(() => {
+      const hash = href.includes("#") ? href.slice(href.indexOf("#") + 1) : "";
+      const path = href.split("#")[0] || "/";
+      if (hash && path === pathname) {
+        document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.replaceState(null, "", `${path}#${hash}`);
+      } else {
+        router.push(href);
+      }
+    }, 60);
+  };
 
   const isActive = (href: string) => !href.includes("#") && (pathname === href || pathname.startsWith(href + "/"));
 
@@ -88,11 +107,11 @@ export default function Header({ whatsappNumber, instagramUrl }: { whatsappNumbe
         </div>
         <nav className="drawer-nav" aria-label="Menu">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} onClick={() => setOpen(false)} tabIndex={open ? 0 : -1}>
+            <Link key={n.href} href={n.href} onClick={(e) => go(e, n.href)} tabIndex={open ? 0 : -1}>
               {n.label}
             </Link>
           ))}
-          <Link href="/carrinho" onClick={() => setOpen(false)} tabIndex={open ? 0 : -1}>
+          <Link href="/carrinho" onClick={(e) => go(e, "/carrinho")} tabIndex={open ? 0 : -1}>
             Minha sacola{hydrated && count > 0 ? ` (${count})` : ""}
           </Link>
         </nav>

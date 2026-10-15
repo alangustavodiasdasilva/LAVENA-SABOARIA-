@@ -935,3 +935,12 @@
 .admin-root .wordmark.is-light .wordmark-script { color: var(--ivory); }
 .admin-root .wordmark.is-light .wordmark-sub { color: var(--gold-300); }
 @media (max-width: 899px) { .admin-root { --tabbar-h: 68px; } }
+
+/* ─── versão do site (temas) ─── */
+.theme-grid { display: grid; gap: 0.7rem; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); margin-top: 0.4rem; }
+.theme-opt { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 0.8rem; text-align: left; background: var(--paper); border: 1.5px solid var(--linen); border-radius: var(--radius-md); transition: border-color 0.2s, box-shadow 0.2s; }
+.theme-opt:hover { border-color: var(--sage-300); }
+.theme-opt.is-active { border-color: var(--sage-600); box-shadow: 0 0 0 3px rgba(122, 145, 105, 0.2); }
+.theme-swatch { flex: none; width: 44px; height: 44px; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08); }
+.theme-text { display: grid; gap: 0.1rem; min-width: 0; }
+.theme-text small { color: var(--ink-mute); font-size: 0.78rem; line-height: 1.3; }

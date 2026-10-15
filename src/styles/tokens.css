@@ -112,7 +112,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  /* clip (e não hidden): hidden vira um contêiner de rolagem e quebra o position: sticky do painel */
+  overflow-x: clip;
 }
 img,
 svg,

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DELIVERY_METHODS, STOCK_STATUSES } from "./types";
+import { THEME_IDS } from "./themes";
 
 const text = (max: number, label = "Texto") =>
   z.string().trim().max(max, `${label} muito longo (máx. ${max} caracteres).`);
@@ -39,7 +40,8 @@ const normalizeSale = (v: number | null | undefined) => (v ? v : null);
 export const variantSchema = z
   .object({
     id: z.string().max(64).optional().nullable(),
-    name: text(40, "Nome da variação").min(1, "Dê um nome para cada variação (ex.: 200g)."),
+    name: text(40, "Nome da variação").min(1, "Dê um nome para cada variação (ex.: Lavanda ou 200g)."),
+    size: optionalText(40, "Tamanho da variação"),
     price: money("Preço da variação"),
     salePrice: money("Preço promocional da variação").nullish(),
     imageUrl: optionalImage,
@@ -58,6 +60,7 @@ export const productSchema = z
     price: money("Preço"),
     salePrice: money("Preço promocional").nullish(),
     size: optionalText(40, "Tamanho"),
+    essence: optionalText(40, "Essência"),
     imageUrl: optionalImage,
     images: z.array(imageRef).max(12, "Use no máximo 12 fotos na galeria."),
     categoryId: z.string().min(1, "Escolha uma categoria.").max(64),
@@ -145,6 +148,7 @@ export const settingsSchema = z.object({
   instagramUrl: z.string().max(200).nullish(),
   announcement: optionalText(160, "Aviso"),
   deliveryInfo: optionalText(600, "Informações de entrega"),
+  siteTheme: z.enum(THEME_IDS, { error: "Versão do site inválida." }).default("padrao"),
   heroSlides: z
     .array(z.object({ src: imageRef, href: z.string().max(300).nullish().transform((v) => v || "") }))
     .max(10, "Use no máximo 10 imagens no topo."),

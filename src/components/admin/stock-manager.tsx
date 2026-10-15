@@ -100,9 +100,9 @@ export default function StockManager({ products }: { products: ProductDTO[] }) {
                 <small>{p.category?.name}</small>
               </div>
             </div>
-            <StockRow id={p.id} kind="product" label={p.variants.length > 0 ? p.size || "Padrão" : null} status={p.stockStatus} quantity={p.stockQuantity} low={p.lowStockAlert} />
+            <StockRow id={p.id} kind="product" label={p.variants.length > 0 ? [p.essence, p.size].filter(Boolean).join(" · ") || "Padrão" : null} status={p.stockStatus} quantity={p.stockQuantity} low={p.lowStockAlert} />
             {p.variants.map((v) => (
-              <StockRow key={v.id} id={v.id} kind="variant" label={v.name} status={v.stockStatus} quantity={v.stockQuantity} low={p.lowStockAlert} />
+              <StockRow key={v.id} id={v.id} kind="variant" label={[v.name, v.size].filter(Boolean).join(" · ")} status={v.stockStatus} quantity={v.stockQuantity} low={p.lowStockAlert} />
             ))}
           </li>
         ))}

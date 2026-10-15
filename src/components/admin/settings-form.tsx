@@ -1,5 +1,6 @@
 "use client";
 
+import { THEMES, THEME_IDS, resolveTheme, type ThemeChoice } from "@/lib/themes";
 import { useRef, useState } from "react";
 import { ArrowDown, ArrowUp, CheckCircle2, ImagePlus, KeyRound, Loader2, Trash2, XCircle } from "lucide-react";
 import { changePassword } from "@/actions/auth";
@@ -36,6 +37,7 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
   const [announcement, setAnnouncement] = useState(settings.announcement ?? "");
   const [delivery, setDelivery] = useState(settings.deliveryInfo ?? "");
   const [slides, setSlides] = useState<HeroSlide[]>(settings.heroSlides);
+  const [theme, setTheme] = useState<string>(settings.siteTheme);
 
   const [cur, setCur] = useState("");
   const [next, setNext] = useState("");
@@ -59,7 +61,7 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    run(() => saveSettings({ whatsappNumber: whatsapp, instagramUrl: instagram, announcement, deliveryInfo: delivery, heroSlides: slides }), { success: "Configurações salvas." });
+    run(() => saveSettings({ whatsappNumber: whatsapp, instagramUrl: instagram, announcement, deliveryInfo: delivery, heroSlides: slides, siteTheme: theme as ThemeChoice }), { success: "Configurações salvas." });
   };
 
   const submitPw = async (e: React.FormEvent) => {
@@ -105,6 +107,28 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
             <label htmlFor="s-del">Informações de entrega</label>
             <textarea id="s-del" className="textarea" rows={3} value={delivery} onChange={(e) => setDelivery(e.target.value)} maxLength={600} placeholder="Ex.: Entregamos na região e enviamos para todo o Brasil. Prazo combinado pelo WhatsApp." />
           </div>
+        </section>
+
+        <section className="card panel" id="versao">
+          <div className="panel-head">
+            <h2>Versão do site</h2>
+          </div>
+          <p className="soft small">Escolha a aparência que os clientes veem: cores e aviso do topo mudam para a data comemorativa. Em &quot;Automático&quot; o site troca sozinho nas datas indicadas.</p>
+          <div className="theme-grid" role="radiogroup" aria-label="Versão do site">
+            {THEME_IDS.map((id) => {
+              const t = THEMES[id];
+              return (
+                <button key={id} type="button" role="radio" aria-checked={theme === id} className={`theme-opt ${theme === id ? "is-active" : ""}`} onClick={() => setTheme(id)}>
+                  <span className="theme-swatch" aria-hidden style={{ background: `linear-gradient(135deg, ${t.swatch[0]} 55%, ${t.swatch[1]} 55%)` }} />
+                  <span className="theme-text">
+                    <strong>{t.emoji} {t.label}</strong>
+                    <small>{t.hint}</small>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {theme === "auto" && <p className="hint">Hoje o site estaria no tema: <strong>{THEMES[resolveTheme("auto")].label}</strong>.</p>}
         </section>
 
         <section className="card panel" id="topo">

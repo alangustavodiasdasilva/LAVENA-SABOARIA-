@@ -27,6 +27,7 @@ export async function saveSettings(input: SettingsInput) {
       instagramUrl,
       announcement: d.announcement,
       deliveryInfo: d.deliveryInfo,
+      siteTheme: d.siteTheme,
       heroImages: d.heroSlides.map((s) => s.src),
       heroImageLinks: d.heroSlides.map((s) => s.href),
       // a galeria nova substitui a "logo padrão" antiga

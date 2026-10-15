@@ -14,6 +14,7 @@ export type CategoryDTO = { id: string; name: string; slug: string };
 export type VariantDTO = {
   id: string;
   name: string;
+  size?: string | null;
   price: number;
   salePrice: number | null;
   imageUrl: string | null;
@@ -31,6 +32,7 @@ export type ProductDTO = {
   price: number;
   salePrice: number | null;
   size: string | null;
+  essence?: string | null;
   imageUrl: string | null;
   images: string[];
   stockStatus: StockStatus;
@@ -76,6 +78,8 @@ export type PublicSettings = {
   announcement: string | null;
   deliveryInfo: string | null;
   heroSlides: HeroSlide[];
+  /** Escolha do dono: "auto" ou o id de um tema (ver lib/themes). */
+  siteTheme: string;
 };
 
 /** Linha de pedido, já com preço resolvido pelo servidor. */

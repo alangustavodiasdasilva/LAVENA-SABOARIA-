@@ -74,3 +74,41 @@ describe("disponibilidade", () => {
     expect(startingPrice(p)).toBe(12);
   });
 });
+
+import { optionDisplayName, optionGroups, pickOption } from "../stock";
+
+describe("essência e tamanho", () => {
+  const prod = product({
+    name: "Sabonete de Colher",
+    size: "100g",
+    essence: "Lavanda",
+    variants: [
+      { id: "v1", name: "Lavanda", size: "200g", price: 30, salePrice: null, imageUrl: null, stockStatus: "IN_STOCK", stockQuantity: 0 },
+      { id: "v2", name: "Maçã verde", size: "100g", price: 20, salePrice: null, imageUrl: null, stockStatus: "IN_STOCK", stockQuantity: 0 },
+    ],
+  });
+  it("monta rótulos com essência e tamanho", () => {
+    const opts = productOptions(prod);
+    expect(opts.map((o) => o.label)).toEqual(["Lavanda · 100g", "Lavanda · 200g", "Maçã verde · 100g"]);
+  });
+  it("usa dois seletores quando há essência ou tamanho nas variações", () => {
+    const g = optionGroups(prod);
+    expect(g).toEqual({ mode: "grouped", essences: ["Lavanda", "Maçã verde"], sizes: ["100g", "200g"] });
+  });
+  it("variações só com nome (modelo antigo) seguem em lista simples", () => {
+    const old = product({ size: "250ml", variants: [{ id: "v", name: "500ml", price: 40, salePrice: null, imageUrl: null, stockStatus: "IN_STOCK", stockQuantity: 0 }] });
+    expect(optionGroups(old)).toEqual({ mode: "flat" });
+    expect(optionGroups(product())).toEqual({ mode: "flat" });
+  });
+  it("escolhe a combinação; se não existir, cai na mesma essência", () => {
+    const opts = productOptions(prod);
+    expect(pickOption(opts, "Lavanda", "200g")?.id).toBe("v1");
+    expect(pickOption(opts, "Maçã verde", "200g")?.id).toBe("v2");
+    expect(pickOption(opts, "Inexistente", "100g")).toBeNull();
+  });
+  it("nome no pedido inclui essência e tamanho", () => {
+    const opts = productOptions(prod);
+    expect(optionDisplayName(prod, opts[0])).toBe("Sabonete de Colher (Lavanda · 100g)");
+    expect(optionDisplayName(prod, opts[2])).toBe("Sabonete de Colher (Maçã verde · 100g)");
+  });
+});

@@ -1,0 +1,175 @@
+/* Versões sazonais do site: só trocam as cores (tokens). O tema vem de data-theme no .theme-root. */
+.theme-root {
+  min-height: 100vh;
+  background: var(--ivory);
+}
+
+.theme-root[data-theme="natal"] {
+  --sage-50: #fbf1f2;
+  --sage-100: #f4dde0;
+  --sage-200: #e8bcc3;
+  --sage-300: #d994a0;
+  --sage-400: #c46f80;
+  --sage-500: #a84a5e;
+  --sage-600: #8c3248;
+  --sage-700: #732639;
+  --sage-800: #5a1c2c;
+  --sage-900: #43141f;
+  --ivory: #fbf6f1;
+  --cream: #f5ebe3;
+  --linen: #ecdcd0;
+}
+
+.theme-root[data-theme="ano-novo"] {
+  --sage-50: #f0f3fa;
+  --sage-100: #dde4f3;
+  --sage-200: #bcc8e3;
+  --sage-300: #94a5cf;
+  --sage-400: #6b80b8;
+  --sage-500: #4d639f;
+  --sage-600: #3b4d84;
+  --sage-700: #2f3f6b;
+  --sage-800: #232f52;
+  --sage-900: #182038;
+  --ivory: #f8f7f4;
+  --cream: #efeef0;
+  --linen: #e2e0e6;
+  --gold-100: #fbf1d0;
+  --gold-200: #f5e29b;
+  --gold-300: #efd06a;
+  --gold-400: #e6b93f;
+  --gold-500: #d3a026;
+  --gold-600: #b2851c;
+  --gold-700: #8c6611;
+}
+
+.theme-root[data-theme="pascoa"] {
+  --sage-50: #f6f3fb;
+  --sage-100: #ebe5f6;
+  --sage-200: #d6caec;
+  --sage-300: #bba9de;
+  --sage-400: #9d86cb;
+  --sage-500: #8470b6;
+  --sage-600: #6e5b9d;
+  --sage-700: #5a4a83;
+  --sage-800: #473a68;
+  --sage-900: #342a4d;
+  --ivory: #fbf8fc;
+  --cream: #f3eef8;
+  --linen: #e6def0;
+}
+
+.theme-root[data-theme="dia-das-maes"] {
+  --sage-50: #fcf1f4;
+  --sage-100: #f8dfe6;
+  --sage-200: #f0bfcd;
+  --sage-300: #e496ac;
+  --sage-400: #d36f8e;
+  --sage-500: #bc4f72;
+  --sage-600: #a03b5b;
+  --sage-700: #852f4b;
+  --sage-800: #682539;
+  --sage-900: #4c1a29;
+  --ivory: #fdf7f6;
+  --cream: #f8ece9;
+  --linen: #efddd9;
+}
+
+.theme-root[data-theme="namorados"] {
+  --sage-50: #fdf0f1;
+  --sage-100: #f9dbde;
+  --sage-200: #f1b7be;
+  --sage-300: #e68c98;
+  --sage-400: #d6606f;
+  --sage-500: #c13c4e;
+  --sage-600: #a82b3e;
+  --sage-700: #8c2234;
+  --sage-800: #6e1a29;
+  --sage-900: #51121e;
+  --ivory: #fcf6f5;
+  --cream: #f7ebe9;
+  --linen: #eddcd8;
+}
+
+.theme-root[data-theme="dia-dos-pais"] {
+  --sage-50: #eff5f6;
+  --sage-100: #dae7ea;
+  --sage-200: #b6cfd5;
+  --sage-300: #8ab1ba;
+  --sage-400: #62919d;
+  --sage-500: #47737f;
+  --sage-600: #3a6270;
+  --sage-700: #2f5460;
+  --sage-800: #243f49;
+  --sage-900: #1a2e36;
+  --ivory: #f6f8f7;
+  --cream: #ebf0ef;
+  --linen: #dce4e3;
+}
+
+.theme-root[data-theme="black-friday"] {
+  --sage-50: #f4f3f1;
+  --sage-100: #e5e3df;
+  --sage-200: #cac7c1;
+  --sage-300: #a9a59d;
+  --sage-400: #86827a;
+  --sage-500: #67635c;
+  --sage-600: #4e4a44;
+  --sage-700: #3a3732;
+  --sage-800: #2a2825;
+  --sage-900: #1c1b19;
+  --ivory: #f7f5f0;
+  --cream: #eeebe4;
+  --linen: #e0dbd0;
+  --gold-100: #f7efd2;
+  --gold-200: #f1e0a3;
+  --gold-300: #ecd07e;
+  --gold-400: #e0b94f;
+  --gold-500: #c79a2a;
+  --gold-600: #a67e1f;
+  --gold-700: #85650f;
+}
+
+/* ─── enfeites: nos temas sazonais o galho padrão sai e entra um motivo da data ─── */
+.theme-root:not([data-theme="padrao"]) .hero-sprig,
+.theme-root:not([data-theme="padrao"]) .gifts-sprig {
+  display: none;
+}
+.theme-root:not([data-theme="padrao"]) .hero-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  background-size: 120px 120px;
+  opacity: 0.5;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
+}
+/* neve */
+.theme-root[data-theme="natal"] .hero-bg::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='12' cy='18' r='3'/%3E%3Ccircle cx='70' cy='40' r='2'/%3E%3Ccircle cx='104' cy='12' r='2.5'/%3E%3Ccircle cx='38' cy='80' r='2'/%3E%3Ccircle cx='96' cy='96' r='3'/%3E%3C/g%3E%3Cg fill='%23d8b45a'%3E%3Ccircle cx='54' cy='10' r='1.4'/%3E%3Ccircle cx='20' cy='60' r='1.4'/%3E%3Ccircle cx='84' cy='72' r='1.4'/%3E%3C/g%3E%3C/svg%3E");
+}
+/* confete dourado */
+.theme-root[data-theme="ano-novo"] .hero-bg::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='%23e6b93f'%3E%3Crect x='14' y='20' width='8' height='3' transform='rotate(35 18 21)'/%3E%3Crect x='80' y='14' width='8' height='3' transform='rotate(-30 84 15)'/%3E%3Crect x='52' y='70' width='8' height='3' transform='rotate(70 56 71)'/%3E%3C/g%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='100' cy='60' r='2.5'/%3E%3Ccircle cx='30' cy='96' r='2'/%3E%3C/g%3E%3Cg fill='%232f3f6b' opacity='.5'%3E%3Ccircle cx='66' cy='34' r='1.6'/%3E%3Ccircle cx='108' cy='102' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+}
+/* ovinhos pastel */
+.theme-root[data-theme="pascoa"] .hero-bg::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg%3E%3Cellipse cx='24' cy='26' rx='7' ry='9' fill='%23d6caec'/%3E%3Cellipse cx='86' cy='48' rx='6' ry='8' fill='%23f6e3b4'/%3E%3Cellipse cx='48' cy='92' rx='7' ry='9' fill='%23f2cfd6'/%3E%3C/g%3E%3C/svg%3E");
+}
+/* corações */
+.theme-root[data-theme="dia-das-maes"] .hero-bg::after,
+.theme-root[data-theme="namorados"] .hero-bg::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='%23e8a3b4'%3E%3Cpath d='M22 30c-5-5-12 1-8 6l8 8 8-8c4-5-3-11-8-6z'/%3E%3Cpath d='M88 66c-4-4-10 1-6 5l6 6 6-6c3-4-2-9-6-5z'/%3E%3Cpath d='M52 98c-3-3-8 1-5 4l5 5 5-5c2-3-2-7-5-4z'/%3E%3C/g%3E%3C/svg%3E");
+}
+/* linhas finas */
+.theme-root[data-theme="dia-dos-pais"] .hero-bg::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M0 60L60 0' stroke='%238ab1ba' stroke-width='1' opacity='.55'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+/* faixas diagonais douradas */
+.theme-root[data-theme="black-friday"] .hero-bg::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M-5 45L45 -5' stroke='%23e0b94f' stroke-width='6' opacity='.25'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}

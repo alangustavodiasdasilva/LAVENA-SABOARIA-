@@ -29,6 +29,8 @@ model Product {
   price       Float
   salePrice   Float?
   size        String?
+  // Essência/aroma do produto base (quando há variações de essência)
+  essence     String?
   imageUrl    String?
   images      String[] @default([])
   stockStatus String   @default("IN_STOCK")
@@ -42,6 +44,7 @@ model Product {
   updatedAt   DateTime @updatedAt
   variants    ProductVariant[]
 
+  @@index([categoryId])
   @@schema("saboaria")
 }
 
@@ -49,7 +52,10 @@ model ProductVariant {
   id            String   @id @default(uuid())
   productId     String
   product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Essência/aroma (ou, em produtos antigos, o tamanho) desta variação
   name          String
+  // Tamanho/peso desta variação (opcional)
+  size          String?
   price         Float
   salePrice     Float?
   imageUrl      String?
@@ -73,6 +79,8 @@ model Settings {
   instagramUrl     String?
   announcement     String?
   deliveryInfo     String?
+  // Versão sazonal do site: auto | padrao | natal | ano-novo | ...
+  siteTheme        String   @default("padrao")
   // Sessões do admin emitidas antes desta data deixam de valer (troca de senha)
   sessionsValidFrom DateTime?
   updatedAt        DateTime @updatedAt
