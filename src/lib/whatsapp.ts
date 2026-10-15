@@ -25,36 +25,38 @@ export type OrderMessageInput = {
   total: number;
 };
 
-const SEP = "━━━━━━━━━━━━━━━━━";
+/** "ALAN DIAS" -> "Alan Dias": nome digitado em caixa alta fica legível na mensagem. */
+function niceName(s: string | null | undefined): string {
+  const t = plain(s);
+  if (!t) return "";
+  const letters = t.replace(/[^A-Za-zÀ-ÿ]/g, "");
+  const shouting = letters.length > 3 && letters === letters.toUpperCase();
+  const base = shouting ? t.toLowerCase() : t;
+  return base.replace(/(^|[\s'-])([a-zà-ÿ])/g, (_, a: string, b: string) => a + b.toUpperCase());
+}
 
-function itemLines(items: OrderItem[], icon: string): string[] {
-  const out: string[] = [];
-  items.forEach((it, idx) => {
-    out.push(`${icon} *${plain(it.name)}*`);
-    out.push(`   ${it.quantity} un. × ${formatBRL(it.unitPrice)} = ${formatBRL(it.unitPrice * it.quantity)}`);
-    if (idx < items.length - 1) out.push("");
-  });
-  return out;
+/** Linha de item: "2x Sabonete de Mel  —  R$ 40,00" (sem emojis: alguns celulares mostram "?" no lugar). */
+function itemLines(items: OrderItem[]): string[] {
+  return items.map((it) => `• ${it.quantity}x ${plain(it.name)} — ${formatBRL(it.unitPrice * it.quantity)}`);
 }
 
 export function buildOrderMessage(o: OrderMessageInput): string {
   const L: string[] = [];
-  const name = plain(o.customerName);
+  const name = niceName(o.customerName);
   const gift = o.type === "GIFT";
 
-  L.push(gift ? "🎁 *Olá, Lavena!*" : "✨ *Olá, Lavena!*");
+  L.push("Olá, Lavena!");
   L.push("");
   if (gift) {
-    const who = plain(o.recipientName);
-    L.push(`Sou *${name || "cliente"}* e gostaria de montar uma *sacola presente*${who ? ` para *${who}*` : ""}.`);
+    const who = niceName(o.recipientName);
+    L.push(`Meu nome é *${name || "cliente"}* e quero montar uma *sacola presente*${who ? ` para *${who}*` : ""}.`);
   } else {
-    L.push(name ? `Sou *${name}* e gostaria de fazer este pedido:` : "Gostaria de fazer este pedido:");
+    L.push(name ? `Meu nome é *${name}* e quero fazer este pedido:` : "Quero fazer este pedido:");
   }
   if (o.code) {
     L.push("");
-    L.push(`🧾 Pedido *${o.code}*`);
+    L.push(`*Pedido ${o.code}*`);
   }
-  L.push("");
 
   const products = o.items.filter((i) => i.kind !== "bag");
   const bags = o.items.filter((i) => i.kind === "bag");
@@ -62,47 +64,46 @@ export function buildOrderMessage(o: OrderMessageInput): string {
   const reserves = products.filter((i) => i.reserve);
 
   if (ready.length > 0) {
-    L.push(gift ? "🎀 *ITENS DO PRESENTE:*" : "📋 *MEU PEDIDO (Pronta Entrega):*");
-    L.push(...itemLines(ready, gift ? "🌿" : "🧼"));
     L.push("");
+    L.push(gift ? "*Itens do presente*" : "*Itens (pronta entrega)*");
+    L.push(...itemLines(ready));
   }
   if (reserves.length > 0) {
-    L.push("📋 *MINHA RESERVA (sob encomenda):*");
-    L.push(...itemLines(reserves, "🧼"));
     L.push("");
+    L.push("*Itens sob encomenda (reserva)*");
+    L.push(...itemLines(reserves));
   }
   if (bags.length > 0) {
-    L.push("🛍️ *EMBALAGEM:*");
-    L.push(...itemLines(bags, "🛍️"));
     L.push("");
+    L.push("*Embalagem*");
+    L.push(...itemLines(bags.map((b) => ({ ...b, name: plain(b.name).replace(/^Embalagem:\s*/i, "") }))));
   }
 
-  L.push(SEP);
   L.push("");
-  L.push(`${gift ? "💝" : "💰"} *Total: ${formatBRL(o.total)}*`);
-  L.push("_Frete a combinar_");
+  L.push(`*Total: ${formatBRL(o.total)}* (frete a combinar)`);
 
   if (gift && o.cardMessage?.trim()) {
     L.push("");
-    L.push("💌 *Mensagem do cartão:*");
-    L.push(`_"${plain(o.cardMessage)}"_`);
+    L.push("*Mensagem do cartão*");
+    L.push(`"${plain(o.cardMessage)}"`);
   }
 
   const delivery = o.deliveryMethod ? DELIVERY_LABEL[o.deliveryMethod] : null;
-  if (delivery || o.address?.trim() || o.customerPhone) {
+  const hasInfo = delivery || o.address?.trim() || o.customerPhone;
+  if (hasInfo) {
     L.push("");
-    if (delivery) L.push(`🚚 *Recebimento:* ${delivery}`);
-    if (o.address?.trim()) L.push(`📍 ${plain(o.address)}`);
-    if (o.customerPhone) L.push(`📱 ${formatPhone(o.customerPhone)}`);
+    if (delivery) L.push(`*Recebimento:* ${delivery}`);
+    if (o.address?.trim()) L.push(`*Endereço:* ${plain(o.address)}`);
+    if (o.customerPhone) L.push(`*Contato:* ${formatPhone(o.customerPhone)}`);
   }
 
   if (o.notes?.trim()) {
     L.push("");
-    L.push("📝 *Observação:*");
+    L.push("*Observação*");
     L.push(plain(o.notes));
   }
 
   L.push("");
-  L.push("Aguardo retorno para combinar pagamento e entrega 🌿");
+  L.push("Aguardo retorno para combinar pagamento e entrega. Obrigada!");
   return L.join("\n");
 }

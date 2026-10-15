@@ -19,11 +19,11 @@ describe("buildOrderMessage", () => {
       items,
       total: 91,
     });
-    expect(msg).toContain("Sou *Ana*");
+    expect(msg).toContain("Meu nome é *Ana*");
     expect(msg).toContain("LV-ABCDE");
-    expect(msg).toContain("MEU PEDIDO (Pronta Entrega)");
-    expect(msg).toContain("MINHA RESERVA");
-    expect(msg).toContain("EMBALAGEM");
+    expect(msg).toContain("Itens (pronta entrega)");
+    expect(msg).toContain("sob encomenda");
+    expect(msg).toContain("*Embalagem*");
     expect(msg).toContain("Retirada");
     expect(msg).toContain("Retiro sábado");
     expect(msg).toMatch(/Total: R\$\s91,00/);
@@ -48,6 +48,16 @@ describe("buildOrderMessage", () => {
     expect(msg).toContain("*Maria*");
     expect(msg).toContain("Mensagem do cartão");
     expect(msg).toContain("Feliz aniversário");
+  });
+
+  it("não usa emojis (alguns aparelhos mostram ? no lugar)", () => {
+    const msg = buildOrderMessage({ type: "CART", customerName: "Ana", items, total: 91 });
+    expect(/[\u{1F000}-\u{1FFFF}\u2600-\u27BF]/u.test(msg)).toBe(false);
+  });
+
+  it("nome digitado em caixa alta fica legível", () => {
+    const msg = buildOrderMessage({ type: "CART", customerName: "ALAN DIAS DIAS", items, total: 1 });
+    expect(msg).toContain("*Alan Dias Dias*");
   });
 
   it("gera link do wa.me codificado", () => {
