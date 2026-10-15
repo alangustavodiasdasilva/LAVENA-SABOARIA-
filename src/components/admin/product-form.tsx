@@ -221,8 +221,9 @@ export default function ProductForm({ product, categories }: { product?: Product
             <input id="p-sale" className="input" inputMode="decimal" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Opcional" />
           </div>
           <div className="field">
-            <label htmlFor="p-size">Tamanho / peso (ex.: 90g)</label>
-            <input id="p-size" className="input" value={size} onChange={(e) => setSize(e.target.value)} maxLength={40} placeholder="Ex.: 90g" />
+            <label htmlFor="p-size">{variants.length > 0 ? "Nome desta opção (botão do produto principal)" : "Tamanho / peso (ex.: 90g)"}</label>
+            <input id="p-size" className="input" value={size} onChange={(e) => setSize(e.target.value)} maxLength={40} placeholder={variants.length > 0 ? "Ex.: Lavanda ou 200g" : "Ex.: 90g"} />
+            {variants.length > 0 && <span className="hint">Com variações, o produto principal vira um botão com este nome (vazio = &quot;Padrão&quot;). Cada variação abaixo é outro botão.</span>}
           </div>
         </div>
         <StockFields idPrefix="p" status={stockStatus} quantity={stockQuantity} onStatus={setStockStatus} onQuantity={setStockQuantity} />
