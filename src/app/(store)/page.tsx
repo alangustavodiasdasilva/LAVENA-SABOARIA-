@@ -126,7 +126,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </section>
       )}
 
-      <Story />
+      <Story image={settings.storyImage} caption={settings.storyCaption} />
       <Steps deliveryInfo={settings.deliveryInfo} />
       <Faq />
       <ContactBand whatsappNumber={settings.whatsappNumber} instagramUrl={settings.instagramUrl} />

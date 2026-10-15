@@ -29,6 +29,8 @@ export async function saveSettings(input: SettingsInput) {
       deliveryInfo: d.deliveryInfo,
       siteTheme: d.siteTheme,
       giftImageUrl: d.giftImage,
+      storyImageUrl: d.storyImage,
+      storyCaption: d.storyCaption,
       heroImages: d.heroSlides.map((s) => s.src),
       heroImageLinks: d.heroSlides.map((s) => s.href),
       // a galeria nova substitui a "logo padrão" antiga

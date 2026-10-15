@@ -22,4 +22,6 @@ export const FALLBACK_SETTINGS = {
   heroSlides: [{ src: "/images/logo-lavena.png", href: "" }],
   siteTheme: "padrao",
   giftImage: null,
+  storyImage: null,
+  storyCaption: null,
 };

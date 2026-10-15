@@ -208,15 +208,32 @@ export function GiftsBand({ hasKits, copy, image }: { hasKits: boolean; copy: Th
 }
 
 /* ─── História da marca ─── */
-export function Story() {
+export function Story({ image, caption }: { image?: string | null; caption?: string | null }) {
   return (
     <section className="section story" id="historia">
       <div className="container story-inner">
-        <div className="story-seal reveal">
-          <div className="story-seal-ring">
-            <Image src="/brand/selo.webp" alt="Selo Lavena Saboaria Artesanal" width={320} height={320} />
+        {image ? (
+          <figure className="story-photo reveal">
+            <div className="story-photo-frame">
+              <SmartImage src={image} alt={caption ? `${caption}, Lavena Saboaria Artesanal` : "Quem está por trás da Lavena"} fill sizes="(max-width: 900px) 80vw, 420px" className="story-photo-img" />
+            </div>
+            <div className="story-photo-seal">
+              <Image src="/brand/selo.webp" alt="Selo Lavena Saboaria Artesanal" width={150} height={150} />
+            </div>
+            {caption && (
+              <figcaption>
+                <span className="story-photo-name">{caption}</span>
+                <small>Lavena Saboaria Artesanal</small>
+              </figcaption>
+            )}
+          </figure>
+        ) : (
+          <div className="story-seal reveal">
+            <div className="story-seal-ring">
+              <Image src="/brand/selo.webp" alt="Selo Lavena Saboaria Artesanal" width={320} height={320} />
+            </div>
           </div>
-        </div>
+        )}
         <div className="story-copy reveal">
           <span className="eyebrow">Nossa história</span>
           <h2>
@@ -226,6 +243,7 @@ export function Story() {
             Inspirada na origem latina <em>“lavare”</em>, Lavena carrega o significado de <strong>lavar, purificar e renovar</strong>. Nossa saboaria nasce desse propósito: transformar o cuidado diário em um momento de leveza, frescor e bem-estar.
           </p>
           <p>Cada detalhe é pensado para transmitir pureza, carinho e conexão com você — da espuma suave ao perfume delicado que envolve a pele.</p>
+          {image && caption && <p className="story-sign">— {caption}</p>}
 
           <div className="story-pillars">
             {[
