@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { cache } from "react";
 import { cookies, headers } from "next/headers";
 import prisma from "./prisma";
-import { clearMemo } from "./memo";
+import { invalidateStoreCache } from "./store-cache";
 import { AuthError, UserError, runAction } from "./action";
 import { hashPassword, safeEqual, verifyPasswordHash } from "./password";
 import { rateLimit, resetRateLimit } from "./rate-limit";
@@ -72,7 +72,7 @@ export async function adminAction<T>(context: string, fn: () => Promise<T>): Pro
     try {
       return await fn();
     } finally {
-      clearMemo(); // o painel mudou algo: a loja precisa ler os dados novos
+      invalidateStoreCache(); // o painel mudou algo: a loja precisa ler os dados novos
     }
   });
 }

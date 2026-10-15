@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import prisma from "./prisma";
-import { memo } from "./memo";
+import { cached } from "./store-cache";
 import { mapBag, mapKit, mapProduct } from "./mappers";
 import type { Catalog, OrderLineInput } from "./orders";
 import type { BagDTO, CategoryDTO, KitDTO, ProductDTO, PublicSettings } from "./types";
@@ -24,7 +24,7 @@ const productInclude = { category: true, variants: true } as const;
 
 /** Produtos visíveis: destaques primeiro, depois os mais novos. */
 export async function getStoreProducts(): Promise<ProductDTO[]> {
-  return memo("products", async () => {
+  return cached(["products"], async () => {
     const rows = await prisma.product.findMany({
       where: { isVisible: true },
       include: productInclude,
@@ -35,7 +35,7 @@ export async function getStoreProducts(): Promise<ProductDTO[]> {
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductDTO | null> {
-  return memo(`product:${slug}`, async () => {
+  return cached(["product", slug], async () => {
     const row = await prisma.product.findFirst({
       where: { slug, isVisible: true },
       include: productInclude,
@@ -51,7 +51,7 @@ export async function getProductById(id: string): Promise<ProductDTO | null> {
 
 /** Categorias que têm pelo menos um produto visível, com a contagem. */
 export async function getStoreCategories(): Promise<(CategoryDTO & { count: number })[]> {
-  return memo("categories", async () => {
+  return cached(["categories"], async () => {
     const rows = await prisma.category.findMany({
       orderBy: { createdAt: "asc" },
       include: { _count: { select: { products: { where: { isVisible: true } } } } },
@@ -63,7 +63,7 @@ export async function getStoreCategories(): Promise<(CategoryDTO & { count: numb
 }
 
 export async function getStoreKits(): Promise<KitDTO[]> {
-  return memo("kits", async () => {
+  return cached(["kits"], async () => {
     const rows = await prisma.kit.findMany({
       where: { isActive: true },
       orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
@@ -73,7 +73,7 @@ export async function getStoreKits(): Promise<KitDTO[]> {
 }
 
 export async function getKitBySlug(slug: string): Promise<KitDTO | null> {
-  return memo(`kit:${slug}`, async () => {
+  return cached(["kit", slug], async () => {
     const row = await prisma.kit.findFirst({ where: { slug, isActive: true } });
     return row ? mapKit(row) : null;
   });
@@ -85,7 +85,7 @@ export async function getKitById(id: string): Promise<KitDTO | null> {
 }
 
 export async function getStoreBags(): Promise<BagDTO[]> {
-  return memo("bags", async () => {
+  return cached(["bags"], async () => {
     const rows = await prisma.bag.findMany({ where: { isActive: true }, orderBy: { createdAt: "asc" } });
     return rows.map(mapBag);
   });
@@ -94,7 +94,10 @@ export async function getStoreBags(): Promise<BagDTO[]> {
 const DEFAULT_HERO = "/images/logo-lavena.png";
 
 export const getPublicSettings = cache(async (): Promise<PublicSettings> => {
-  const s = await memo("settings", () => prisma.settings.findUnique({ where: { id: "default" } }));
+  const s = await cached(["settings"], async () => {
+    const row = await prisma.settings.findUnique({ where: { id: "default" } });
+    return row ? { ...row, updatedAt: row.updatedAt.toISOString(), sessionsValidFrom: null, adminPassword: null } : null;
+  });
   const slides: { src: string; href: string }[] = [];
   const seen = new Set<string>();
   const push = (src: string | null | undefined, href: string | null | undefined) => {

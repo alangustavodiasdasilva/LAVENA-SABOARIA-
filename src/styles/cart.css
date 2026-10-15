@@ -145,7 +145,7 @@
 }
 @media (min-width: 640px) {
   .cart-fields {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
   .cart-fields > .delivery-field,
   .cart-fields > .field:nth-of-type(n + 3) {
@@ -166,7 +166,7 @@
 }
 @media (min-width: 640px) {
   .delivery-options {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 .delivery-opt {

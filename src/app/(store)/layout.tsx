@@ -8,6 +8,9 @@ import { getPublicSettings, safe } from "@/lib/data";
 import { FALLBACK_SETTINGS } from "@/lib/site";
 import { THEMES, resolveTheme } from "@/lib/themes";
 import "@/styles/themes.css";
+import "@/styles/effects.css";
+import Reveal from "@/components/store/reveal";
+import ThemeFX from "@/components/store/theme-fx";
 
 const DEFAULT_ANNOUNCEMENT = "Feito à mão com carinho · Pedidos pelo WhatsApp · Frete a combinar";
 
@@ -17,6 +20,8 @@ export default async function StoreLayout({ children }: { children: React.ReactN
   return (
     <div className="theme-root" data-theme={theme}>
     <ToastProvider>
+    <Reveal />
+    <ThemeFX theme={theme} />
       <CartProvider>
         <a href="#conteudo" className="skip-link">
           Pular para o conteúdo
