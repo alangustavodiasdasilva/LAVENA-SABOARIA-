@@ -7,6 +7,9 @@ export const BASE_OPTION_ID = "";
 export type ProductOption = {
   id: string;
   label: string;
+  /** Essência/aroma (ou o nome da variação) e tamanho/peso, separados para montar os seletores. */
+  essence: string | null;
+  size: string | null;
   price: number;
   salePrice: number | null;
   imageUrl: string | null;
@@ -14,11 +17,18 @@ export type ProductOption = {
   stockQuantity: number;
 };
 
-/** Opções de compra: o produto base primeiro, depois as variações (peso/tamanho). */
+const clean = (v: string | null | undefined) => v?.trim() || null;
+const joinLabel = (essence: string | null, size: string | null) => [essence, size].filter(Boolean).join(" · ");
+
+/** Opções de compra: o produto base primeiro, depois as variações (essência e/ou tamanho/peso). */
 export function productOptions(p: ProductDTO): ProductOption[] {
+  const baseEssence = clean(p.essence);
+  const baseSize = clean(p.size);
   const base: ProductOption = {
     id: BASE_OPTION_ID,
-    label: p.size?.trim() || (p.variants.length > 0 ? "Padrão" : "Único"),
+    label: joinLabel(baseEssence, baseSize) || (p.variants.length > 0 ? "Padrão" : "Único"),
+    essence: baseEssence,
+    size: baseSize,
     price: p.price,
     salePrice: p.salePrice,
     imageUrl: p.imageUrl,
@@ -27,16 +37,55 @@ export function productOptions(p: ProductDTO): ProductOption[] {
   };
   return [
     base,
-    ...p.variants.map((v) => ({
-      id: v.id,
-      label: v.name,
-      price: v.price,
-      salePrice: v.salePrice,
-      imageUrl: v.imageUrl,
-      stockStatus: v.stockStatus,
-      stockQuantity: v.stockQuantity,
-    })),
+    ...p.variants.map((v) => {
+      const essence = clean(v.name);
+      const size = clean(v.size);
+      return {
+        id: v.id,
+        label: joinLabel(essence, size),
+        essence,
+        size,
+        price: v.price,
+        salePrice: v.salePrice,
+        imageUrl: v.imageUrl,
+        stockStatus: v.stockStatus,
+        stockQuantity: v.stockQuantity,
+      };
+    }),
   ];
+}
+
+export type OptionGroups =
+  | { mode: "flat" }
+  | { mode: "grouped"; essences: string[]; sizes: string[] };
+
+/**
+ * Como mostrar as opções. "grouped" (dois seletores: essência e tamanho) quando alguma
+ * variação tem tamanho ou o produto tem essência; senão uma lista simples de botões.
+ */
+export function optionGroups(p: ProductDTO): OptionGroups {
+  if (p.variants.length === 0) return { mode: "flat" };
+  const grouped = !!clean(p.essence) || p.variants.some((v) => !!clean(v.size));
+  if (!grouped) return { mode: "flat" };
+  const opts = productOptions(p);
+  const uniq = (xs: (string | null)[], fallback: string) => [...new Set(xs.map((x) => x ?? fallback))];
+  return {
+    mode: "grouped",
+    essences: uniq(opts.map((o) => o.essence), "Padrão"),
+    sizes: uniq(opts.map((o) => o.size), "Único"),
+  };
+}
+
+/** Escolhe a opção que combina essência e tamanho; se não existir, a primeira disponível da essência. */
+export function pickOption(opts: ProductOption[], essence: string, size: string): ProductOption | null {
+  const ess = (o: ProductOption) => o.essence ?? "Padrão";
+  const siz = (o: ProductOption) => o.size ?? "Único";
+  return (
+    opts.find((o) => ess(o) === essence && siz(o) === size) ??
+    opts.find((o) => ess(o) === essence && isPurchasableStatus(o.stockStatus)) ??
+    opts.find((o) => ess(o) === essence) ??
+    null
+  );
 }
 
 export function isPurchasableStatus(status: StockStatus): boolean {
@@ -112,9 +161,11 @@ export function statusFromQuantity(current: StockStatus, qty: number): StockStat
 }
 
 /** Nome mostrado no pedido/sacola: "Sabonete de Mel (200g)". A opção base usa o tamanho quando há variações. */
-export function optionDisplayName(p: Pick<ProductDTO, "name" | "size" | "variants">, option: Pick<ProductOption, "id" | "label">): string {
+export function optionDisplayName(p: Pick<ProductDTO, "name" | "size" | "essence" | "variants">, option: Pick<ProductOption, "id" | "label">): string {
   if (option.id === "") {
-    return p.variants.length > 0 && p.size?.trim() ? `${p.name} (${p.size.trim()})` : p.name;
+    if (p.variants.length === 0) return p.name;
+    const label = joinLabel(clean(p.essence), clean(p.size));
+    return label ? `${p.name} (${label})` : p.name;
   }
   return `${p.name} (${option.label})`;
 }

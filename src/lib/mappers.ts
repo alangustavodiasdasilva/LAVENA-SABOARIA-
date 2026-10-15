@@ -26,6 +26,7 @@ export function mapVariant(v: ProductVariant): VariantDTO {
   return {
     id: v.id,
     name: v.name,
+    size: v.size,
     price: v.price,
     salePrice: v.salePrice,
     imageUrl: v.imageUrl,
@@ -47,6 +48,7 @@ export function mapProduct(p: ProductRow): ProductDTO {
     price: p.price,
     salePrice: p.salePrice,
     size: p.size,
+    essence: p.essence,
     imageUrl: p.imageUrl,
     images: p.images,
     stockStatus: stock(p.stockStatus),

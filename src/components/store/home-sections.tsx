@@ -1,3 +1,4 @@
+import type { ThemeCopy } from "@/lib/theme-copy";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -19,33 +20,30 @@ import { Heart, InstagramIcon, Sprig } from "@/components/ui/ornaments";
 import type { CategoryDTO, HeroSlide } from "@/lib/types";
 
 /* ─── Hero ─── */
-export function Hero({ slides }: { slides: HeroSlide[] }) {
+export function Hero({ slides, copy }: { slides: HeroSlide[]; copy: ThemeCopy }) {
   return (
     <section className="hero">
       <div className="hero-bg" aria-hidden />
       <div className="container hero-inner">
         <div className="hero-copy">
-          <span className="eyebrow">Saboaria artesanal</span>
+          <span className="eyebrow">{copy.heroEyebrow}</span>
           <h1>
-            Sinta a pureza.
-            <span className="hero-script title-accent">Viva Lavena.</span>
+            {copy.heroTitle}
+            <span className="hero-script title-accent">{copy.heroAccent}</span>
           </h1>
-          <p className="hero-lead">
-            Sabonetes, sabonetes líquidos, geleias e mousses de banho feitos à mão, com ingredientes selecionados e aromas delicados que
-            transformam o seu banho em um momento de <em>bem-estar</em>.
-          </p>
+          <p className="hero-lead">{copy.heroLead}</p>
           <div className="hero-cta">
             <Link href="/loja" className="btn btn-primary btn-lg">
-              Conhecer os produtos <ArrowRight size={18} />
+              {copy.heroCta} <ArrowRight size={18} />
             </Link>
             <Link href="/presente" className="btn btn-outline btn-lg">
               Montar um presente
             </Link>
           </div>
           <ul className="hero-chips" aria-label="Nossos valores">
-            <li>Feito à mão</li>
-            <li>Natural</li>
-            <li>Delicado</li>
+            {copy.heroChips.map((c) => (
+              <li key={c}>{c}</li>
+            ))}
           </ul>
         </div>
 
@@ -158,7 +156,7 @@ export function Lines({ categories }: { categories: CategoryDTO[] }) {
 }
 
 /* ─── Presentes ─── */
-export function GiftsBand({ hasKits }: { hasKits: boolean }) {
+export function GiftsBand({ hasKits, copy }: { hasKits: boolean; copy: ThemeCopy }) {
   return (
     <section className="section section-alt gifts" id="presentes">
       <div className="container gifts-inner">
@@ -169,13 +167,11 @@ export function GiftsBand({ hasKits }: { hasKits: boolean }) {
           <Sprig className="gifts-sprig" />
         </div>
         <div className="gifts-copy reveal">
-          <span className="eyebrow">Presentes</span>
+          <span className="eyebrow">{copy.giftsEyebrow}</span>
           <h2>
-            Presenteie com <span className="title-accent">carinho</span>
+            {copy.giftsPre} <span className="title-accent">{copy.giftsAccent}</span>
           </h2>
-          <p className="gifts-lead">
-            Monte uma sacola presente com os produtos que mais combinam com quem você ama. Escolha a embalagem, escreva um cartão e deixe o resto com a gente.
-          </p>
+          <p className="gifts-lead">{copy.giftsLead}</p>
           <ul className="check-list">
             <li>
               <Check size={18} /> Kits prontos ou produtos avulsos

@@ -292,14 +292,15 @@ export default function GiftBuilder({
                     const opt = optionFor(p);
                     const k = keyOf(p, opt);
                     const qty = prodQty[k] || 0;
+                    const inGift = Object.entries(prodQty).reduce((n, [key, q]) => (key.startsWith(`${p.id}|`) ? n + q : n), 0);
                     const reserve = opt.stockStatus === "IN_PRODUCTION";
                     const max = availableUnits(opt);
                     return (
-                      <article key={p.id} className={`gcard ${qty > 0 ? "is-selected" : ""}`}>
+                      <article key={p.id} className={`gcard ${inGift > 0 ? "is-selected" : ""}`}>
                         <div className="gcard-media img-wrap">
                           <SmartImage src={opt.imageUrl || p.imageUrl || p.images[0]} alt={p.name} fill sizes="(max-width: 640px) 50vw, 220px" />
                           {reserve && <span className="badge badge-sage gcard-tag">Sob encomenda</span>}
-                          {qty > 0 && (
+                          {inGift > 0 && (
                             <span className="gcard-check">
                               <Check size={14} />
                             </span>
@@ -308,7 +309,7 @@ export default function GiftBuilder({
                         <div className="gcard-body">
                           <h3>{p.name}</h3>
                           {opts.length > 1 ? (
-                            <div className="gpills" role="group" aria-label={`Tamanho de ${p.name}`}>
+                            <div className="gpills" role="group" aria-label={`Opções de ${p.name}`}>
                               {opts.map((o) => (
                                 <button key={o.id || "base"} type="button" className={`gpill ${o.id === opt.id ? "is-active" : ""}`} disabled={!isPurchasableStatus(o.stockStatus)} aria-pressed={o.id === opt.id} onClick={() => setChosen((c) => ({ ...c, [p.id]: o.id }))}>
                                   {o.label}
@@ -318,6 +319,7 @@ export default function GiftBuilder({
                           ) : (
                             <p className="gcard-meta">{p.size || " "}</p>
                           )}
+                          {inGift > 0 && qty === 0 && <p className="gcard-meta">{inGift} no presente (outra opção)</p>}
                           <div className="gcard-price">
                             {isOnSale(opt) && <s>{formatBRL(opt.price)}</s>}
                             <strong>{formatBRL(effectivePrice(opt))}</strong>

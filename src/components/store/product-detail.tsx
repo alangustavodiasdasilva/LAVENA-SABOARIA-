@@ -9,7 +9,7 @@ import { kitLine, productLine } from "./cart-helpers";
 import QtyStepper from "@/components/ui/qty-stepper";
 import SmartImage from "@/components/ui/smart-image";
 import { discountPercent, effectivePrice, isOnSale } from "@/lib/pricing";
-import { availableUnits, defaultOption, kitAvailability, lowStockNote, productOptions } from "@/lib/stock";
+import { availableUnits, defaultOption, isPurchasableStatus, kitAvailability, lowStockNote, optionGroups, pickOption, productOptions } from "@/lib/stock";
 import { formatBRL } from "@/lib/format";
 import { whatsappLink } from "@/lib/whatsapp";
 import type { KitDTO, ProductDTO } from "@/lib/types";
@@ -55,6 +55,7 @@ export function ProductDetail({
 }) {
   const { add } = useCart();
   const options = useMemo(() => productOptions(product), [product]);
+  const groups = useMemo(() => optionGroups(product), [product]);
   const [optionId, setOptionId] = useState(defaultOption(product).id);
   const [qty, setQty] = useState(1);
   const selected = options.find((o) => o.id === optionId) ?? options[0];
@@ -101,7 +102,7 @@ export function ProductDetail({
 
         <p className="pd-desc">{product.description}</p>
 
-        {options.length > 1 && (
+        {options.length > 1 && groups.mode === "flat" && (
           <fieldset className="pd-options">
             <legend>Escolha a opção</legend>
             <div className="pd-pills">
@@ -123,6 +124,57 @@ export function ProductDetail({
               })}
             </div>
           </fieldset>
+        )}
+
+        {options.length > 1 && groups.mode === "grouped" && (
+          <>
+            {groups.essences.length > 1 && (
+              <fieldset className="pd-options">
+                <legend>Essência</legend>
+                <div className="pd-pills">
+                  {groups.essences.map((ess) => {
+                    const mine = options.filter((o) => (o.essence ?? "Padrão") === ess);
+                    const out = mine.every((o) => o.stockStatus === "OUT_OF_STOCK");
+                    const active = (selected.essence ?? "Padrão") === ess;
+                    return (
+                      <button
+                        key={ess}
+                        type="button"
+                        className={`pill ${active ? "is-active" : ""}`}
+                        aria-pressed={active}
+                        disabled={out}
+                        onClick={() => {
+                          const next = pickOption(options, ess, selected.size ?? "Único");
+                          if (next) setOptionId(next.id);
+                        }}
+                      >
+                        <span>{ess}</span>
+                        {out && <small>Esgotado</small>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            )}
+            {groups.sizes.length > 1 && (
+              <fieldset className="pd-options">
+                <legend>Tamanho / peso</legend>
+                <div className="pd-pills">
+                  {groups.sizes.map((sz) => {
+                    const opt = options.find((o) => (o.essence ?? "Padrão") === (selected.essence ?? "Padrão") && (o.size ?? "Único") === sz);
+                    const out = !opt || !isPurchasableStatus(opt.stockStatus);
+                    const active = (selected.size ?? "Único") === sz;
+                    return (
+                      <button key={sz} type="button" className={`pill ${active ? "is-active" : ""}`} aria-pressed={active} disabled={out} onClick={() => opt && setOptionId(opt.id)}>
+                        <span>{sz}</span>
+                        <small>{!opt ? "Indisponível" : out ? "Esgotado" : formatBRL(effectivePrice(opt))}</small>
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            )}
+          </>
         )}
 
         {!sold && (

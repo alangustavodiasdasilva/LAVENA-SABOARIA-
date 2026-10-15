@@ -29,6 +29,8 @@ model Product {
   price       Float
   salePrice   Float?
   size        String?
+  // Essência/aroma do produto base (quando há variações de essência)
+  essence     String?
   imageUrl    String?
   images      String[] @default([])
   stockStatus String   @default("IN_STOCK")
@@ -50,7 +52,10 @@ model ProductVariant {
   id            String   @id @default(uuid())
   productId     String
   product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Essência/aroma (ou, em produtos antigos, o tamanho) desta variação
   name          String
+  // Tamanho/peso desta variação (opcional)
+  size          String?
   price         Float
   salePrice     Float?
   imageUrl      String?

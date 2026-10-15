@@ -15,6 +15,8 @@ import {
   safe,
 } from "@/lib/data";
 import { FALLBACK_SETTINGS, SITE_DESCRIPTION, SITE_TAGLINE } from "@/lib/site";
+import { THEME_COPY } from "@/lib/theme-copy";
+import { resolveTheme } from "@/lib/themes";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +46,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     safe(getStoreCategories, []),
   ]);
   const settings = settingsR.data;
+  const copy = THEME_COPY[resolveTheme(settings.siteTheme)];
   const products = productsR.data;
   const kits = kitsR.data.slice(0, 3);
   const failed = productsR.failed;
@@ -51,7 +54,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      <Hero slides={settings.heroSlides} />
+      <Hero slides={settings.heroSlides} copy={copy} />
       <TrustStrip />
       <Lines categories={categoriesR.data} />
 
@@ -61,7 +64,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
             <div className="section-head">
               <span className="eyebrow">{products.some((p) => p.isFeatured) ? "Mais amados" : "Novidades"}</span>
               <h2>
-                Para o seu <span className="title-accent">momento</span> de cuidado
+                {copy.featuredPre} <span className="title-accent">{copy.featuredAccent}</span> {copy.featuredPost}
               </h2>
             </div>
             {products.length > 0 && (
@@ -98,7 +101,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </div>
       </section>
 
-      <GiftsBand hasKits={kits.length > 0} />
+      <GiftsBand hasKits={kits.length > 0} copy={copy} />
 
       {kits.length > 0 && (
         <section className="section" id="kits">
@@ -106,7 +109,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
             <div className="section-head is-centered reveal">
               <span className="eyebrow is-centered">Kits especiais</span>
               <h2>
-                Prontos para <span className="title-accent">presentear</span>
+                {copy.kitsPre} <span className="title-accent">{copy.kitsAccent}</span>
               </h2>
               <p>Combinações pensadas com carinho para você dar (ou se dar) um mimo especial.</p>
             </div>

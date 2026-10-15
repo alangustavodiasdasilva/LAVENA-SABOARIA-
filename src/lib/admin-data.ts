@@ -161,8 +161,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         lowStock.push({ productId: p.id, name: p.name, label, quantity: qty });
       }
     };
-    check(p.stockStatus, p.stockQuantity, p.variants.length > 0 ? p.size : null);
-    p.variants.forEach((v) => check(v.stockStatus, v.stockQuantity, v.name));
+    check(p.stockStatus, p.stockQuantity, p.variants.length > 0 ? [p.essence, p.size].filter(Boolean).join(" · ") || null : null);
+    p.variants.forEach((v) => check(v.stockStatus, v.stockQuantity, [v.name, v.size].filter(Boolean).join(" · ")));
   }
   lowStock.sort((a, b) => a.quantity - b.quantity);
 

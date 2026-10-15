@@ -14,6 +14,7 @@ export type CategoryDTO = { id: string; name: string; slug: string };
 export type VariantDTO = {
   id: string;
   name: string;
+  size?: string | null;
   price: number;
   salePrice: number | null;
   imageUrl: string | null;
@@ -31,6 +32,7 @@ export type ProductDTO = {
   price: number;
   salePrice: number | null;
   size: string | null;
+  essence?: string | null;
   imageUrl: string | null;
   images: string[];
   stockStatus: StockStatus;

@@ -13,7 +13,7 @@ import { moneyToInput, parseMoney } from "@/lib/format";
 import type { AdminCategoryDTO } from "@/lib/admin-types";
 import type { ProductDTO, StockStatus } from "@/lib/types";
 
-type VariantForm = { id: string | null; key: string; name: string; price: string; salePrice: string; imageUrl: string | null; stockStatus: StockStatus; stockQuantity: string };
+type VariantForm = { id: string | null; key: string; name: string; size: string; price: string; salePrice: string; imageUrl: string | null; stockStatus: StockStatus; stockQuantity: string };
 
 let seq = 0;
 const newKey = () => `v${++seq}`;
@@ -39,6 +39,7 @@ export default function ProductForm({ product, categories }: { product?: Product
   const [price, setPrice] = useState(product ? moneyToInput(product.price) : "");
   const [salePrice, setSalePrice] = useState(product?.salePrice ? moneyToInput(product.salePrice) : "");
   const [size, setSize] = useState(product?.size ?? "");
+  const [essence, setEssence] = useState(product?.essence ?? "");
   const [stockStatus, setStockStatus] = useState<StockStatus>(product?.stockStatus ?? "IN_STOCK");
   const [stockQuantity, setStockQuantity] = useState(String(product?.stockQuantity ?? 0));
   const [lowStockAlert, setLowStockAlert] = useState(String(product?.lowStockAlert ?? 3));
@@ -50,6 +51,7 @@ export default function ProductForm({ product, categories }: { product?: Product
       id: v.id,
       key: newKey(),
       name: v.name,
+      size: v.size ?? "",
       price: moneyToInput(v.price),
       salePrice: v.salePrice ? moneyToInput(v.salePrice) : "",
       imageUrl: v.imageUrl,
@@ -90,6 +92,7 @@ export default function ProductForm({ product, categories }: { product?: Product
       price: p,
       salePrice: sale,
       size,
+      essence: variants.length > 0 ? essence : "",
       imageUrl: gallery[0] ?? null,
       images: gallery.slice(1),
       categoryId,
@@ -101,6 +104,7 @@ export default function ProductForm({ product, categories }: { product?: Product
       variants: variants.map((v) => ({
         id: v.id,
         name: v.name,
+        size: v.size,
         price: moneyOrZero(v.price),
         salePrice: salePriceOrNull(v.salePrice),
         imageUrl: v.imageUrl,
@@ -221,10 +225,16 @@ export default function ProductForm({ product, categories }: { product?: Product
             <input id="p-sale" className="input" inputMode="decimal" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} placeholder="Opcional" />
           </div>
           <div className="field">
-            <label htmlFor="p-size">{variants.length > 0 ? "Nome desta opção (botão do produto principal)" : "Tamanho / peso (ex.: 90g)"}</label>
-            <input id="p-size" className="input" value={size} onChange={(e) => setSize(e.target.value)} maxLength={40} placeholder={variants.length > 0 ? "Ex.: Lavanda ou 200g" : "Ex.: 90g"} />
-            {variants.length > 0 && <span className="hint">Com variações, o produto principal vira um botão com este nome (vazio = &quot;Padrão&quot;). Cada variação abaixo é outro botão.</span>}
+            <label htmlFor="p-size">Tamanho / peso</label>
+            <input id="p-size" className="input" value={size} onChange={(e) => setSize(e.target.value)} maxLength={40} placeholder="Ex.: 90g" />
           </div>
+          {variants.length > 0 && (
+            <div className="field">
+              <label htmlFor="p-ess">Essência deste produto</label>
+              <input id="p-ess" className="input" value={essence} onChange={(e) => setEssence(e.target.value)} maxLength={40} placeholder="Ex.: Lavanda" />
+              <span className="hint">O produto principal é uma das opções. Cada variação abaixo é outra essência e/ou tamanho.</span>
+            </div>
+          )}
         </div>
         <StockFields idPrefix="p" status={stockStatus} quantity={stockQuantity} onStatus={setStockStatus} onQuantity={setStockQuantity} />
         {stockStatus === "IN_STOCK" && (
@@ -239,12 +249,12 @@ export default function ProductForm({ product, categories }: { product?: Product
       <section className="card panel">
         <div className="panel-head">
           <h2>Variações</h2>
-          <button type="button" className="btn btn-outline btn-sm" onClick={() => setVariants((vs) => [...vs, { id: null, key: newKey(), name: "", price: price, salePrice: "", imageUrl: null, stockStatus: "IN_STOCK", stockQuantity: "0" }])} disabled={variants.length >= 12}>
+          <button type="button" className="btn btn-outline btn-sm" onClick={() => setVariants((vs) => [...vs, { id: null, key: newKey(), name: "", size: "", price: price, salePrice: "", imageUrl: null, stockStatus: "IN_STOCK", stockQuantity: "0" }])} disabled={variants.length >= 12}>
             <Plus size={15} /> Adicionar
           </button>
         </div>
         {variants.length === 0 ? (
-          <p className="soft small">Opcional. Use para o mesmo produto em outros aromas/essências ou tamanhos (ex.: Lavanda, Maracujá, 200g, 500g). Cada variação tem nome, preço e estoque próprios e aparece como botão na página do produto.</p>
+          <p className="soft small">Opcional. Use para o mesmo produto em outras essências e/ou tamanhos. Ex.: Sabonete de colher com as essências Lavanda e Maçã verde, cada uma em 100g e 200g: crie uma variação para cada combinação. Cada uma tem preço e estoque próprios; na loja o cliente escolhe a essência e depois o tamanho.</p>
         ) : (
           <div className="variant-list">
             {variants.map((v) => (
@@ -253,8 +263,12 @@ export default function ProductForm({ product, categories }: { product?: Product
                 <div className="variant-fields">
                   <div className="form-row is-compact">
                     <div className="field">
-                      <label htmlFor={`${v.key}-n`}>Nome</label>
-                      <input id={`${v.key}-n`} className="input" value={v.name} onChange={(e) => setVariant(v.key, { name: e.target.value })} maxLength={40} placeholder="Ex.: 200g" />
+                      <label htmlFor={`${v.key}-n`}>Essência / nome</label>
+                      <input id={`${v.key}-n`} className="input" value={v.name} onChange={(e) => setVariant(v.key, { name: e.target.value })} maxLength={40} placeholder="Ex.: Maçã verde" />
+                    </div>
+                    <div className="field">
+                      <label htmlFor={`${v.key}-z`}>Tamanho / peso</label>
+                      <input id={`${v.key}-z`} className="input" value={v.size} onChange={(e) => setVariant(v.key, { size: e.target.value })} maxLength={40} placeholder="Ex.: 200g" />
                     </div>
                     <div className="field">
                       <label htmlFor={`${v.key}-p`}>Preço (R$)</label>
