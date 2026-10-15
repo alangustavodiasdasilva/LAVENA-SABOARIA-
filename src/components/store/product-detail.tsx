@@ -9,7 +9,7 @@ import { kitLine, productLine } from "./cart-helpers";
 import QtyStepper from "@/components/ui/qty-stepper";
 import SmartImage from "@/components/ui/smart-image";
 import { discountPercent, effectivePrice, isOnSale } from "@/lib/pricing";
-import { availableUnits, defaultOption, isPurchasableStatus, kitAvailability, lowStockNote, optionGroups, pickOption, productOptions } from "@/lib/stock";
+import { availableUnits, defaultOption, kitAvailability, lowStockNote, optionGroups, pickBySize, pickOption, productOptions } from "@/lib/stock";
 import { formatBRL } from "@/lib/format";
 import { whatsappLink } from "@/lib/whatsapp";
 import type { KitDTO, ProductDTO } from "@/lib/types";
@@ -161,13 +161,25 @@ export function ProductDetail({
                 <legend>Tamanho / peso</legend>
                 <div className="pd-pills">
                   {groups.sizes.map((sz) => {
-                    const opt = options.find((o) => (o.essence ?? "Padrão") === (selected.essence ?? "Padrão") && (o.size ?? "Único") === sz);
-                    const out = !opt || !isPurchasableStatus(opt.stockStatus);
+                    const mine = options.filter((o) => (o.size ?? "Único") === sz);
+                    const out = mine.every((o) => o.stockStatus === "OUT_OF_STOCK");
                     const active = (selected.size ?? "Único") === sz;
+                    const here = mine.find((o) => (o.essence ?? "Padrão") === (selected.essence ?? "Padrão"));
+                    const price = (here ?? mine[0]) && effectivePrice((here ?? mine[0])!);
                     return (
-                      <button key={sz} type="button" className={`pill ${active ? "is-active" : ""}`} aria-pressed={active} disabled={out} onClick={() => opt && setOptionId(opt.id)}>
+                      <button
+                        key={sz}
+                        type="button"
+                        className={`pill ${active ? "is-active" : ""}`}
+                        aria-pressed={active}
+                        disabled={out}
+                        onClick={() => {
+                          const next = pickBySize(options, sz, selected.essence ?? "Padrão");
+                          if (next) setOptionId(next.id);
+                        }}
+                      >
                         <span>{sz}</span>
-                        <small>{!opt ? "Indisponível" : out ? "Esgotado" : formatBRL(effectivePrice(opt))}</small>
+                        <small>{out ? "Esgotado" : formatBRL(price)}</small>
                       </button>
                     );
                   })}
