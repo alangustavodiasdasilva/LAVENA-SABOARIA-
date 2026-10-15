@@ -2,10 +2,11 @@
 
 import { THEMES, THEME_IDS, resolveTheme, type ThemeChoice } from "@/lib/themes";
 import { useRef, useState } from "react";
-import { ArrowDown, ArrowUp, CheckCircle2, ImagePlus, KeyRound, Loader2, Trash2, XCircle } from "lucide-react";
+import { ArrowDown, ArrowUp, CheckCircle2, Crop, ImagePlus, KeyRound, Loader2, Trash2, XCircle } from "lucide-react";
 import { changePassword } from "@/actions/auth";
 import { saveSettings } from "@/actions/settings";
 import { SingleImage, useImageUpload } from "@/components/admin/image-uploader";
+import ImageAdjuster from "@/components/admin/image-adjuster";
 import { useRun } from "@/components/admin/use-run";
 import SmartImage from "@/components/ui/smart-image";
 import { formatPhone } from "@/lib/format";
@@ -39,6 +40,7 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
   const [slides, setSlides] = useState<HeroSlide[]>(settings.heroSlides);
   const [theme, setTheme] = useState<string>(settings.siteTheme);
   const [giftImage, setGiftImage] = useState<string | null>(settings.giftImage);
+  const [adjustSlide, setAdjustSlide] = useState<number | null>(null);
 
   const [cur, setCur] = useState("");
   const [next, setNext] = useState("");
@@ -137,7 +139,7 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
             <h2>Foto da seção de presentes</h2>
           </div>
           <p className="soft small">Aparece na página inicial, ao lado de &quot;Presenteie com carinho&quot;. Use uma foto vertical ou quadrada. Sem foto, o site usa a cesta padrão da Lavena. Troque por uma foto de Natal, Dia das Mães etc. quando quiser.</p>
-          <SingleImage value={giftImage} onChange={setGiftImage} label="Foto" />
+          <SingleImage value={giftImage} onChange={setGiftImage} label="Foto" aspect="arch" />
         </section>
 
         <section className="card panel" id="topo">
@@ -156,6 +158,9 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
                 <li key={`${i}-${s.src.slice(-20)}`}>
                   <span className="slide-thumb">
                     <SmartImage src={s.src} alt={`Imagem ${i + 1}`} fill sizes="120px" style={{ objectFit: "cover" }} />
+                  <button type="button" className="img-adjust" onClick={() => setAdjustSlide(i)} aria-label="Ajustar imagem" title="Ajustar imagem">
+                      <Crop size={14} />
+                    </button>
                   </span>
                   <div className="field grow">
                     <label htmlFor={`slide-${i}`}>Ao clicar, abrir</label>
@@ -192,7 +197,20 @@ export default function SettingsForm({ settings, linkOptions, status }: { settin
             {busy ? "Salvando…" : "Salvar configurações"}
           </button>
         </div>
-      </form>
+      {adjustSlide != null && slides[adjustSlide] && (
+          <ImageAdjuster
+            src={slides[adjustSlide].src}
+            initialAspect="sq"
+            onClose={() => setAdjustSlide(null)}
+            onApply={async (file) => {
+              const idx = adjustSlide;
+              setAdjustSlide(null);
+              const [url] = await upload([file]);
+              if (url) setSlides((arr) => arr.map((x, n) => (n === idx ? { ...x, src: url } : x)));
+            }}
+          />
+        )}
+        </form>
 
       <form className="card panel" id="seguranca" onSubmit={submitPw} noValidate>
         <div className="panel-head">
